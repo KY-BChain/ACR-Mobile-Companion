@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "acr-mobile-companion",
+    "slug": "acr-mobile-companion",
+    "version": "0.1.0",
+    "sdkVersion": "51.0.0",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "ios": {
+      "bundleIdentifier": "com.anonymous.acr-mobile-companion"
+    }
+  }
+}
