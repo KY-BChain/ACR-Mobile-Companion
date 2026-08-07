@@ -4,6 +4,7 @@ import { ACRColors, ACRTypography } from '../theme/colors';
 
 interface Props {
   options: string[];
+  labels?: string[];
   selected: string;
   onSelect: (value: string) => void;
 }
