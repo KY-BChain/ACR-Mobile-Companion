@@ -1,6 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import * as Localization from 'expo-localization';
+import * as Updates from 'expo-updates';       
 import { I18nManager } from 'react-native';
 
 // Import all translation resources
@@ -27,14 +28,14 @@ export const SUPPORTED_LANGUAGES = [
 export type LanguageCode = typeof SUPPORTED_LANGUAGES[number]['code'];
 
 const resources = {
-  'en-GB': { translation: enGB },
-  'fr-FR': { translation: frFR },
-  'de-DE': { translation: deDE },
-  'ru-RU': { translation: ruRU },
-  'ar-SA': { translation: arSA },
-  'zh-CN': { translation: zhCN },
-  'ko-KR': { translation: koKR },
-  'ja-JP': { translation: jaJP },
+  'en-GB': enGB,
+  'fr-FR': frFR,
+  'de-DE': deDE,
+  'ru-RU': ruRU,
+  'ar-SA': arSA,
+  'zh-CN': zhCN,
+  'ko-KR': koKR,
+  'ja-JP': jaJP,
 };
 
 // Detect device locale or fallback to en-GB
@@ -75,8 +76,11 @@ export const changeLanguage = async (lang: LanguageCode) => {
   if (isRTL !== currentlyRTL) {
     I18nManager.allowRTL(isRTL);
     I18nManager.forceRTL(isRTL);
-    // Note: App restart required for full RTL layout switch
-    // Use expo-updates or react-native-restart in production
+    try {
+      await Updates.reloadAsync();
+    } catch (e) {
+      console.warn('RTL change requires app restart in development');
+    }
   }
 };
 

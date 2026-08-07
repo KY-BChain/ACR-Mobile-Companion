@@ -23,8 +23,6 @@ import {
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 
-// ─── Corporate logos ───
-// Place these files in: src/assets/logos/ (or your preferred assets path)
 const LOGO_CORNERSTONE = require('../assets/logos/logo-cornerstone.png');
 const LOGO_BLOCKENERGY = require('../assets/logos/logo-blockenergy.png');
 
@@ -43,8 +41,6 @@ export const WelcomeScreen: React.FC = () => {
   const handleSelectLanguage = async (code: LanguageCode) => {
     if (code !== currentLang) {
       await changeLanguage(code);
-      // NOTE: For full RTL layout switch (Arabic), an app restart is required.
-      // In production, use: import * as Updates from 'expo-updates'; await Updates.reloadAsync();
     }
     setLangModalVisible(false);
   };
@@ -65,11 +61,11 @@ export const WelcomeScreen: React.FC = () => {
             <Text style={styles.consentTitle}>{t('welcome:title')}</Text>
             <Text style={styles.consentText}>
               {t('welcome:description1')}
-              {"\n\n"}
+              {'\n\n'}
               {t('welcome:description2')}
-              {"\n\n"}
+              {'\n\n'}
               {t('welcome:description3')}
-              {"\n\n"}
+              {'\n\n'}
               {t('welcome:description4')}
             </Text>
           </View>
@@ -79,14 +75,16 @@ export const WelcomeScreen: React.FC = () => {
         <TouchableOpacity
           style={styles.langSelector}
           onPress={() => setLangModalVisible(true)}
-          activeOpacity={0.7}
+          activeOpacity={0.6}
           accessibilityRole="button"
           accessibilityLabel={t('welcome:languageSelector')}
         >
-          <Text style={styles.langLabel}>{t('welcome:languageSelector')}</Text>
-          <Text style={styles.langValue}>
-            {currentLangMeta?.flag}  {currentLangMeta?.name}
-          </Text>
+          <View style={styles.langRow}>
+            <Text style={styles.langLabel}>{t('welcome:languageSelector')}</Text>
+            <Text style={styles.langValue}>
+              {currentLangMeta?.flag}  {currentLangMeta?.name}
+            </Text>
+          </View>
         </TouchableOpacity>
 
         {/* ─── Action buttons ─── */}
@@ -104,9 +102,6 @@ export const WelcomeScreen: React.FC = () => {
         </View>
       </ScreenLayout>
 
-      {/* ─── Top-right logo: Corner Stone International Foundation ───
-          Positioned absolutely over the ScreenLayout header area.
-          Adjust `top` value if your ScreenLayout header height differs. */}
       <Image
         source={LOGO_CORNERSTONE}
         style={[styles.logoTopRight, { top: insets.top + 10 }]}
@@ -114,7 +109,6 @@ export const WelcomeScreen: React.FC = () => {
         accessibilityLabel="Corner Stone International Foundation"
       />
 
-      {/* ─── Bottom-left logo: Block Energy (WelcomeScreen ONLY) ─── */}
       <Image
         source={LOGO_BLOCKENERGY}
         style={[styles.logoBottomLeft, { bottom: insets.bottom + 10 }]}
@@ -176,11 +170,7 @@ export const WelcomeScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
-
-  // ─── Existing styles (preserved) ───
+  root: { flex: 1 },
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -216,10 +206,6 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     color: ACRColors.ink,
   },
-  bold: {
-    fontWeight: '700',
-    color: ACRColors.primaryDark,
-  },
   btnRow: {
     flexDirection: 'row',
     gap: 8,
@@ -227,20 +213,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 13,
     paddingBottom: 16,
   },
-
-  // ─── Language selector (new) ───
   langSelector: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: ACRColors.card,
-    borderWidth: 1,
-    borderColor: ACRColors.line,
+    borderWidth: 1.5,
+    borderColor: ACRColors.primary,
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 14,
     marginHorizontal: 13,
     marginBottom: 10,
+  },
+  langRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   langLabel: {
     ...ACRTypography.label,
@@ -253,24 +243,20 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 13,
   },
-
-  // ─── Logo positioning (new) ───
   logoTopRight: {
     position: 'absolute',
     right: 14,
-    width: 90,
-    height: 36,
+    width: 70,
+    height: 28,
     zIndex: 10,
   },
   logoBottomLeft: {
     position: 'absolute',
     left: 16,
-    width: 140,
-    height: 45,
+    width: 100,
+    height: 32,
     zIndex: 10,
   },
-
-  // ─── Modal styles (new) ───
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.65)',

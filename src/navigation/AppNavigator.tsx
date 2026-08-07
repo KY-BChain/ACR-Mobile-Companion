@@ -38,7 +38,6 @@ export const AppNavigator: React.FC = () => {
   }, [setAttestation]);
 
   return (
-    <NavigationContainer>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
@@ -55,6 +54,5 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="About" component={AboutScreen} />
         <Stack.Screen name="FailClosed" component={FailClosedScreen} />
       </Stack.Navigator>
-    </NavigationContainer>
   );
 };
