@@ -45,17 +45,20 @@ export const ResultScreen: React.FC = () => {
         </>
       }
     >
+      {/* Subtype */}
       <View style={styles.subtypeBox}>
         <Text style={styles.subtypeLabel}>{t('result:molecularSubtype')}</Text>
         <Text style={styles.subtypeValue}>{data.molecularSubtype.code}</Text>
         <Text style={styles.subtypeText}>{data.molecularSubtype.display}</Text>
       </View>
 
+      {/* Bayesian */}
       <ACRCard title={t('result:bayesianConfidence')}>
         <Text style={styles.confValue}>{data.bayesian.confidence.toString()}</Text>
         <Text style={styles.hint}>{t('result:bayesianHint')}</Text>
       </ACRCard>
 
+      {/* Rules fired */}
       <ACRCard title={t('result:rulesFired')}>
         {data.reasoning.rulesFired.map((rule) => (
           <View key={rule.ruleId} style={styles.rule}>
@@ -67,6 +70,7 @@ export const ResultScreen: React.FC = () => {
         <Text style={styles.hint}>{t('result:rulesFiredHint')}</Text>
       </ACRCard>
 
+      {/* Recommendations */}
       <ACRCard title={t('result:recommendations')}>
         {data.recommendations.map((rec) => (
           <View key={rec.code} style={styles.rule}>
@@ -78,6 +82,7 @@ export const ResultScreen: React.FC = () => {
         <Text style={styles.hint}>{t('result:recommendationsHint')}</Text>
       </ACRCard>
 
+      {/* Provenance */}
       <ACRCard title={t('result:reasoningProvenance')}>
         <Text style={styles.prov}>
           {`reasoningMode: ${data.reasoning.reasoningMode}
@@ -90,6 +95,7 @@ ontologySHA256: ${data.provenance.ontologySha256.substring(0, 16)}… `}
         </Text>
       </ACRCard>
 
+      {/* Retention */}
       <ACRCard title={t('result:retention')}>
         <Text style={styles.hint}>
           {t('result:retentionHint')}

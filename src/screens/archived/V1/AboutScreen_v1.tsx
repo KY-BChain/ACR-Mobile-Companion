@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, I18nManager } from 'react-native';
-import { useTranslation } from 'react-i18next';
+import { View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ACRColors, ACRTypography } from '../theme/colors';
 import { ScreenLayout } from '../components/ScreenLayout';
@@ -14,50 +13,49 @@ import type { RootStackParamList } from '../navigation/AppNavigator';
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const AboutScreen: React.FC = () => {
-  const { t } = useTranslation();
   const navigation = useNavigation<NavProp>();
   const { attestation } = useAssessmentStore();
 
   const state = attestation?.verificationState || 'UNAVAILABLE';
-  const lastVerified = attestation?.lastSuccessfulVerificationTimestamp || t('common:emDash');
-  const ontologyHash = attestation?.expected?.ontologySha256 || t('about:unknownValue');
+  const lastVerified = attestation?.lastSuccessfulVerificationTimestamp || '—';
+  const ontologyHash = attestation?.expected?.ontologySha256 || '—';
 
   return (
     <ScreenLayout
-      title={t('about:title')}
-      subtitle={t('about:subtitle')}
-      bannerText={t('about:environment')}
+      title="About"
+      subtitle="Build and baseline identity"
+      bannerText="ENVIRONMENT: EVALUATION"
       bannerVariant="trial"
       footer={
-        <ACRButton title={t('common:close')} variant="primary" onPress={() => navigation.goBack()} />
+        <ACRButton title="Close" variant="primary" onPress={() => navigation.goBack()} />
       }
     >
-      <ACRCard title={t('about:appSection')}>
-        <Row label={t('about:marketingVersion')} value="0.1.0" />
-        <Row label={t('about:nativeBuild')} value="42" />
-        <Row label={t('about:easBuildProfile')} value="trial-internal" />
+      <ACRCard title="Application">
+        <Row label="Marketing version" value="0.1.0" />
+        <Row label="Native build" value="42" />
+        <Row label="EAS build / profile" value="trial-internal" />
       </ACRCard>
 
-      <ACRCard title={t('about:serviceSection')}>
-        <Row label={t('about:gateway')} value="gw-v0.1.0" />
-        <Row label={t('about:reasoner')} value="v2.2.1" />
-        <Row label={t('about:responseContract')} value="m1" />
-        <Row label={t('about:reasoningMode')} value="OPENLLET_SWRL" />
+      <ACRCard title="Service">
+        <Row label="Gateway" value="gw-v0.1.0" />
+        <Row label="Reasoner" value="v2.2.1" />
+        <Row label="Response contract" value="m1" />
+        <Row label="Reasoning mode" value="OPENLLET_SWRL" />
       </ACRCard>
 
-      <ACRCard title={t('about:attestationSection')}>
+      <ACRCard title="Baseline attestation">
         <Row
-          label={t('about:state')}
+          label="State"
           valueComponent={<ACRStateBadge state={state} />}
         />
-        <Row label={t('about:lastVerified')} value={lastVerified} />
-        <Text style={styles.hint}>{t('about:ontologyHashLabel')}</Text>
+        <Row label="Last verified" value={lastVerified} />
+        <Text style={styles.hint}>Ontology SHA-256 (observed, read-only mount):</Text>
         <Text style={styles.prov}>{ontologyHash}</Text>
       </ACRCard>
 
-      <ACRCard title={t('about:dataHandlingSection')}>
+      <ACRCard title="Data handling">
         <Text style={styles.hint}>
-          {t('about:dataHandlingText')}
+          No intentional clinical data at rest. No analytics. Crash reporting disabled for wave one. Over-the-air updates disabled — every change requires a new reviewed build.
         </Text>
       </ACRCard>
     </ScreenLayout>
@@ -98,7 +96,6 @@ const styles = StyleSheet.create({
     color: ACRColors.muted,
     marginTop: 8,
     marginBottom: 4,
-    writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
   },
   prov: {
     ...ACRTypography.monospace,

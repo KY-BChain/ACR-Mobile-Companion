@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, I18nManager } from 'react-native';
-import { useTranslation } from 'react-i18next';
+import { View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ACRColors, ACRTypography } from '../theme/colors';
 import { ScreenLayout } from '../components/ScreenLayout';
@@ -16,7 +15,6 @@ import type { RootStackParamList } from '../navigation/AppNavigator';
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const FailClosedScreen: React.FC = () => {
-  const { t } = useTranslation();
   const navigation = useNavigation<NavProp>();
   const { attestation, setAttestation } = useAssessmentStore();
   const [checking, setChecking] = useState(false);
@@ -37,33 +35,33 @@ export const FailClosedScreen: React.FC = () => {
   };
 
   const state = attestation?.verificationState || 'UNAVAILABLE';
-  const lastSuccess = attestation?.lastSuccessfulVerificationTimestamp || t('common:emDash');
+  const lastSuccess = attestation?.lastSuccessfulVerificationTimestamp || '—';
 
   return (
     <ScreenLayout
-      title={t('failClosed:title')}
-      subtitle={t('failClosed:subtitle')}
-      bannerText={t('assessment:clinicalTransparencyBanner')}
+      title="Service unavailable"
+      subtitle="Baseline verification failed"
+      bannerText="Clinical transparency: outputs are decision support only."
       footer={
         <>
-          <ACRButton title={t('common:about')} variant="secondary" onPress={() => navigation.navigate('About')} />
-          <ACRButton title={t('failClosed:retryCheck')} variant="primary" onPress={handleRetry} disabled={checking} />
+          <ACRButton title="About" variant="secondary" onPress={() => navigation.navigate('About')} />
+          <ACRButton title="Retry check" variant="primary" onPress={handleRetry} disabled={checking} />
         </>
       }
     >
       <ACRStopBox
-        title={t('failClosed:blockedTitle')}
-        message={t('failClosed:blockedMessage')}
+        title="Assessment blocked"
+        message="The service could not verify that the connected reasoner matches the accepted baseline. No assessment can be submitted until verification succeeds."
       />
 
-      <ACRCard title={t('failClosed:verificationDetail')} style={{ marginTop: 12 }}>
-        <Row label={t('failClosed:state')} valueComponent={<ACRStateBadge state={state} />} />
-        <Row label={t('failClosed:expectedReasoner')} value="v2.2.1" />
-        <Row label={t('failClosed:observedReasoner')} value={attestation?.observed?.reasonerVersion || t('common:emDash')} />
-        <Row label={t('failClosed:ontologyHash')} value={attestation?.observed?.ontologySha256 ? t('failClosed:observed') : t('failClosed:notObserved')} />
-        <Row label={t('failClosed:lastSuccessfulCheck')} value={lastSuccess} />
+      <ACRCard title="Verification detail" style={{ marginTop: 12 }}>
+        <Row label="State" valueComponent={<ACRStateBadge state={state} />} />
+        <Row label="Expected reasoner" value="v2.2.1" />
+        <Row label="Observed reasoner" value={attestation?.observed?.reasonerVersion || '—'} />
+        <Row label="Ontology hash" value={attestation?.observed?.ontologySha256 ? 'observed' : 'not observed'} />
+        <Row label="Last successful check" value={lastSuccess} />
         <Text style={styles.hint}>
-          {t('failClosed:verificationHint')}
+          Expected values come from the accepted baseline manifest; they are never reported as observations.
         </Text>
       </ACRCard>
     </ScreenLayout>
@@ -103,6 +101,5 @@ const styles = StyleSheet.create({
     ...ACRTypography.hint,
     color: ACRColors.muted,
     marginTop: 4,
-    writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
   },
 });

@@ -25,12 +25,7 @@
     "unavailable": "不可用",
     "mismatch": "不匹配",
     "yes": "是",
-    "no": "否",
-    "checking": "检查中…",
-    "emDash": "—",
-    "negative": "阴性",
-    "positive": "阳性",
-    "retryCheck": "重试检查"
+    "no": "否"
   },
   "welcome": {
     "title": "开始前",
@@ -48,9 +43,7 @@
     "step3Subtitle": "第 3 步，共 3 步 · 生物标志物与手术",
     "reviewTitle": "复核",
     "reviewSubtitle": "提交前确认输入内容",
-    "clinicalTransparency": "临床透明度：输出结果仅为决策支持，由经过验证的规则库生成。临床判断仍由临床医生负责。",
-    "clinicalTransparencyBanner": "临床透明度：输出结果仅为决策支持，由经过验证的规则库生成。临床判断仍由临床医生负责。",
-    "stepSubtitle": "第 {{current}} 步，共 {{total}} 步 · {{title}}"
+    "clinicalTransparency": "临床透明度：输出结果仅为决策支持，由经过验证的规则库生成。临床判断仍由临床医生负责。"
   },
   "receptors": {
     "cardTitle": "受体状态",
@@ -63,8 +56,7 @@
     "negative": "阴性",
     "sessionId": "会话ID",
     "sessionIdHint": "每次评估生成新的UUIDv4。从不输入、从不复用、从不持久化。",
-    "sessionLabel": "会话",
-    "stepTitle": "受体状态"
+    "sessionLabel": "会话"
   },
   "tumour": {
     "cardTitle": "肿瘤",
@@ -85,8 +77,7 @@
     "nodalN2": "N2",
     "nodalN3": "N3",
     "age": "年龄（岁）",
-    "ageHint": "18–120，整年。年龄是推理引擎唯一使用的 demographics 字段。",
-    "stepTitle": "肿瘤特征"
+    "ageHint": "18–120，整年。年龄是推理引擎唯一使用的 demographics 字段。"
   },
   "biomarkers": {
     "cardTitle": "血清标志物",
@@ -114,16 +105,7 @@
     "baseline": "基线",
     "attestation": "认证",
     "attestationHint": "推理引擎 v2.2.1 · OPENLLET_SWRL · 本体哈希与已接受的基线清单匹配。",
-    "submitBlocked": "除非认证状态为已验证，否则提交被阻止。",
-    "age": "年龄",
-    "baselineHint": "推理引擎 v2.2.1 · OPENLLET_SWRL · 本体哈希与已接受的基线清单匹配。",
-    "checking": "检查中…",
-    "ki67": "Ki-67",
-    "nodalStatus": "淋巴结状态",
-    "submissionFailed": "提交失败",
-    "subtitle": "提交前确认输入内容",
-    "surgeryDate": "手术日期",
-    "title": "复核"
+    "submitBlocked": "除非认证状态为已验证，否则提交被阻止。"
   },
   "result": {
     "title": "评估结果",
@@ -146,11 +128,7 @@
     "timestamp": "时间戳",
     "buildId": "构建ID",
     "ontologySHA256": "本体 SHA-256",
-    "tapToExpand": "点击展开",
-    "bayesianHint": "中等置信度。完整精度作为可见的完整性检查显示。",
-    "newAssessment": "新建评估",
-    "noResult": "暂无可用结果。",
-    "reasoningProvenance": "推理来源"
+    "tapToExpand": "点击展开"
   },
   "about": {
     "title": "关于",
@@ -171,15 +149,7 @@
     "ontologyHashLabel": "本体 SHA-256（已观察，只读挂载）",
     "dataHandlingSection": "数据处理",
     "dataHandlingText": "不保留任何临床数据。无分析。第一阶段禁用崩溃报告。禁用无线更新 — 每次更改都需要新的经过审核的构建。",
-    "unknownValue": "不可用",
-    "application": "应用",
-    "baselineAttestation": "基线认证",
-    "dataHandling": "数据处理",
-    "easBuildProfile": "EAS构建 / 配置文件",
-    "ontologySha256": "本体 SHA-256（已观察，只读挂载）",
-    "reasoningMode": "推理模式",
-    "responseContract": "响应合同",
-    "service": "服务"
+    "unknownValue": "不可用"
   },
   "failClosed": {
     "title": "服务不可用",
@@ -193,13 +163,7 @@
     "notObserved": "未观察到",
     "lastSuccessfulCheck": "上次成功检查",
     "expectedValuesHint": "预期值来自已接受的基线清单；它们永远不会被报告为观察值。",
-    "sameTreatment": "不匹配同样处理。重试仅重新运行验证 — 绝不会重新提交评估。",
-    "blockedMessage": "服务无法验证连接的推理引擎是否与已接受的基线匹配。在验证成功之前，无法提交任何评估。",
-    "blockedTitle": "评估被阻止",
-    "observed": "已观察",
-    "retryCheck": "重试检查",
-    "state": "状态",
-    "verificationHint": "预期值来自已接受的基线清单；它们永远不会被报告为观察值。"
+    "sameTreatment": "不匹配同样处理。重试仅重新运行验证 — 绝不会重新提交评估。"
   },
   "provenance": {
     "acrNative": "ACR_NATIVE",
@@ -216,21 +180,5 @@
     "indeterminate": "评估结果不确定。请勿自动重试 — 请联系支持人员。",
     "rateLimited": "请求过多。请等待后重试。",
     "networkError": "网络连接失败。请检查您的连接后重试。"
-  },
-  "markers": {
-    "ca153": "CA 15-3 (U/mL)",
-    "ca153Hint": "参考阈值 35.0 — 评估在服务器端执行。",
-    "cea": "CEA (ng/mL)",
-    "ceaHint": "参考阈值 5.0 — 评估在服务器端执行。",
-    "serumMarkersTitle": "血清标志物",
-    "stepTitle": "生物标志物与手术",
-    "surgeryDate": "手术日期",
-    "surgeryDateHint": "允许未来日期并按原样提交：B3守卫是推理引擎的责任，必须保持可测试性。",
-    "surgeryTitle": "手术"
-  },
-  "session": {
-    "cardTitle": "会话",
-    "sessionId": "会话ID",
-    "sessionIdHint": "每次评估生成新的UUIDv4。从不输入、从不复用、从不持久化。"
   }
 }

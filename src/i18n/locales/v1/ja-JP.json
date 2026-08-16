@@ -25,12 +25,7 @@
     "unavailable": "利用不可",
     "mismatch": "不一致",
     "yes": "はい",
-    "no": "いいえ",
-    "checking": "確認中…",
-    "emDash": "—",
-    "negative": "陰性",
-    "positive": "陽性",
-    "retryCheck": "再試行"
+    "no": "いいえ"
   },
   "welcome": {
     "title": "開始する前に",
@@ -48,9 +43,7 @@
     "step3Subtitle": "ステップ 3 / 3 · バイオマーカーと手術",
     "reviewTitle": "確認",
     "reviewSubtitle": "送信前に入力内容を確認してください",
-    "clinicalTransparency": "臨床透明性：出力は検証されたルールベースによって生成された意思決定支援のみです。臨床判断は臨床医に委ねられます。",
-    "clinicalTransparencyBanner": "臨床透明性：出力は検証されたルールベースによって生成された意思決定支援のみです。臨床判断は臨床医に委ねられます。",
-    "stepSubtitle": "ステップ {{current}} / {{total}} · {{title}}"
+    "clinicalTransparency": "臨床透明性：出力は検証されたルールベースによって生成された意思決定支援のみです。臨床判断は臨床医に委ねられます。"
   },
   "receptors": {
     "cardTitle": "受容体状態",
@@ -63,8 +56,7 @@
     "negative": "陰性",
     "sessionId": "セッションID",
     "sessionIdHint": "評価ごとに新しいUUIDv4が生成されます。入力せず、再利用せず、永続化しません。",
-    "sessionLabel": "セッション",
-    "stepTitle": "受容体状態"
+    "sessionLabel": "セッション"
   },
   "tumour": {
     "cardTitle": "腫瘍",
@@ -85,8 +77,7 @@
     "nodalN2": "N2",
     "nodalN3": "N3",
     "age": "年齢（歳）",
-    "ageHint": "18–120、満年齢。年齢は推論エンジンが消費する唯一の人口統計フィールドです。",
-    "stepTitle": "腫瘍特性"
+    "ageHint": "18–120、満年齢。年齢は推論エンジンが消費する唯一の人口統計フィールドです。"
   },
   "biomarkers": {
     "cardTitle": "血清マーカー",
@@ -114,16 +105,7 @@
     "baseline": "ベースライン",
     "attestation": "検証",
     "attestationHint": "推論エンジン v2.2.1 · OPENLLET_SWRL · オントロジーハッシュが受け入れられたベースラインマニフェストと一致します。",
-    "submitBlocked": "検証が検証済みでない限り、送信はブロックされます。",
-    "age": "年齢",
-    "baselineHint": "推論エンジン v2.2.1 · OPENLLET_SWRL · オントロジーハッシュが受け入れられたベースラインマニフェストと一致します。",
-    "checking": "確認中…",
-    "ki67": "Ki-67",
-    "nodalStatus": "リンパ節状態",
-    "submissionFailed": "送信に失敗しました",
-    "subtitle": "送信前に入力内容を確認してください",
-    "surgeryDate": "手術日",
-    "title": "確認"
+    "submitBlocked": "検証が検証済みでない限り、送信はブロックされます。"
   },
   "result": {
     "title": "評価結果",
@@ -146,11 +128,7 @@
     "timestamp": "タイムスタンプ",
     "buildId": "ビルドID",
     "ontologySHA256": "オントロジーSHA-256",
-    "tapToExpand": "タップして展開",
-    "bayesianHint": "中程度の信頼度。完全な精度は、可視的な整合性チェックとして表示されます。",
-    "newAssessment": "新規評価",
-    "noResult": "結果はありません。",
-    "reasoningProvenance": "推論の由来"
+    "tapToExpand": "タップして展開"
   },
   "about": {
     "title": "について",
@@ -171,15 +149,7 @@
     "ontologyHashLabel": "オントロジーSHA-256（観測済み、読み取り専用マウント）",
     "dataHandlingSection": "データ処理",
     "dataHandlingText": "臨床データの意図的な保存はありません。分析なし。ウェーブ1ではクラッシュレポートを無効化。OTAアップデート無効 — 変更ごとに新しいレビュービルドが必要です。",
-    "unknownValue": "利用不可",
-    "application": "アプリケーション",
-    "baselineAttestation": "ベースライン検証",
-    "dataHandling": "データ処理",
-    "easBuildProfile": "EASビルド / プロファイル",
-    "ontologySha256": "オントロジーSHA-256（観測済み、読み取り専用マウント）",
-    "reasoningMode": "推論モード",
-    "responseContract": "応答契約",
-    "service": "サービス"
+    "unknownValue": "利用不可"
   },
   "failClosed": {
     "title": "サービス利用不可",
@@ -193,13 +163,7 @@
     "notObserved": "観測されず",
     "lastSuccessfulCheck": "最後の成功チェック",
     "expectedValuesHint": "予想値は受け入れられたベースラインマニフェストから取得されます。観測として報告されることはありません。",
-    "sameTreatment": "不一致の場合も同様の処理。再試行は検証のみを再実行 — 評価を再送信することはありません。",
-    "blockedMessage": "サービスは、接続された推論エンジンが受け入れられたベースラインと一致することを確認できませんでした。検証が成功するまで、評価を送信することはできません。",
-    "blockedTitle": "評価ブロック",
-    "observed": "観測済み",
-    "retryCheck": "再試行",
-    "state": "状態",
-    "verificationHint": "予想値は受け入れられたベースラインマニフェストから取得されます。観測として報告されることはありません。"
+    "sameTreatment": "不一致の場合も同様の処理。再試行は検証のみを再実行 — 評価を再送信することはありません。"
   },
   "provenance": {
     "acrNative": "ACR_NATIVE",
@@ -216,21 +180,5 @@
     "indeterminate": "評価結果が不確定です。自動的に再試行しないでください — サポートにお問い合わせください。",
     "rateLimited": "リクエストが多すぎます。再試行する前にお待ちください。",
     "networkError": "ネットワーク接続に失敗しました。接続を確認して再試行してください。"
-  },
-  "markers": {
-    "ca153": "CA 15-3 (U/mL)",
-    "ca153Hint": "基準閾値 35.0 — 評価はサーバー側で実行されます。",
-    "cea": "CEA (ng/mL)",
-    "ceaHint": "基準閾値 5.0 — 評価はサーバー側で実行されます。",
-    "serumMarkersTitle": "血清マーカー",
-    "stepTitle": "バイオマーカーと手術",
-    "surgeryDate": "手術日",
-    "surgeryDateHint": "将来日付が許可され、変更なしで送信されます：B3ガードは推論エンジンの責任であり、テスト可能である必要があります。",
-    "surgeryTitle": "手術"
-  },
-  "session": {
-    "cardTitle": "セッション",
-    "sessionId": "セッションID",
-    "sessionIdHint": "評価ごとに新しいUUIDv4が生成されます。入力せず、再利用せず、永続化しません。"
   }
 }

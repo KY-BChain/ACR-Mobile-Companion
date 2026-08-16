@@ -1,6 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, I18nManager } from 'react-native';
-import { useTranslation } from 'react-i18next';
+import { View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { ACRColors, ACRTypography } from '../theme/colors';
 import { ScreenLayout } from '../components/ScreenLayout';
@@ -14,15 +13,14 @@ import type { RootStackParamList } from '../navigation/AppNavigator';
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const ResultScreen: React.FC = () => {
-  const { t } = useTranslation();
   const navigation = useNavigation<NavProp>();
   const { result, reset } = useAssessmentStore();
 
   if (!result) {
     return (
       <View style={styles.empty}>
-        <Text style={styles.emptyText}>{t('result:noResult')}</Text>
-        <ACRButton title={t('result:newAssessment')} variant="primary" onPress={() => { reset(); navigation.navigate('Welcome'); }} />
+        <Text style={styles.emptyText}>No result available.</Text>
+        <ACRButton title="New assessment" variant="primary" onPress={() => { reset(); navigation.navigate('Welcome'); }} />
       </View>
     );
   }
@@ -31,32 +29,35 @@ export const ResultScreen: React.FC = () => {
 
   return (
     <ScreenLayout
-      title={t('result:title')}
-      subtitle={t('result:subtitle')}
-      bannerText={t('assessment:clinicalTransparencyBanner')}
+      title="Assessment result"
+      subtitle="Server-side reasoning · synthetic profile"
+      bannerText="Clinical transparency: this output is decision support only. Clinical judgement remains with the clinician."
       footer={
         <>
           <ACRButton
-            title={t('result:newAssessment')}
+            title="New assessment"
             variant="secondary"
             onPress={() => { reset(); navigation.navigate('Welcome'); }}
           />
-          <ACRButton title={t('common:done')} variant="primary" onPress={() => { reset(); navigation.navigate('Welcome'); }} />
+          <ACRButton title="Done" variant="primary" onPress={() => { reset(); navigation.navigate('Welcome'); }} />
         </>
       }
     >
+      {/* Subtype */}
       <View style={styles.subtypeBox}>
-        <Text style={styles.subtypeLabel}>{t('result:molecularSubtype')}</Text>
+        <Text style={styles.subtypeLabel}>Molecular subtype</Text>
         <Text style={styles.subtypeValue}>{data.molecularSubtype.code}</Text>
         <Text style={styles.subtypeText}>{data.molecularSubtype.display}</Text>
       </View>
 
-      <ACRCard title={t('result:bayesianConfidence')}>
+      {/* Bayesian */}
+      <ACRCard title="Bayesian confidence">
         <Text style={styles.confValue}>{data.bayesian.confidence.toString()}</Text>
-        <Text style={styles.hint}>{t('result:bayesianHint')}</Text>
+        <Text style={styles.hint}>Moderate confidence. Full precision shown as a visible integrity check.</Text>
       </ACRCard>
 
-      <ACRCard title={t('result:rulesFired')}>
+      {/* Rules fired */}
+      <ACRCard title="Rules fired">
         {data.reasoning.rulesFired.map((rule) => (
           <View key={rule.ruleId} style={styles.rule}>
             <Text style={styles.ruleId}>{rule.ruleId}</Text>
@@ -64,10 +65,11 @@ export const ResultScreen: React.FC = () => {
             <ACRBadge provenance={rule.provenance} />
           </View>
         ))}
-        <Text style={styles.hint}>{t('result:rulesFiredHint')}</Text>
+        <Text style={styles.hint}>Only rules that actually fired are listed.</Text>
       </ACRCard>
 
-      <ACRCard title={t('result:recommendations')}>
+      {/* Recommendations */}
+      <ACRCard title="Recommendations">
         {data.recommendations.map((rec) => (
           <View key={rec.code} style={styles.rule}>
             <Text style={styles.ruleDesc}>
@@ -75,10 +77,11 @@ export const ResultScreen: React.FC = () => {
             </Text>
           </View>
         ))}
-        <Text style={styles.hint}>{t('result:recommendationsHint')}</Text>
+        <Text style={styles.hint}>Text is returned by the reasoner and rendered unchanged.</Text>
       </ACRCard>
 
-      <ACRCard title={t('result:reasoningProvenance')}>
+      {/* Provenance */}
+      <ACRCard title="Reasoning provenance">
         <Text style={styles.prov}>
           {`reasoningMode: ${data.reasoning.reasoningMode}
 reasoner: ${data.provenance.reasonerVersion}
@@ -86,13 +89,14 @@ responseContract: ${data.provenance.responseContract}
 timestamp: ${result.completedAt}
 buildId: mob-v0.1.0 (42)
 ontologySHA256: ${data.provenance.ontologySha256.substring(0, 16)}… `}
-          <Text style={styles.tapHint}>{t('result:tapToExpand')}</Text>
+          <Text style={styles.tapHint}>▸ tap to expand</Text>
         </Text>
       </ACRCard>
 
-      <ACRCard title={t('result:retention')}>
+      {/* Retention */}
+      <ACRCard title="Retention">
         <Text style={styles.hint}>
-          {t('result:retentionHint')}
+          This result is held in memory only. Leaving this screen clears the assessment. Nothing is written to device storage.
         </Text>
       </ACRCard>
     </ScreenLayout>
@@ -144,7 +148,6 @@ const styles = StyleSheet.create({
     ...ACRTypography.hint,
     color: ACRColors.muted,
     marginTop: 4,
-    writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
   },
   rule: {
     borderLeftWidth: 3,

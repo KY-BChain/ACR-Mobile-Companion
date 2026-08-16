@@ -25,12 +25,7 @@
     "unavailable": "NON DISPONIBLE",
     "mismatch": "NON CONCORDANT",
     "yes": "Oui",
-    "no": "Non",
-    "checking": "Vérification en cours…",
-    "emDash": "—",
-    "negative": "négatif",
-    "positive": "positif",
-    "retryCheck": "Réessayer"
+    "no": "Non"
   },
   "welcome": {
     "title": "Avant de commencer",
@@ -48,9 +43,7 @@
     "step3Subtitle": "Étape 3 sur 3 · Biomarqueurs et chirurgie",
     "reviewTitle": "Révision",
     "reviewSubtitle": "Confirmez les entrées avant soumission",
-    "clinicalTransparency": "Transparence clinique : les résultats sont uniquement un support décisionnel, générés par une base de règles validée. Le jugement clinique reste de la responsabilité du clinicien.",
-    "clinicalTransparencyBanner": "Transparence clinique : les résultats sont uniquement un support décisionnel, générés par une base de règles validée. Le jugement clinique reste de la responsabilité du clinicien.",
-    "stepSubtitle": "Étape {{current}} sur {{total}} · {{title}}"
+    "clinicalTransparency": "Transparence clinique : les résultats sont uniquement un support décisionnel, générés par une base de règles validée. Le jugement clinique reste de la responsabilité du clinicien."
   },
   "receptors": {
     "cardTitle": "Statut des récepteurs",
@@ -63,8 +56,7 @@
     "negative": "négatif",
     "sessionId": "ID de session",
     "sessionIdHint": "UUIDv4 frais par évaluation. Jamais saisi, jamais réutilisé, jamais persisté.",
-    "sessionLabel": "Session",
-    "stepTitle": "Statut des récepteurs"
+    "sessionLabel": "Session"
   },
   "tumour": {
     "cardTitle": "Tumeur",
@@ -85,8 +77,7 @@
     "nodalN2": "N2",
     "nodalN3": "N3",
     "age": "Âge (années)",
-    "ageHint": "18–120, années entières. L'âge est le seul champ démographique que le moteur d'inférence consomme.",
-    "stepTitle": "Caractéristiques de la tumeur"
+    "ageHint": "18–120, années entières. L'âge est le seul champ démographique que le moteur d'inférence consomme."
   },
   "biomarkers": {
     "cardTitle": "Marqueurs sériques",
@@ -114,16 +105,7 @@
     "baseline": "Référence",
     "attestation": "Attestation",
     "attestationHint": "Moteur d'inférence v2.2.1 · OPENLLET_SWRL · le hachage de l'ontologie correspond au manifeste de référence accepté.",
-    "submitBlocked": "La soumission est bloquée tant que l'attestation n'est pas VÉRIFIÉE.",
-    "age": "Âge",
-    "baselineHint": "Moteur d'inférence v2.2.1 · OPENLLET_SWRL · le hachage de l'ontologie correspond au manifeste de référence accepté.",
-    "checking": "Vérification en cours…",
-    "ki67": "Ki-67",
-    "nodalStatus": "Statut nodal",
-    "submissionFailed": "Échec de la soumission",
-    "subtitle": "Confirmez les entrées avant soumission",
-    "surgeryDate": "Date de chirurgie",
-    "title": "Révision"
+    "submitBlocked": "La soumission est bloquée tant que l'attestation n'est pas VÉRIFIÉE."
   },
   "result": {
     "title": "Résultat de l'évaluation",
@@ -146,11 +128,7 @@
     "timestamp": "Horodatage",
     "buildId": "ID de build",
     "ontologySHA256": "Ontologie SHA-256",
-    "tapToExpand": "appuyer pour développer",
-    "bayesianHint": "Confiance modérée. La pleine précision est affichée comme vérification d'intégrité visible.",
-    "newAssessment": "Nouvelle évaluation",
-    "noResult": "Aucun résultat disponible.",
-    "reasoningProvenance": "Provenance du raisonnement"
+    "tapToExpand": "appuyer pour développer"
   },
   "about": {
     "title": "À propos",
@@ -171,15 +149,7 @@
     "ontologyHashLabel": "Ontologie SHA-256 (observé, montage en lecture seule)",
     "dataHandlingSection": "Gestion des données",
     "dataHandlingText": "Aucune donnée clinique intentionnelle au repos. Pas d'analytique. Rapport de plantage désactivé pour la vague un. Mises à jour over-the-air désactivées — chaque modification nécessite un nouveau build révisé.",
-    "unknownValue": "NON DISPONIBLE",
-    "application": "Application",
-    "baselineAttestation": "Attestation de référence",
-    "dataHandling": "Gestion des données",
-    "easBuildProfile": "Build / profil EAS",
-    "ontologySha256": "Ontologie SHA-256 (observé, montage en lecture seule)",
-    "reasoningMode": "Mode de raisonnement",
-    "responseContract": "Contrat de réponse",
-    "service": "Service"
+    "unknownValue": "NON DISPONIBLE"
   },
   "failClosed": {
     "title": "Service indisponible",
@@ -193,13 +163,7 @@
     "notObserved": "non observé",
     "lastSuccessfulCheck": "Dernière vérification réussie",
     "expectedValuesHint": "Les valeurs attendues proviennent du manifeste de référence accepté ; elles ne sont jamais rapportées comme observations.",
-    "sameTreatment": "Même traitement pour NON CONCORDANT. Réessayer relance uniquement la vérification — il ne resoumet jamais une évaluation.",
-    "blockedMessage": "Le service n'a pas pu vérifier que le moteur d'inférence connecté correspond à la référence acceptée. Aucune évaluation ne peut être soumise tant que la vérification ne réussit pas.",
-    "blockedTitle": "Évaluation bloquée",
-    "observed": "observé",
-    "retryCheck": "Réessayer",
-    "state": "État",
-    "verificationHint": "Les valeurs attendues proviennent du manifeste de référence accepté ; elles ne sont jamais rapportées comme observations."
+    "sameTreatment": "Même traitement pour NON CONCORDANT. Réessayer relance uniquement la vérification — il ne resoumet jamais une évaluation."
   },
   "provenance": {
     "acrNative": "ACR_NATIVE",
@@ -216,21 +180,5 @@
     "indeterminate": "Le résultat de l'évaluation est incertain. Ne réessayez pas automatiquement — contactez le support.",
     "rateLimited": "Trop de requêtes. Veuillez attendre avant de réessayer.",
     "networkError": "Échec de connexion réseau. Veuillez vérifier votre connexion et réessayer."
-  },
-  "markers": {
-    "ca153": "CA 15-3 (U/mL)",
-    "ca153Hint": "Seuil de référence 35,0 — l'évaluation est effectuée côté serveur.",
-    "cea": "CEA (ng/mL)",
-    "ceaHint": "Seuil de référence 5,0 — l'évaluation est effectuée côté serveur.",
-    "serumMarkersTitle": "Marqueurs sériques",
-    "stepTitle": "Biomarqueurs et chirurgie",
-    "surgeryDate": "Date de chirurgie",
-    "surgeryDateHint": "Les dates futures sont autorisées et soumises sans modification : le garde B3 est la responsabilité du moteur d'inférence et doit rester testable.",
-    "surgeryTitle": "Chirurgie"
-  },
-  "session": {
-    "cardTitle": "Session",
-    "sessionId": "ID de session",
-    "sessionIdHint": "UUIDv4 frais par évaluation. Jamais saisi, jamais réutilisé, jamais persisté."
   }
 }

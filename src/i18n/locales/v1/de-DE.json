@@ -25,12 +25,7 @@
     "unavailable": "NICHT VERFÜGBAR",
     "mismatch": "NICHT ÜBEREINSTIMMEND",
     "yes": "Ja",
-    "no": "Nein",
-    "checking": "Prüfung läuft…",
-    "emDash": "—",
-    "negative": "negativ",
-    "positive": "positiv",
-    "retryCheck": "Erneut versuchen"
+    "no": "Nein"
   },
   "welcome": {
     "title": "Bevor Sie beginnen",
@@ -48,9 +43,7 @@
     "step3Subtitle": "Schritt 3 von 3 · Biomarker und Chirurgie",
     "reviewTitle": "Überprüfung",
     "reviewSubtitle": "Bestätigen Sie die Eingaben vor dem Senden",
-    "clinicalTransparency": "Klinische Transparenz: Die Ergebnisse sind ausschließlich Entscheidungshilfen, generiert durch eine validierte Regelbasis. Die klinische Beurteilung verbleibt beim Kliniker.",
-    "clinicalTransparencyBanner": "Klinische Transparenz: Die Ergebnisse sind ausschließlich Entscheidungshilfen, generiert durch eine validierte Regelbasis. Die klinische Beurteilung verbleibt beim Kliniker.",
-    "stepSubtitle": "Schritt {{current}} von {{total}} · {{title}}"
+    "clinicalTransparency": "Klinische Transparenz: Die Ergebnisse sind ausschließlich Entscheidungshilfen, generiert durch eine validierte Regelbasis. Die klinische Beurteilung verbleibt beim Kliniker."
   },
   "receptors": {
     "cardTitle": "Rezeptorstatus",
@@ -63,8 +56,7 @@
     "negative": "negativ",
     "sessionId": "Sitzungs-ID",
     "sessionIdHint": "Neue UUIDv4 pro Bewertung. Nie eingegeben, nie wiederverwendet, nie persistiert.",
-    "sessionLabel": "Sitzung",
-    "stepTitle": "Rezeptorstatus"
+    "sessionLabel": "Sitzung"
   },
   "tumour": {
     "cardTitle": "Tumor",
@@ -85,8 +77,7 @@
     "nodalN2": "N2",
     "nodalN3": "N3",
     "age": "Alter (Jahre)",
-    "ageHint": "18–120, ganze Jahre. Das Alter ist das einzige demografische Feld, das der Reasoner verarbeitet.",
-    "stepTitle": "Tumorcharakteristiken"
+    "ageHint": "18–120, ganze Jahre. Das Alter ist das einzige demografische Feld, das der Reasoner verarbeitet."
   },
   "biomarkers": {
     "cardTitle": "Serummarker",
@@ -114,16 +105,7 @@
     "baseline": "Baseline",
     "attestation": "Attestation",
     "attestationHint": "Reasoner v2.2.1 · OPENLLET_SWRL · Ontologie-Hash stimmt mit dem akzeptierten Baseline-Manifest überein.",
-    "submitBlocked": "Senden ist blockiert, solange die Attestation nicht VERIFIZIERT ist.",
-    "age": "Alter",
-    "baselineHint": "Reasoner v2.2.1 · OPENLLET_SWRL · Ontologie-Hash stimmt mit dem akzeptierten Baseline-Manifest überein.",
-    "checking": "Prüfung läuft…",
-    "ki67": "Ki-67",
-    "nodalStatus": "Lymphknotenstatus",
-    "submissionFailed": "Senden fehlgeschlagen",
-    "subtitle": "Bestätigen Sie die Eingaben vor dem Senden",
-    "surgeryDate": "Chirurgiedatum",
-    "title": "Überprüfung"
+    "submitBlocked": "Senden ist blockiert, solange die Attestation nicht VERIFIZIERT ist."
   },
   "result": {
     "title": "Bewertungsergebnis",
@@ -146,11 +128,7 @@
     "timestamp": "Zeitstempel",
     "buildId": "Build-ID",
     "ontologySHA256": "Ontologie SHA-256",
-    "tapToExpand": "zum Erweitieren tippen",
-    "bayesianHint": "Mittlere Konfidenz. Volle Präzision wird als sichtbare Integritätsprüfung angezeigt.",
-    "newAssessment": "Neue Bewertung",
-    "noResult": "Kein Ergebnis verfügbar.",
-    "reasoningProvenance": "Reasoning-Herkunft"
+    "tapToExpand": "zum Erweitieren tippen"
   },
   "about": {
     "title": "Info",
@@ -171,15 +149,7 @@
     "ontologyHashLabel": "Ontologie SHA-256 (beobachtet, schreibgeschütztes Mount)",
     "dataHandlingSection": "Datenverarbeitung",
     "dataHandlingText": "Keine beabsichtigte Speicherung klinischer Daten. Keine Analytik. Absturzberichte für Wave One deaktiviert. Over-the-Air-Updates deaktiviert — jede Änderung erfordert einen neuen geprüften Build.",
-    "unknownValue": "NICHT VERFÜGBAR",
-    "application": "Anwendung",
-    "baselineAttestation": "Baseline-Attestation",
-    "dataHandling": "Datenverarbeitung",
-    "easBuildProfile": "EAS-Build / Profil",
-    "ontologySha256": "Ontologie SHA-256 (beobachtet, schreibgeschütztes Mount)",
-    "reasoningMode": "Reasoning-Modus",
-    "responseContract": "Antwortvertrag",
-    "service": "Dienst"
+    "unknownValue": "NICHT VERFÜGBAR"
   },
   "failClosed": {
     "title": "Dienst nicht verfügbar",
@@ -193,13 +163,7 @@
     "notObserved": "nicht beobachtet",
     "lastSuccessfulCheck": "Letzte erfolgreiche Prüfung",
     "expectedValuesHint": "Erwartete Werte stammen aus dem akzeptierten Baseline-Manifest; sie werden nie als Beobachtungen gemeldet.",
-    "sameTreatment": "Gleiche Behandlung bei NICHT ÜBEREINSTIMMEND. Wiederholen führt nur die Verifizierung erneut aus — es wird nie eine Bewertung erneut gesendet.",
-    "blockedMessage": "Der Dienst konnte nicht verifizieren, dass der verbundene Reasoner mit der akzeptierten Baseline übereinstimmt. Keine Bewertung kann gesendet werden, bis die Verifizierung erfolgreich ist.",
-    "blockedTitle": "Bewertung blockiert",
-    "observed": "beobachtet",
-    "retryCheck": "Erneut versuchen",
-    "state": "Status",
-    "verificationHint": "Erwartete Werte stammen aus dem akzeptierten Baseline-Manifest; sie werden nie als Beobachtungen gemeldet."
+    "sameTreatment": "Gleiche Behandlung bei NICHT ÜBEREINSTIMMEND. Wiederholen führt nur die Verifizierung erneut aus — es wird nie eine Bewertung erneut gesendet."
   },
   "provenance": {
     "acrNative": "ACR_NATIVE",
@@ -216,21 +180,5 @@
     "indeterminate": "Das Bewertungsergebnis ist ungewiss. Nicht automatisch wiederholen — kontaktieren Sie den Support.",
     "rateLimited": "Zu viele Anfragen. Bitte warten Sie, bevor Sie es erneut versuchen.",
     "networkError": "Netzwerkverbindung fehlgeschlagen. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut."
-  },
-  "markers": {
-    "ca153": "CA 15-3 (U/mL)",
-    "ca153Hint": "Referenzschwelle 35,0 — Auswertung erfolgt serverseitig.",
-    "cea": "CEA (ng/mL)",
-    "ceaHint": "Referenzschwelle 5,0 — Auswertung erfolgt serverseitig.",
-    "serumMarkersTitle": "Serummarker",
-    "stepTitle": "Biomarker und Chirurgie",
-    "surgeryDate": "Chirurgiedatum",
-    "surgeryDateHint": "Zukünftige Daten sind erlaubt und werden unverändert übermittelt: Die B3-Überwachung ist Aufgabe des Reasoners und muss testbar bleiben.",
-    "surgeryTitle": "Chirurgie"
-  },
-  "session": {
-    "cardTitle": "Sitzung",
-    "sessionId": "Sitzungs-ID",
-    "sessionIdHint": "Neue UUIDv4 pro Bewertung. Nie eingegeben, nie wiederverwendet, nie persistiert."
   }
 }

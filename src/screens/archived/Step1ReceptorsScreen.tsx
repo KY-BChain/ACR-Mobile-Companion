@@ -28,6 +28,8 @@ export const Step1ReceptorsScreen: React.FC = () => {
 
   const isValid = form.step1.ki67 !== '' && !isNaN(Number(form.step1.ki67));
 
+  // Data values stay 'positive' | 'negative' for the store / rule engine.
+  // Display labels are translated for UI rendering.
   const receptorOptions: Array<{ value: 'positive' | 'negative'; label: string }> = [
     { value: 'positive', label: t('common:positive') },
     { value: 'negative', label: t('common:negative') },

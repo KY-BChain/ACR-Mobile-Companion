@@ -19,6 +19,7 @@ export const Step2TumourScreen: React.FC = () => {
   const navigation = useNavigation<NavProp>();
   const { form, setStep2 } = useAssessmentStore();
 
+  // Grade options: data values remain '1'|'2'|'3', labels are translatable if needed.
   const gradeOptions = [
     { value: '1', label: t('tumour:grade1') },
     { value: '2', label: t('tumour:grade2') },
@@ -48,7 +49,7 @@ export const Step2TumourScreen: React.FC = () => {
       <ACRCard title={t('tumour:cardTitle')}>
         <Label text={t('tumour:stage')} optional />
         <View style={styles.pickerShell}>
-          <Text style={styles.pickerText}>{form.step2.stage || t('common:emDash')}</Text>
+          <Text style={styles.pickerText}>{form.step2.stage || '—'}</Text>
         </View>
         <Text style={styles.hint}>{t('tumour:stageHint')}</Text>
 
@@ -62,7 +63,7 @@ export const Step2TumourScreen: React.FC = () => {
 
         <Label text={t('tumour:histologicalSubtype')} optional />
         <View style={styles.pickerShell}>
-          <Text style={styles.pickerText}>{form.step2.histologicalSubtype || t('common:emDash')}</Text>
+          <Text style={styles.pickerText}>{form.step2.histologicalSubtype || '—'}</Text>
         </View>
 
         <Label text={t('tumour:nodalStatus')} optional />
