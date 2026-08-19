@@ -1,6 +1,8 @@
 # ACR Mobile Companion — v0.5 P1/P2 Update
 ## Application Guide & Git Commit Instructions
 
+> **v1.4 requirements/reference notice:** This guide preserves the clinical and visual requirements record. Its wholesale file-replacement, Git, tagging and push instructions are superseded by `ACR_Mobile_P1P2_First_Loop_Codex_Task_v1.4.md`. The generator `vP1P2/apply-v0.5-update.sh` is reference-only and must not be executed. Follow the v1.4 Codex Implementation Task through Kraken review instead.
+
 ---
 
 ## 1. HOW TO APPLY THE CHANGES
@@ -18,6 +20,8 @@ Create these **two new files** in your project:
 
 Copy the source code from the previous message into each file.
 
+For v1.4, do not copy these files wholesale. The generator contains 14 existing P1/P2 candidates plus these two new screens, 16 candidates total; Codex must compare them with the live application and apply minimal edits.
+
 ### Step C: Replace existing files
 Replace these **existing files** with the updated versions from the previous message:
 
@@ -29,21 +33,21 @@ Replace these **existing files** with the updated versions from the previous mes
 | Step2TumourScreen.tsx | `src/screens/Step2TumourScreen.tsx` | `Step 2 of 3` → `Step 2 of 5` |
 | Step3MarkersScreen.tsx | `src/screens/Step3MarkersScreen.tsx` | `Step 3 of 3` → `Step 3 of 5`; Next → navigates to P1 |
 | ReviewScreen.tsx | `src/screens/ReviewScreen.tsx` | Added Provisional P1/P2 review cards |
-| en-GB.json | `src/locales/en-GB.json` | Added p1, p2, review keys; updated step counts |
-| fr-FR.json | `src/locales/fr-FR.json` | Same (translated) |
-| de-DE.json | `src/locales/de-DE.json` | Same (translated) |
-| ru-RU.json | `src/locales/ru-RU.json` | Same (translated) |
-| ar-SA.json | `src/locales/ar-SA.json` | Same (translated) |
-| zh-CN.json | `src/locales/zh-CN.json` | Same (translated) |
-| ko-KR.json | `src/locales/ko-KR.json` | Same (translated) |
-| ja-JP.json | `src/locales/ja-JP.json` | Same (translated) |
+| AboutScreen.tsx | `src/screens/AboutScreen.tsx` | Extend the existing About route with five internally paginated pages |
+| en-GB.json | `src/i18n/locales/en-GB.json` | Source/template; add P1, P2, Review and About keys; update step counts |
+| fr-FR.json | `src/i18n/locales/fr-FR.json` | Same (translated) |
+| de-DE.json | `src/i18n/locales/de-DE.json` | Same (translated) |
+| ru-RU.json | `src/i18n/locales/ru-RU.json` | Same (translated) |
+| ar-SA.json | `src/i18n/locales/ar-SA.json` | Same (translated; preserve RTL) |
+| zh-CN.json | `src/i18n/locales/zh-CN.json` | Same (translated) |
+| ko-KR.json | `src/i18n/locales/ko-KR.json` | Same (translated) |
+| ja-JP.json | `src/i18n/locales/ja-JP.json` | Same (translated) |
 
 ### Step D: Files that do NOT change
 These files remain exactly as they are:
 - `WelcomeScreen.tsx`
 - `ResultScreen.tsx`
 - `FailClosedScreen.tsx`
-- `AboutScreen.tsx`
 - `config.ts`
 - `app.json`
 - All component files (`ScreenLayout`, `ACRCard`, `ACRInput`, `ACRButton`, `ACRSegmentedControl`, etc.)
@@ -51,9 +55,17 @@ These files remain exactly as they are:
 - All utility files (`uuid.ts`, etc.)
 - All API files (`infer.ts`, `attestation.ts`)
 
+### Step E: Apply the v1.4 About requirement
+
+Extend the existing `src/screens/AboutScreen.tsx` and existing `About` route with five internally paginated pages labelled `About 1 of 5` through `About 5 of 5`. Provide the v1.4 Codex Implementation Task's English (UK) source meaning in all eight active languages, preserve Arabic RTL behaviour, and retain the existing live application, service, attestation and data-handling information on page 5. Do not add About assessment routes or another `NavigationContainer`.
+
+The full v1.4 application scope is therefore **15 existing files plus two new assessment screens = 17 application files**. This is distinct from the generator's 16 P1/P2 candidates.
+
 ---
 
 ## 2. GIT COMMANDS (run in order)
+
+The commands in this section are retained as superseded historical reference. Do not use them for v1.4; the Codex Implementation Task stops with an uncommitted diff for Kraken review.
 
 Open Terminal and navigate to your project:
 
@@ -75,16 +87,17 @@ git add src/screens/Step1ReceptorsScreen.tsx
 git add src/screens/Step2TumourScreen.tsx
 git add src/screens/Step3MarkersScreen.tsx
 git add src/screens/ReviewScreen.tsx
+git add src/screens/AboutScreen.tsx
 git add src/screens/P1Screen.tsx
 git add src/screens/P2Screen.tsx
-git add src/locales/en-GB.json
-git add src/locales/fr-FR.json
-git add src/locales/de-DE.json
-git add src/locales/ru-RU.json
-git add src/locales/ar-SA.json
-git add src/locales/zh-CN.json
-git add src/locales/ko-KR.json
-git add src/locales/ja-JP.json
+git add src/i18n/locales/en-GB.json
+git add src/i18n/locales/fr-FR.json
+git add src/i18n/locales/de-DE.json
+git add src/i18n/locales/ru-RU.json
+git add src/i18n/locales/ar-SA.json
+git add src/i18n/locales/zh-CN.json
+git add src/i18n/locales/ko-KR.json
+git add src/i18n/locales/ja-JP.json
 ```
 
 Or simply:
@@ -97,7 +110,7 @@ git add src/
 git status
 ```
 You should see:
-- 12 modified files (store, navigator, 3 steps, review, 8 JSON)
+- 15 modified existing files (store, navigator, 3 steps, Review, About and 8 active locale JSON files)
 - 2 new files (P1Screen.tsx, P2Screen.tsx)
 
 ### 2.4 Commit with descriptive message
@@ -208,14 +221,15 @@ npx expo start --android
  M src/screens/Step2TumourScreen.tsx   (step count 3→5)
  M src/screens/Step3MarkersScreen.tsx  (step count 3→5, Next→P1)
  M src/screens/ReviewScreen.tsx        (+Provisional P1/P2 cards)
- M src/locales/en-GB.json              (+p1, +p2, +review keys, step counts)
- M src/locales/fr-FR.json              (same, translated)
- M src/locales/de-DE.json              (same, translated)
- M src/locales/ru-RU.json              (same, translated)
- M src/locales/ar-SA.json              (same, translated)
- M src/locales/zh-CN.json              (same, translated)
- M src/locales/ko-KR.json              (same, translated)
- M src/locales/ja-JP.json              (same, translated)
+ M src/screens/AboutScreen.tsx         (five internally paginated About pages)
+ M src/i18n/locales/en-GB.json         (+p1, +p2, +review, +about keys, step counts)
+ M src/i18n/locales/fr-FR.json         (same, translated)
+ M src/i18n/locales/de-DE.json         (same, translated)
+ M src/i18n/locales/ru-RU.json         (same, translated)
+ M src/i18n/locales/ar-SA.json         (same, translated; RTL preserved)
+ M src/i18n/locales/zh-CN.json         (same, translated)
+ M src/i18n/locales/ko-KR.json         (same, translated)
+ M src/i18n/locales/ja-JP.json         (same, translated)
  A src/screens/P1Screen.tsx            (new)
  A src/screens/P2Screen.tsx            (new)
 ```
@@ -244,8 +258,8 @@ If the repo `github.com/KY-BChain/acr-mobile-companion` does not yet exist:
 
 ## 6. NEXT STEPS AFTER THIS COMMIT
 
-1. **iOS Simulator test**: iPhone 17 Pro iOS 26.3 — verify all 5 steps flow correctly
-2. **Physical iPhone test**: iPhone 13, iPhone X, iPhone 8+ — check layout at different screen sizes
+1. **iOS Simulator acceptance test**: iPhone 16e / iOS 26.3 — verify all 5 steps flow correctly
+2. **Deferred physical-device test**: iPhone 13 / iOS 26.6.1 — verify separately after simulator acceptance
 3. **iPad test**: Check if layout scales correctly (may need ScrollView adjustments)
 4. **Android test**: Select physical Android phones for testing
 5. **API integration**: Later campaign to map P1/P2 fields to `/api/infer` DTO (v1.0)
