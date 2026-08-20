@@ -9,7 +9,7 @@ interface Props {
   onSelect: (value: string) => void;
 }
 
-export const ACRSegmentedControl: React.FC<Props> = ({ options, selected, onSelect }) => (
+export const ACRSegmentedControl: React.FC<Props> = ({ options, labels, selected, onSelect }) => (
   <View style={styles.container}>
     {options.map((opt, idx) => (
       <TouchableOpacity
@@ -22,7 +22,7 @@ export const ACRSegmentedControl: React.FC<Props> = ({ options, selected, onSele
         onPress={() => onSelect(opt)}
         activeOpacity={0.9}
       >
-        <Text style={[styles.text, selected === opt && styles.selectedText]}>{opt}</Text>
+        <Text style={[styles.text, selected === opt && styles.selectedText]}>{labels?.[idx] || opt}</Text>
       </TouchableOpacity>
     ))}
   </View>

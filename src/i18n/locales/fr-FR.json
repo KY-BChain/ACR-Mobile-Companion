@@ -120,7 +120,7 @@
     "checking": "Vérification en cours…",
     "ki67": "Ki-67",
     "nodalStatus": "Statut nodal",
-    "submissionFailed": "Échec de la soumission",
+    "submissionFailed": "Échec de la soumission", "p1Title": "P1 provisoire", "p2Title": "P2 provisoire", "provisionalHint": "Champs provisoires pour données synthétiques. Non envoyés à l’API et non utilisés pour le résultat.",
     "subtitle": "Confirmez les entrées avant soumission",
     "surgeryDate": "Date de chirurgie",
     "title": "Révision"
@@ -171,7 +171,7 @@
     "ontologyHashLabel": "Ontologie SHA-256 (observé, montage en lecture seule)",
     "dataHandlingSection": "Gestion des données",
     "dataHandlingText": "Aucune donnée clinique intentionnelle au repos. Pas d'analytique. Rapport de plantage désactivé pour la vague un. Mises à jour over-the-air désactivées — chaque modification nécessite un nouveau build révisé.",
-    "unknownValue": "NON DISPONIBLE",
+    "unknownValue": "NON DISPONIBLE", "pageIndicator": "À propos {{current}} sur {{total}}", "page1Title": "Qu’est-ce que la plateforme ACR ?", "page1Text": "ACR Platform est une plateforme expérimentale d’aide à la décision clinique. Les partenaires cliniques et les experts des essais cliniques orientent les faits recueillis et révisent son modèle de connaissances médicales et ses règles.", "page2Title": "Fonctionnement d’ACR", "page2Text": "Un utilisateur autorisé saisit des faits cliniques structurés approuvés. L’application compagnon envoie uniquement la demande d’évaluation approuvée au service ACR connecté, qui renvoie les résultats et leur provenance.", "page3Title": "Les données restent. Les règles voyagent.", "page3Text": "Dans un déploiement clinique, ACR est conçu pour que les données des patients restent dans l’infrastructure autorisée. Cette démo mobile utilise uniquement des données synthétiques.", "page4Title": "Explicabilité et sécurité", "page4Text": "Les résultats ACR sont une aide à la décision uniquement. P1 et P2 sont des champs de démonstration provisoires, non envoyés à l’API et non utilisés pour produire le résultat.", "page5Title": "Version et référence vérifiée",
     "application": "Application",
     "baselineAttestation": "Attestation de référence",
     "dataHandling": "Gestion des données",
@@ -201,6 +201,8 @@
     "state": "État",
     "verificationHint": "Les valeurs attendues proviennent du manifeste de référence accepté ; elles ne sont jamais rapportées comme observations."
   },
+  "p1": { "title": "P1 provisoire", "stepTitle": "Champs du contrat", "banner": "DÉMO SYNTHÉTIQUE · CHAMPS PROVISOIRES", "cardTitle": "Tumeur et genre", "tumorSize": "Taille de la tumeur", "tumorSizeHint": "Nombre fini supérieur à zéro. Unité en attente.", "tumorSizeError": "Saisissez une valeur finie supérieure à zéro.", "gender": "Genre", "female": "femme", "male": "homme", "other": "autre", "unknown": "inconnu", "genderPending": "Le genre est en attente et ne bloque pas cette démo.", "nodalWarningTitle": "Avertissement ganglionnaire", "nodalWarning": "N0–N3 ne doit pas être converti silencieusement en positif ou négatif." },
+  "p2": { "title": "P2 provisoire", "stepTitle": "Champs supplémentaires", "banner": "DÉMO SYNTHÉTIQUE · CHAMPS PROVISOIRES", "cardTitle": "Champs supplémentaires", "ecogScore": "Score ECOG", "ecogHint": "Entier facultatif de 0 à 4.", "ecogError": "Saisissez un entier de 0 à 4.", "pdl1Status": "Statut PD-L1", "her2Low": "HER2 faible", "lvef": "FEVG (%)", "lvefHint": "Valeur facultative de 0 à 100.", "lvefError": "Saisissez une valeur de 0 à 100.", "treatmentIntent": "Intention thérapeutique", "notTested": "non testé", "unknown": "inconnu", "neoadjuvant": "néoadjuvant", "adjuvant": "adjuvant", "unspecified": "non précisé" },
   "provenance": {
     "acrNative": "ACR_NATIVE",
     "openlletVerified": "OPENLLET_NATIVE_VERIFIED",

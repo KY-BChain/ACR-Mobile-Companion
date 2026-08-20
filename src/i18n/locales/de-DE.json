@@ -120,7 +120,7 @@
     "checking": "Prüfung läuft…",
     "ki67": "Ki-67",
     "nodalStatus": "Lymphknotenstatus",
-    "submissionFailed": "Senden fehlgeschlagen",
+    "submissionFailed": "Senden fehlgeschlagen", "p1Title": "Vorläufiges P1", "p2Title": "Vorläufiges P2", "provisionalHint": "Vorläufige Felder für synthetische Daten. Nicht an die API gesendet und nicht für das Ergebnis verwendet.",
     "subtitle": "Bestätigen Sie die Eingaben vor dem Senden",
     "surgeryDate": "Chirurgiedatum",
     "title": "Überprüfung"
@@ -171,7 +171,7 @@
     "ontologyHashLabel": "Ontologie SHA-256 (beobachtet, schreibgeschütztes Mount)",
     "dataHandlingSection": "Datenverarbeitung",
     "dataHandlingText": "Keine beabsichtigte Speicherung klinischer Daten. Keine Analytik. Absturzberichte für Wave One deaktiviert. Over-the-Air-Updates deaktiviert — jede Änderung erfordert einen neuen geprüften Build.",
-    "unknownValue": "NICHT VERFÜGBAR",
+    "unknownValue": "NICHT VERFÜGBAR", "pageIndicator": "Info {{current}} von {{total}}", "page1Title": "Was die ACR-Plattform ist", "page1Text": "Die ACR-Plattform ist eine experimentelle Plattform zur klinischen Entscheidungsunterstützung. Klinische Partner und Experten für klinische Studien begleiten die erfassten Fakten sowie das medizinische Wissensmodell und die Entscheidungsregeln.", "page2Title": "Wie ACR funktioniert", "page2Text": "Ein autorisierter Nutzer erfasst freigegebene strukturierte klinische Fakten. Die Begleit-App sendet nur die freigegebene Anfrage an den ACR-Dienst, der Ergebnisse und Begründungsherkunft zurückgibt.", "page3Title": "Daten bleiben. Regeln reisen.", "page3Text": "In einem klinischen Einsatz verbleiben Patientendaten in der autorisierten Infrastruktur. Diese mobile Demo verwendet ausschließlich synthetische Daten.", "page4Title": "Erklärbarkeit und Sicherheit", "page4Text": "ACR-Ergebnisse dienen nur der Entscheidungsunterstützung. P1 und P2 sind vorläufige Demo-Felder, werden nicht an die API gesendet und erzeugen kein Ergebnis.", "page5Title": "Build und verifizierte Basis",
     "application": "Anwendung",
     "baselineAttestation": "Baseline-Attestation",
     "dataHandling": "Datenverarbeitung",
@@ -201,6 +201,8 @@
     "state": "Status",
     "verificationHint": "Erwartete Werte stammen aus dem akzeptierten Baseline-Manifest; sie werden nie als Beobachtungen gemeldet."
   },
+  "p1": { "title": "Vorläufiges P1", "stepTitle": "Vertragsfelder", "banner": "SYNTHETISCHE DEMO · VORLÄUFIGE FELDER", "cardTitle": "Tumor und Geschlecht", "tumorSize": "Tumorgröße", "tumorSizeHint": "Endliche Zahl größer als null. Einheit ausstehend.", "tumorSizeError": "Geben Sie einen endlichen Wert größer als null ein.", "gender": "Geschlecht", "female": "weiblich", "male": "männlich", "other": "andere", "unknown": "unbekannt", "genderPending": "Geschlecht ausstehend; dieser Demoablauf wird nicht blockiert.", "nodalWarningTitle": "Hinweis zur Knotenabbildung", "nodalWarning": "N0–N3 dürfen nicht stillschweigend positiv oder negativ abgebildet werden." },
+  "p2": { "title": "Vorläufiges P2", "stepTitle": "Zusätzliche Demofelder", "banner": "SYNTHETISCHE DEMO · VORLÄUFIGE FELDER", "cardTitle": "Zusätzliche Felder", "ecogScore": "ECOG-Score", "ecogHint": "Optionale Ganzzahl von 0 bis 4.", "ecogError": "Geben Sie eine Ganzzahl von 0 bis 4 ein.", "pdl1Status": "PD-L1-Status", "her2Low": "HER2-low", "lvef": "LVEF (%)", "lvefHint": "Optionaler Wert von 0 bis 100.", "lvefError": "Geben Sie einen Wert von 0 bis 100 ein.", "treatmentIntent": "Behandlungsabsicht", "notTested": "nicht getestet", "unknown": "unbekannt", "neoadjuvant": "neoadjuvant", "adjuvant": "adjuvant", "unspecified": "nicht angegeben" },
   "provenance": {
     "acrNative": "ACR_NATIVE",
     "openlletVerified": "OPENLLET_NATIVE_VERIFIED",

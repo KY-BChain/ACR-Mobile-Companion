@@ -21,13 +21,13 @@ export const Step3MarkersScreen: React.FC = () => {
   return (
     <ScreenLayout
       title={t('assessment:newTitle')}
-      subtitle={t('assessment:stepSubtitle', { current: 3, total: 3, title: t('markers:stepTitle') })}
+      subtitle={t('assessment:stepSubtitle', { current: 3, total: 5, title: t('markers:stepTitle') })}
       bannerText={t('assessment:clinicalTransparencyBanner')}
-      steps={{ total: 3, current: 3 }}
+      steps={{ total: 5, current: 3 }}
       footer={
         <>
           <ACRButton title={t('common:back')} variant="secondary" onPress={() => navigation.goBack()} />
-          <ACRButton title={t('common:review')} variant="primary" onPress={() => navigation.navigate('Review')} />
+          <ACRButton title={t('common:next')} variant="primary" onPress={() => navigation.navigate('P1')} />
         </>
       }
     >

@@ -139,7 +139,8 @@
     "checking": "Checking…",
     "baselineHint": "Reasoner v2.2.1 · OPENLLET_SWRL · ontology hash matches the accepted baseline manifest.",
     "submitBlocked": "Submission is blocked unless attestation is VERIFIED.",
-    "submissionFailed": "Submission failed"
+    "submissionFailed": "Submission failed",
+    "p1Title": "Provisional P1", "p2Title": "Provisional P2", "provisionalHint": "Provisional synthetic-data fields only. Not sent to the API or used to produce the Result."
   },
   "result": {
     "title": "Assessment result",
@@ -215,8 +216,10 @@
     "dataHandlingSection": "Data handling",
     "dataHandling": "Data handling",
     "dataHandlingText": "No intentional clinical data at rest. No analytics. Crash reporting disabled for wave one. Over-the-air updates disabled — every change requires a new reviewed build.",
-    "unknownValue": "UNAVAILABLE"
+    "unknownValue": "UNAVAILABLE", "pageIndicator": "About {{current}} of {{total}}", "page1Title": "What the ACR Platform is", "page1Text": "ACR Platform is an investigational clinical decision-support platform. Clinical partners and clinical-trials experts guide the clinical facts collected and review its governed medical knowledge model and decision-support rules. It supports clinical judgement; it does not replace diagnosis, treatment decisions or the responsible clinician.", "page2Title": "How ACR works", "page2Text": "An authorised user enters approved structured clinical facts. The companion app sends only the approved assessment request to the connected ACR service. The ACR Platform applies its ontology and clinician-reviewed SWRL rules through the Openllet reasoner. It returns decision-support results with the rules that fired and reasoning provenance for review. Where enabled, the optional Bayesian layer can add a confidence estimate without replacing the rule-based explanation.", "page3Title": "Data Stays. Rules Travel.", "page3Text": "In a clinical deployment, ACR is designed so patient data remains within authorised clinical infrastructure while governed knowledge and rules are deployed to where the data is held. This mobile demo uses synthetic data only and does not demonstrate a production patient-data connection.", "page4Title": "Explainability and safety", "page4Text": "ACR results are decision support only. The app can show recommendations, fired rules, reasoning mode and baseline identity so the result can be reviewed. P1 and P2 are provisional demo fields in this version and are not sent to the API or used to produce the Result. Do not enter real, coded or pseudonymised patient information.", "page5Title": "Build and verified baseline"
   },
+  "p1": { "title": "Provisional P1", "stepTitle": "Core contract fields", "banner": "SYNTHETIC DEMO ONLY · PROVISIONAL FIELDS", "cardTitle": "Tumour and gender", "tumorSize": "Tumour size", "tumorSizeHint": "Finite number greater than zero. Unit pending.", "tumorSizeError": "Enter a finite value greater than zero.", "gender": "Gender", "female": "female", "male": "male", "other": "other", "unknown": "unknown", "genderPending": "Gender is pending and does not block this demo flow.", "nodalWarningTitle": "Nodal mapping notice", "nodalWarning": "N0–N3 must not be silently mapped to positive or negative. This warning is non-blocking in this UI-only flow." },
+  "p2": { "title": "Provisional P2", "stepTitle": "Additional demo fields", "banner": "SYNTHETIC DEMO ONLY · PROVISIONAL FIELDS", "cardTitle": "Additional fields", "ecogScore": "ECOG score", "ecogHint": "Optional integer from 0 to 4.", "ecogError": "Enter an integer from 0 to 4.", "pdl1Status": "PD-L1 status", "her2Low": "HER2-low", "lvef": "LVEF (%)", "lvefHint": "Optional finite value from 0 to 100.", "lvefError": "Enter a finite value from 0 to 100.", "treatmentIntent": "Treatment intent", "notTested": "not tested", "unknown": "unknown", "neoadjuvant": "neoadjuvant", "adjuvant": "adjuvant", "unspecified": "unspecified" },
   "provenance": {
     "acrNative": "ACR_NATIVE",
     "openlletVerified": "OPENLLET_NATIVE_VERIFIED",

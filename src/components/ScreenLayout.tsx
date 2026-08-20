@@ -8,6 +8,7 @@ import { ACRStepIndicator } from './ACRStepIndicator';
 interface Props {
   title: string;
   subtitle?: string;
+  titleStyle?: object;
   bannerText?: string;
   bannerVariant?: 'warning' | 'trial';
   steps?: { total: number; current: number };
@@ -18,6 +19,7 @@ interface Props {
 export const ScreenLayout: React.FC<Props> = ({
   title,
   subtitle,
+  titleStyle,
   bannerText,
   bannerVariant = 'warning',
   steps,
@@ -26,7 +28,7 @@ export const ScreenLayout: React.FC<Props> = ({
 }) => (
   <SafeAreaView style={styles.safe}>
     <View style={styles.island} />
-    <ACRHeader title={title} subtitle={subtitle} />
+    <ACRHeader title={title} subtitle={subtitle} titleStyle={titleStyle} />
     {bannerText ? <ACRBanner text={bannerText} variant={bannerVariant} /> : null}
     {steps ? <ACRStepIndicator total={steps.total} current={steps.current} /> : null}
     <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>

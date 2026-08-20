@@ -35,9 +35,9 @@ export const Step2TumourScreen: React.FC = () => {
   return (
     <ScreenLayout
       title={t('assessment:newTitle')}
-      subtitle={t('assessment:stepSubtitle', { current: 2, total: 3, title: t('tumour:stepTitle') })}
+      subtitle={t('assessment:stepSubtitle', { current: 2, total: 5, title: t('tumour:stepTitle') })}
       bannerText={t('assessment:clinicalTransparencyBanner')}
-      steps={{ total: 3, current: 2 }}
+      steps={{ total: 5, current: 2 }}
       footer={
         <>
           <ACRButton title={t('common:back')} variant="secondary" onPress={() => navigation.goBack()} />

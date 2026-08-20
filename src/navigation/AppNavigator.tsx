@@ -5,6 +5,8 @@ import { WelcomeScreen } from '../screens/WelcomeScreen';
 import { Step1ReceptorsScreen } from '../screens/Step1ReceptorsScreen';
 import { Step2TumourScreen } from '../screens/Step2TumourScreen';
 import { Step3MarkersScreen } from '../screens/Step3MarkersScreen';
+import { P1Screen } from '../screens/P1Screen';
+import { P2Screen } from '../screens/P2Screen';
 import { ReviewScreen } from '../screens/ReviewScreen';
 import { ResultScreen } from '../screens/ResultScreen';
 import { AboutScreen } from '../screens/AboutScreen';
@@ -17,6 +19,8 @@ export type RootStackParamList = {
   Step1: undefined;
   Step2: undefined;
   Step3: undefined;
+  P1: undefined;
+  P2: undefined;
   Review: undefined;
   Result: undefined;
   About: undefined;
@@ -49,6 +53,8 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="Step1" component={Step1ReceptorsScreen} />
         <Stack.Screen name="Step2" component={Step2TumourScreen} />
         <Stack.Screen name="Step3" component={Step3MarkersScreen} />
+        <Stack.Screen name="P1" component={P1Screen} />
+        <Stack.Screen name="P2" component={P2Screen} />
         <Stack.Screen name="Review" component={ReviewScreen} />
         <Stack.Screen name="Result" component={ResultScreen} />
         <Stack.Screen name="About" component={AboutScreen} />

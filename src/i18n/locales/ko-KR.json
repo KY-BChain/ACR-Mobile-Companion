@@ -120,7 +120,7 @@
     "checking": "확인 중…",
     "ki67": "Ki-67",
     "nodalStatus": "림프절 상태",
-    "submissionFailed": "제출 실패",
+    "submissionFailed": "제출 실패", "p1Title": "임시 P1", "p2Title": "임시 P2", "provisionalHint": "합성 데이터 전용 임시 필드입니다. API로 전송되지 않으며 결과 생성에 사용되지 않습니다.",
     "subtitle": "제출 전 입력 내용을 확인하세요",
     "surgeryDate": "수술 날짜",
     "title": "검토"
@@ -171,7 +171,7 @@
     "ontologyHashLabel": "온톨로지 SHA-256 (관찰됨, 읽기 전용 마운트)",
     "dataHandlingSection": "데이터 처리",
     "dataHandlingText": "의도적인 임상 데이터 저장이 없습니다. 분석 없음. 1차 웨이브용 충돌 보고 비활성화됨. OTA 업데이트 비활성화됨 — 모든 변경에는 새로 검토된 빌드가 필요합니다.",
-    "unknownValue": "사용 불가",
+    "unknownValue": "사용 불가", "pageIndicator": "정보 {{current}} / {{total}}", "page1Title": "ACR 플랫폼이란", "page1Text": "ACR 플랫폼은 임상 의사결정을 지원하는 연구 플랫폼입니다. 임상 파트너와 임상시험 전문가는 수집할 임상 사실과 의료 지식 모델 및 의사결정 규칙을 검토합니다.", "page2Title": "ACR 작동 방식", "page2Text": "승인된 사용자가 승인된 구조화 임상 사실을 입력합니다. 앱은 승인된 평가 요청만 ACR 서비스로 보내고 결과와 추론 근거를 받습니다.", "page3Title": "데이터는 머물고 규칙은 이동합니다.", "page3Text": "임상 배포에서 환자 데이터는 승인된 인프라에 남습니다. 이 모바일 데모는 합성 데이터만 사용합니다.", "page4Title": "설명 가능성과 안전", "page4Text": "ACR 결과는 의사결정 지원 전용입니다. P1과 P2는 임시 데모 필드이며 API로 전송되거나 결과 생성에 사용되지 않습니다.", "page5Title": "빌드 및 검증된 기준선",
     "application": "애플리케이션",
     "baselineAttestation": "기준선 검증",
     "dataHandling": "데이터 처리",
@@ -201,6 +201,8 @@
     "state": "상태",
     "verificationHint": "예상 값은 수락된 기준 매니페스트에서 가져옵니다. 관찰로 보고되지 않습니다."
   },
+  "p1": { "title": "임시 P1", "stepTitle": "계약 필드", "banner": "합성 데모 전용 · 임시 필드", "cardTitle": "종양 및 성별", "tumorSize": "종양 크기", "tumorSizeHint": "0보다 큰 유한 숫자입니다. 단위는 보류 중입니다.", "tumorSizeError": "0보다 큰 유한 값을 입력하세요.", "gender": "성별", "female": "여성", "male": "남성", "other": "기타", "unknown": "알 수 없음", "genderPending": "성별은 보류 중이며 데모 흐름을 막지 않습니다.", "nodalWarningTitle": "림프절 매핑 알림", "nodalWarning": "N0–N3을 양성 또는 음성으로 조용히 매핑하면 안 됩니다." },
+  "p2": { "title": "임시 P2", "stepTitle": "추가 데모 필드", "banner": "합성 데모 전용 · 임시 필드", "cardTitle": "추가 필드", "ecogScore": "ECOG 점수", "ecogHint": "0에서 4 사이의 선택적 정수입니다.", "ecogError": "0에서 4 사이의 정수를 입력하세요.", "pdl1Status": "PD-L1 상태", "her2Low": "HER2-low", "lvef": "LVEF (%)", "lvefHint": "0에서 100 사이의 선택적 값입니다.", "lvefError": "0에서 100 사이의 값을 입력하세요.", "treatmentIntent": "치료 의도", "notTested": "검사하지 않음", "unknown": "알 수 없음", "neoadjuvant": "신보조", "adjuvant": "보조", "unspecified": "지정되지 않음" },
   "provenance": {
     "acrNative": "ACR_NATIVE",
     "openlletVerified": "OPENLLET_NATIVE_VERIFIED",

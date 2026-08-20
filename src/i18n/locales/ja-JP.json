@@ -120,7 +120,7 @@
     "checking": "確認中…",
     "ki67": "Ki-67",
     "nodalStatus": "リンパ節状態",
-    "submissionFailed": "送信に失敗しました",
+    "submissionFailed": "送信に失敗しました", "p1Title": "暫定 P1", "p2Title": "暫定 P2", "provisionalHint": "合成データ専用の暫定フィールドです。APIには送信せず、結果の生成にも使用しません。",
     "subtitle": "送信前に入力内容を確認してください",
     "surgeryDate": "手術日",
     "title": "確認"
@@ -171,7 +171,7 @@
     "ontologyHashLabel": "オントロジーSHA-256（観測済み、読み取り専用マウント）",
     "dataHandlingSection": "データ処理",
     "dataHandlingText": "臨床データの意図的な保存はありません。分析なし。ウェーブ1ではクラッシュレポートを無効化。OTAアップデート無効 — 変更ごとに新しいレビュービルドが必要です。",
-    "unknownValue": "利用不可",
+    "unknownValue": "利用不可", "pageIndicator": "About {{current}} / {{total}}", "page1Title": "ACRプラットフォームとは", "page1Text": "ACR Platformは研究用の臨床意思決定支援プラットフォームです。臨床パートナーと臨床試験の専門家が収集する臨床情報を導き、医学知識モデルと意思決定ルールを確認します。", "page2Title": "ACRの仕組み", "page2Text": "承認された利用者が承認済みの構造化臨床情報を入力します。アプリは承認済みの評価リクエストだけをACRサービスへ送り、結果と推論の出典を受け取ります。", "page3Title": "データは留まり、ルールは移動します。", "page3Text": "臨床環境では患者データは承認済みの基盤内に残ります。このモバイルデモは合成データのみを使用します。", "page4Title": "説明可能性と安全性", "page4Text": "ACRの結果は意思決定支援のみを目的とします。P1とP2は暫定デモ項目で、APIに送信せず結果生成にも使用しません。", "page5Title": "ビルドと検証済みベースライン",
     "application": "アプリケーション",
     "baselineAttestation": "ベースライン検証",
     "dataHandling": "データ処理",
@@ -201,6 +201,8 @@
     "state": "状態",
     "verificationHint": "予想値は受け入れられたベースラインマニフェストから取得されます。観測として報告されることはありません。"
   },
+  "p1": { "title": "暫定 P1", "stepTitle": "契約フィールド", "banner": "合成デモのみ · 暫定フィールド", "cardTitle": "腫瘍と性別", "tumorSize": "腫瘍サイズ", "tumorSizeHint": "0より大きい有限の数値。単位は保留中です。", "tumorSizeError": "0より大きい有限値を入力してください。", "gender": "性別", "female": "女性", "male": "男性", "other": "その他", "unknown": "不明", "genderPending": "性別は保留中ですが、このデモの流れは妨げません。", "nodalWarningTitle": "リンパ節マッピング通知", "nodalWarning": "N0–N3を陽性または陰性に暗黙変換しないでください。" },
+  "p2": { "title": "暫定 P2", "stepTitle": "追加デモフィールド", "banner": "合成デモのみ · 暫定フィールド", "cardTitle": "追加フィールド", "ecogScore": "ECOGスコア", "ecogHint": "0から4までの任意の整数です。", "ecogError": "0から4までの整数を入力してください。", "pdl1Status": "PD-L1状態", "her2Low": "HER2-low", "lvef": "LVEF（%）", "lvefHint": "0から100までの任意の有限値です。", "lvefError": "0から100までの値を入力してください。", "treatmentIntent": "治療意図", "notTested": "未検査", "unknown": "不明", "neoadjuvant": "術前", "adjuvant": "術後", "unspecified": "未指定" },
   "provenance": {
     "acrNative": "ACR_NATIVE",
     "openlletVerified": "OPENLLET_NATIVE_VERIFIED",

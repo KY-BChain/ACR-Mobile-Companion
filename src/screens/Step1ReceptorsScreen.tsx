@@ -36,9 +36,9 @@ export const Step1ReceptorsScreen: React.FC = () => {
   return (
     <ScreenLayout
       title={t('assessment:newTitle')}
-      subtitle={t('assessment:stepSubtitle', { current: 1, total: 3, title: t('receptors:stepTitle') })}
+      subtitle={t('assessment:stepSubtitle', { current: 1, total: 5, title: t('receptors:stepTitle') })}
       bannerText={t('assessment:clinicalTransparencyBanner')}
-      steps={{ total: 3, current: 1 }}
+      steps={{ total: 5, current: 1 }}
       footer={
         <>
           <ACRButton title={t('common:cancel')} variant="secondary" onPress={() => navigation.navigate('Welcome')} />

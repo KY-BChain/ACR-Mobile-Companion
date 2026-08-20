@@ -5,11 +5,12 @@ import { ACRColors, ACRTypography } from '../theme/colors';
 interface Props {
   title: string;
   subtitle?: string;
+  titleStyle?: object;
 }
 
-export const ACRHeader: React.FC<Props> = ({ title, subtitle }) => (
+export const ACRHeader: React.FC<Props> = ({ title, subtitle, titleStyle }) => (
   <View style={styles.container}>
-    <Text style={styles.title}>{title}</Text>
+    <Text style={[styles.title, titleStyle]}>{title}</Text>
     {subtitle ? <Text style={styles.sub}>{subtitle}</Text> : null}
   </View>
 );

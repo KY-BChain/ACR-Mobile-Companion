@@ -120,7 +120,7 @@
     "checking": "检查中…",
     "ki67": "Ki-67",
     "nodalStatus": "淋巴结状态",
-    "submissionFailed": "提交失败",
+    "submissionFailed": "提交失败", "p1Title": "临时 P1", "p2Title": "临时 P2", "provisionalHint": "仅用于合成数据的临时字段。不发送到 API，也不用于生成结果。",
     "subtitle": "提交前确认输入内容",
     "surgeryDate": "手术日期",
     "title": "复核"
@@ -171,7 +171,7 @@
     "ontologyHashLabel": "本体 SHA-256（已观察，只读挂载）",
     "dataHandlingSection": "数据处理",
     "dataHandlingText": "不保留任何临床数据。无分析。第一阶段禁用崩溃报告。禁用无线更新 — 每次更改都需要新的经过审核的构建。",
-    "unknownValue": "不可用",
+    "unknownValue": "不可用", "pageIndicator": "关于 {{current}} / {{total}}", "page1Title": "什么是 ACR 平台", "page1Text": "ACR 平台是一个研究性的临床决策支持平台。临床合作伙伴和临床试验专家指导收集的临床事实，并审查其受治理的医学知识模型和决策支持规则。", "page2Title": "ACR 如何工作", "page2Text": "授权用户输入经批准的结构化临床事实。配套应用仅向连接的 ACR 服务发送经批准的评估请求，并返回结果和推理来源。", "page3Title": "数据留存，规则随行。", "page3Text": "在临床部署中，患者数据保留在授权的临床基础设施内。本移动演示仅使用合成数据。", "page4Title": "可解释性与安全", "page4Text": "ACR 结果仅用于决策支持。P1 和 P2 是临时演示字段，不发送到 API，也不用于生成结果。", "page5Title": "构建与已验证基线",
     "application": "应用",
     "baselineAttestation": "基线认证",
     "dataHandling": "数据处理",
@@ -201,6 +201,8 @@
     "state": "状态",
     "verificationHint": "预期值来自已接受的基线清单；它们永远不会被报告为观察值。"
   },
+  "p1": { "title": "临时 P1", "stepTitle": "合同字段", "banner": "仅限合成演示 · 临时字段", "cardTitle": "肿瘤与性别", "tumorSize": "肿瘤大小", "tumorSizeHint": "大于零的有限数值。单位待定。", "tumorSizeError": "请输入大于零的有限值。", "gender": "性别", "female": "女性", "male": "男性", "other": "其他", "unknown": "未知", "genderPending": "性别待定，不会阻止此演示流程。", "nodalWarningTitle": "淋巴结映射提示", "nodalWarning": "N0–N3 不得静默映射为阳性或阴性。" },
+  "p2": { "title": "临时 P2", "stepTitle": "其他演示字段", "banner": "仅限合成演示 · 临时字段", "cardTitle": "其他字段", "ecogScore": "ECOG评分", "ecogHint": "可选整数，范围为0至4。", "ecogError": "请输入0至4的整数。", "pdl1Status": "PD-L1状态", "her2Low": "HER2低表达", "lvef": "LVEF（%）", "lvefHint": "可选有限值，范围为0至100。", "lvefError": "请输入0至100的有限值。", "treatmentIntent": "治疗意图", "notTested": "未检测", "unknown": "未知", "neoadjuvant": "新辅助", "adjuvant": "辅助", "unspecified": "未指定" },
   "provenance": {
     "acrNative": "ACR_NATIVE",
     "openlletVerified": "OPENLLET_NATIVE_VERIFIED",

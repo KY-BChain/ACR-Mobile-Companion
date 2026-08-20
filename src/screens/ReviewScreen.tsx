@@ -19,7 +19,7 @@ type NavProp = NativeStackNavigationProp<RootStackParamList>;
 export const ReviewScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<NavProp>();
-  const { form, sessionId, attestation, setAttestation, setResult, reset } = useAssessmentStore();
+  const { form, p1, p2, sessionId, attestation, setAttestation, setResult, reset } = useAssessmentStore();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -106,6 +106,21 @@ export const ReviewScreen: React.FC = () => {
       <ACRCard title={t('review:reasoningOptions')}>
         <Row label={t('review:bayesianLayer')} value={form.step3.bayesianEnhanced ? t('common:on') : t('common:off')} />
         <Text style={styles.hint}>{t('review:bayesianHint')}</Text>
+      </ACRCard>
+
+      <ACRCard title={t('review:p1Title')}>
+        <Row label={t('p1:tumorSize')} value={p1.tumorSize || t('common:emDash')} />
+        <Row label={t('p1:gender')} value={p1.gender || t('common:emDash')} />
+        <Text style={styles.hint}>{t('review:provisionalHint')}</Text>
+      </ACRCard>
+
+      <ACRCard title={t('review:p2Title')}>
+        <Row label={t('p2:ecogScore')} value={p2.ecogScore || t('common:emDash')} />
+        <Row label={t('p2:pdl1Status')} value={p2.pdl1Status || t('common:emDash')} />
+        <Row label={t('p2:her2Low')} value={p2.her2Low || t('common:emDash')} />
+        <Row label={t('p2:lvef')} value={p2.lvef || t('common:emDash')} />
+        <Row label={t('p2:treatmentIntent')} value={p2.treatmentIntent || t('common:emDash')} />
+        <Text style={styles.hint}>{t('review:provisionalHint')}</Text>
       </ACRCard>
 
       <ACRCard title={t('review:baseline')}>
