@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -22,6 +22,7 @@ import {
 } from '../i18n/config';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import { getLocaleDirection, getTextAlign, isRTL } from '../utils/rtl';
 
 const LOGO_CORNERSTONE = require('../assets/logos/logo-cornerstone.png');
 const LOGO_BLOCKENERGY = require('../assets/logos/logo-blockenergy.png');
@@ -34,19 +35,37 @@ export const WelcomeScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const [langModalVisible, setLangModalVisible] = useState(false);
+  const languageChangeInProgress = useRef(false);
 
   const currentLang = i18n.language as LanguageCode;
+  const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
+  const direction = getLocaleDirection(activeLanguage);
+  const textAlign = getTextAlign(activeLanguage);
+  const isRtl = isRTL(activeLanguage);
+  const localeTextStyle = { writingDirection: direction, textAlign };
   const currentLangMeta = SUPPORTED_LANGUAGES.find((l) => l.code === currentLang);
 
   const handleSelectLanguage = async (code: LanguageCode) => {
-    if (code !== currentLang) {
-      await changeLanguage(code);
+    if (languageChangeInProgress.current) {
+      return;
     }
+
+    languageChangeInProgress.current = true;
     setLangModalVisible(false);
+
+    try {
+      if (code !== currentLang) {
+        await changeLanguage(code);
+      }
+    } catch (error) {
+      console.error('Language change failed', error);
+    } finally {
+      languageChangeInProgress.current = false;
+    }
   };
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, { direction }]}>
       <ScreenLayout
         title={t('app:name')}
         subtitle={t('app:tagline')}
@@ -54,12 +73,12 @@ export const WelcomeScreen: React.FC = () => {
         bannerVariant="trial"
       >
         <View style={styles.center}>
-          <Text style={styles.logo}>{t('app:name')}</Text>
-          <Text style={styles.tag}>{t('app:tagline')}</Text>
+          <Text style={[styles.logo, localeTextStyle]}>{t('app:name')}</Text>
+          <Text style={[styles.tag, localeTextStyle]}>{t('app:tagline')}</Text>
 
           <View style={styles.consentBox}>
-            <Text style={styles.consentTitle}>{t('welcome:title')}</Text>
-            <Text style={styles.consentText}>
+            <Text style={[styles.consentTitle, localeTextStyle]}>{t('welcome:title')}</Text>
+            <Text style={[styles.consentText, localeTextStyle]}>
               {t('welcome:description1')}
               {'\n\n'}
               {t('welcome:description2')}
@@ -80,8 +99,8 @@ export const WelcomeScreen: React.FC = () => {
           accessibilityLabel={t('welcome:languageSelector')}
         >
           <View style={styles.langRow}>
-            <Text style={styles.langLabel}>{t('welcome:languageSelector')}</Text>
-            <Text style={styles.langValue}>
+            <Text style={[styles.langLabel, localeTextStyle]}>{t('welcome:languageSelector')}</Text>
+            <Text style={[styles.langValue, localeTextStyle]}>
               {currentLangMeta?.flag}  {currentLangMeta?.name}
             </Text>
           </View>
@@ -104,14 +123,22 @@ export const WelcomeScreen: React.FC = () => {
 
       <Image
         source={LOGO_CORNERSTONE}
-        style={[styles.logoTopRight, { top: insets.top + 10 }]}
+        style={[
+          styles.logoTop,
+          isRtl ? styles.logoTopLeft : styles.logoTopRight,
+          { top: insets.top + 10 },
+        ]}
         resizeMode="contain"
         accessibilityLabel="Corner Stone International Foundation"
       />
 
       <Image
         source={LOGO_BLOCKENERGY}
-        style={[styles.logoBottomLeft, { bottom: insets.bottom + 10 }]}
+        style={[
+          styles.logoBottom,
+          isRtl ? styles.logoBottomRight : styles.logoBottomLeft,
+          { bottom: insets.bottom + 10 },
+        ]}
         resizeMode="contain"
         accessibilityLabel="Block Energy"
       />
@@ -125,7 +152,7 @@ export const WelcomeScreen: React.FC = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { width: Math.min(width * 0.85, 360) }]}>
-            <Text style={styles.modalTitle}>{t('welcome:languageSelector')}</Text>
+            <Text style={[styles.modalTitle, localeTextStyle]}>{t('welcome:languageSelector')}</Text>
 
             <FlatList
               data={SUPPORTED_LANGUAGES}
@@ -135,24 +162,50 @@ export const WelcomeScreen: React.FC = () => {
                 return (
                   <TouchableOpacity
                     style={[styles.langItem, selected && styles.langItemSelected]}
-                    onPress={() => handleSelectLanguage(item.code)}
+                    onPress={() => { void handleSelectLanguage(item.code); }}
                     activeOpacity={0.7}
                   >
-                    <Text style={styles.langItemFlag}>{item.flag}</Text>
+                    <Text
+                      style={[
+                        styles.langItemFlag,
+                        isRtl ? styles.langItemFlagRtl : styles.langItemFlagLtr,
+                      ]}
+                    >
+                      {item.flag}
+                    </Text>
                     <Text
                       style={[
                         styles.langItemName,
                         selected && styles.langItemNameSelected,
-                        item.rtl && { textAlign: 'right' },
+                        {
+                          writingDirection: getLocaleDirection(item.code),
+                          textAlign: getTextAlign(item.code),
+                        },
                       ]}
                     >
                       {item.name}
                     </Text>
-                    {selected && <Text style={styles.checkmark}>✓</Text>}
+                    {selected && (
+                      <Text
+                        style={[
+                          styles.checkmark,
+                          isRtl ? styles.checkmarkRtl : styles.checkmarkLtr,
+                        ]}
+                      >
+                        ✓
+                      </Text>
+                    )}
                   </TouchableOpacity>
                 );
               }}
-              ItemSeparatorComponent={() => <View style={styles.separator} />}
+              ItemSeparatorComponent={() => (
+                <View
+                  style={[
+                    styles.separator,
+                    isRtl ? styles.separatorRtl : styles.separatorLtr,
+                  ]}
+                />
+              )}
             />
 
             <TouchableOpacity
@@ -160,7 +213,7 @@ export const WelcomeScreen: React.FC = () => {
               onPress={() => setLangModalVisible(false)}
               activeOpacity={0.7}
             >
-              <Text style={styles.modalCloseText}>{t('common:cancel')}</Text>
+              <Text style={[styles.modalCloseText, localeTextStyle]}>{t('common:cancel')}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -243,19 +296,29 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 13,
   },
-  logoTopRight: {
+  logoTop: {
     position: 'absolute',
-    right: 14,
     width: 70,
     height: 28,
     zIndex: 10,
   },
-  logoBottomLeft: {
+  logoTopRight: {
+    right: 14,
+  },
+  logoTopLeft: {
+    left: 14,
+  },
+  logoBottom: {
     position: 'absolute',
-    left: 16,
     width: 100,
     height: 32,
     zIndex: 10,
+  },
+  logoBottomLeft: {
+    left: 16,
+  },
+  logoBottomRight: {
+    right: 16,
   },
   modalOverlay: {
     flex: 1,
@@ -291,7 +354,12 @@ const styles = StyleSheet.create({
   },
   langItemFlag: {
     fontSize: 20,
+  },
+  langItemFlagLtr: {
     marginRight: 12,
+  },
+  langItemFlagRtl: {
+    marginLeft: 12,
   },
   langItemName: {
     ...ACRTypography.body,
@@ -307,12 +375,22 @@ const styles = StyleSheet.create({
     color: ACRColors.primary,
     fontSize: 16,
     fontWeight: '700',
+  },
+  checkmarkLtr: {
     marginLeft: 8,
+  },
+  checkmarkRtl: {
+    marginRight: 8,
   },
   separator: {
     height: 1,
     backgroundColor: ACRColors.line,
+  },
+  separatorLtr: {
     marginLeft: 42,
+  },
+  separatorRtl: {
+    marginRight: 42,
   },
   modalCloseBtn: {
     marginTop: 10,

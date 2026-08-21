@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
 import { WelcomeScreen } from '../screens/WelcomeScreen';
 import { Step1ReceptorsScreen } from '../screens/Step1ReceptorsScreen';
 import { Step2TumourScreen } from '../screens/Step2TumourScreen';
@@ -13,6 +13,7 @@ import { AboutScreen } from '../screens/AboutScreen';
 import { FailClosedScreen } from '../screens/FailClosedScreen';
 import { checkAttestation } from '../api/attestation';
 import { useAssessmentStore } from '../store/assessmentStore';
+import { isRTL } from '../utils/rtl';
 
 export type RootStackParamList = {
   Welcome: undefined;
@@ -30,7 +31,9 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const AppNavigator: React.FC = () => {
+  const { i18n } = useTranslation();
   const { setAttestation } = useAssessmentStore();
+  const isRtl = isRTL(i18n.resolvedLanguage ?? i18n.language);
 
   useEffect(() => {
     // Initial attestation check on app launch
@@ -45,7 +48,7 @@ export const AppNavigator: React.FC = () => {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          animation: 'slide_from_right',
+          animation: isRtl ? 'slide_from_left' : 'slide_from_right',
         }}
         initialRouteName="Welcome"
       >

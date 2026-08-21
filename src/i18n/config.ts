@@ -1,8 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import * as Localization from 'expo-localization';
-import * as Updates from 'expo-updates';       
-import { I18nManager } from 'react-native';
 
 // Import all translation resources
 import enGB from './locales/en-GB.json';
@@ -45,12 +43,6 @@ const matchedLang = SUPPORTED_LANGUAGES.find(l =>
 );
 const defaultLang: LanguageCode = matchedLang?.code ?? 'en-GB';
 
-// RTL handling for Arabic
-if (defaultLang === 'ar-SA' && !I18nManager.isRTL) {
-  I18nManager.allowRTL(true);
-  I18nManager.forceRTL(true);
-}
-
 i18n
   .use(initReactI18next)
   .init({
@@ -68,20 +60,7 @@ i18n
   });
 
 export const changeLanguage = async (lang: LanguageCode) => {
-  const isRTL = lang === 'ar-SA';
-  const currentlyRTL = I18nManager.isRTL;
-
   await i18n.changeLanguage(lang);
-
-  if (isRTL !== currentlyRTL) {
-    I18nManager.allowRTL(isRTL);
-    I18nManager.forceRTL(isRTL);
-    try {
-      await Updates.reloadAsync();
-    } catch (e) {
-      console.warn('RTL change requires app restart in development');
-    }
-  }
 };
 
 export default i18n;

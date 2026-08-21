@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, I18nManager } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { ACRColors, ACRTypography } from '../theme/colors';
@@ -10,14 +10,20 @@ import { ACRStateBadge } from '../components/ACRStateBadge';
 import { useAssessmentStore } from '../store/assessmentStore';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import { getLocaleDirection, getTextAlign } from '../utils/rtl';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const AboutScreen: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigation = useNavigation<NavProp>();
   const { attestation } = useAssessmentStore();
   const [page, setPage] = useState(0);
+  const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
+  const localeTextStyle = {
+    writingDirection: getLocaleDirection(activeLanguage),
+    textAlign: getTextAlign(activeLanguage),
+  };
 
   useEffect(() => navigation.addListener('focus', () => setPage(0)), [navigation]);
 
@@ -40,12 +46,12 @@ export const AboutScreen: React.FC = () => {
       </>}
     >
       {page === 0 ? <>
-        <ACRCard title={t('about:page1Title')}><Text accessibilityRole="text" style={styles.bodyText}>{t('about:page1Text')}</Text></ACRCard>
-        <ACRCard title={t('about:page2Title')}><Text accessibilityRole="text" style={styles.bodyText}>{t('about:page2Text')}</Text></ACRCard>
+        <ACRCard title={t('about:page1Title')}><Text accessibilityRole="text" style={[styles.bodyText, localeTextStyle]}>{t('about:page1Text')}</Text></ACRCard>
+        <ACRCard title={t('about:page2Title')}><Text accessibilityRole="text" style={[styles.bodyText, localeTextStyle]}>{t('about:page2Text')}</Text></ACRCard>
       </> : <>
-        <ACRCard title={t('about:page3Title')}><Text accessibilityRole="text" style={styles.bodyText}>{t('about:page3Text')}</Text></ACRCard>
-        <ACRCard title={t('about:page4Title')}><Text accessibilityRole="text" style={styles.bodyText}>{t('about:page4Text')}</Text></ACRCard>
-        <ACRCard title={t('about:dataHandlingSection')}><Text style={styles.bodyText}>{t('about:dataHandlingText')}</Text></ACRCard>
+        <ACRCard title={t('about:page3Title')}><Text accessibilityRole="text" style={[styles.bodyText, localeTextStyle]}>{t('about:page3Text')}</Text></ACRCard>
+        <ACRCard title={t('about:page4Title')}><Text accessibilityRole="text" style={[styles.bodyText, localeTextStyle]}>{t('about:page4Text')}</Text></ACRCard>
+        <ACRCard title={t('about:dataHandlingSection')}><Text style={[styles.bodyText, localeTextStyle]}>{t('about:dataHandlingText')}</Text></ACRCard>
       </>}
     </ScreenLayout>
   );
@@ -86,7 +92,6 @@ const styles = StyleSheet.create({
     lineHeight: 25,
     color: ACRColors.ink,
     marginVertical: 10,
-    writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
   },
   aboutTitle: {
     fontSize: 25,
@@ -96,7 +101,6 @@ const styles = StyleSheet.create({
     color: ACRColors.muted,
     marginTop: 8,
     marginBottom: 4,
-    writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
   },
   prov: {
     ...ACRTypography.monospace,

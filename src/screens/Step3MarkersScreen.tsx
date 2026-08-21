@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, I18nManager } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { ACRColors, ACRTypography } from '../theme/colors';
@@ -10,6 +10,7 @@ import { ACRButton } from '../components/ACRButton';
 import { useAssessmentStore } from '../store/assessmentStore';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import { getLocaleDirection, getTextAlign } from '../utils/rtl';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -62,9 +63,18 @@ export const Step3MarkersScreen: React.FC = () => {
 };
 
 const Label: React.FC<{ text: string; optional?: boolean }> = ({ text, optional }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
   return (
-    <Text style={styles.label}>
+    <Text
+      style={[
+        styles.label,
+        {
+          writingDirection: getLocaleDirection(activeLanguage),
+          textAlign: getTextAlign(activeLanguage),
+        },
+      ]}
+    >
       {text} {optional ? <Text style={styles.small}>· {t('common:optional')}</Text> : null}
     </Text>
   );
@@ -75,7 +85,6 @@ const styles = StyleSheet.create({
     ...ACRTypography.label,
     marginTop: 9,
     marginBottom: 4,
-    writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
   },
   small: {
     fontWeight: '400',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, I18nManager } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { ACRColors, ACRTypography } from '../theme/colors';
@@ -13,15 +13,21 @@ import { submitAssessment } from '../api/infer';
 import { generateRequestId } from '../utils/uuid';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import { getLocaleDirection, getTextAlign } from '../utils/rtl';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const ReviewScreen: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigation = useNavigation<NavProp>();
   const { form, p1, p2, sessionId, attestation, setAttestation, setResult, reset } = useAssessmentStore();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
+  const localeTextStyle = {
+    writingDirection: getLocaleDirection(activeLanguage),
+    textAlign: getTextAlign(activeLanguage),
+  };
 
   const isVerified = attestation?.verificationState === 'VERIFIED';
 
@@ -105,13 +111,13 @@ export const ReviewScreen: React.FC = () => {
 
       <ACRCard title={t('review:reasoningOptions')}>
         <Row label={t('review:bayesianLayer')} value={form.step3.bayesianEnhanced ? t('common:on') : t('common:off')} />
-        <Text style={styles.hint}>{t('review:bayesianHint')}</Text>
+        <Text style={[styles.hint, localeTextStyle]}>{t('review:bayesianHint')}</Text>
       </ACRCard>
 
       <ACRCard title={t('review:p1Title')}>
         <Row label={t('p1:tumorSize')} value={p1.tumorSize || t('common:emDash')} />
         <Row label={t('p1:gender')} value={p1.gender || t('common:emDash')} />
-        <Text style={styles.hint}>{t('review:provisionalHint')}</Text>
+        <Text style={[styles.hint, localeTextStyle]}>{t('review:provisionalHint')}</Text>
       </ACRCard>
 
       <ACRCard title={t('review:p2Title')}>
@@ -120,7 +126,7 @@ export const ReviewScreen: React.FC = () => {
         <Row label={t('p2:her2Low')} value={p2.her2Low || t('common:emDash')} />
         <Row label={t('p2:lvef')} value={p2.lvef || t('common:emDash')} />
         <Row label={t('p2:treatmentIntent')} value={p2.treatmentIntent || t('common:emDash')} />
-        <Text style={styles.hint}>{t('review:provisionalHint')}</Text>
+        <Text style={[styles.hint, localeTextStyle]}>{t('review:provisionalHint')}</Text>
       </ACRCard>
 
       <ACRCard title={t('review:baseline')}>
@@ -130,16 +136,16 @@ export const ReviewScreen: React.FC = () => {
             attestation ? (
               <ACRStateBadge state={attestation.verificationState} />
             ) : (
-              <Text style={styles.muted}>{t('review:checking')}</Text>
+              <Text style={[styles.muted, localeTextStyle]}>{t('review:checking')}</Text>
             )
           }
         />
-        <Text style={styles.hint}>{t('review:baselineHint')}</Text>
+        <Text style={[styles.hint, localeTextStyle]}>{t('review:baselineHint')}</Text>
       </ACRCard>
 
       {error ? (
         <View style={styles.errorBox}>
-          <Text style={styles.errorText}>{error}</Text>
+          <Text style={[styles.errorText, localeTextStyle]}>{error}</Text>
         </View>
       ) : null}
     </ScreenLayout>
@@ -150,12 +156,21 @@ const Row: React.FC<{ label: string; value?: string; valueComponent?: React.Reac
   label,
   value,
   valueComponent,
-}) => (
-  <View style={styles.row}>
-    <Text style={styles.rowLabel}>{label}</Text>
-    {valueComponent || <Text style={styles.rowValue}>{value}</Text>}
-  </View>
-);
+}) => {
+  const { i18n } = useTranslation();
+  const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
+  const localeTextStyle = {
+    writingDirection: getLocaleDirection(activeLanguage),
+    textAlign: getTextAlign(activeLanguage),
+  };
+
+  return (
+    <View style={styles.row}>
+      <Text style={[styles.rowLabel, localeTextStyle]}>{label}</Text>
+      {valueComponent || <Text style={[styles.rowValue, localeTextStyle]}>{value}</Text>}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   row: {
@@ -179,7 +194,6 @@ const styles = StyleSheet.create({
     ...ACRTypography.hint,
     color: ACRColors.muted,
     marginTop: 4,
-    writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
   },
   muted: {
     fontSize: 11,

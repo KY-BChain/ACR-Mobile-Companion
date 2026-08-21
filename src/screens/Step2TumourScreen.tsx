@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, I18nManager } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { ACRColors, ACRTypography } from '../theme/colors';
@@ -11,13 +11,19 @@ import { ACRButton } from '../components/ACRButton';
 import { useAssessmentStore } from '../store/assessmentStore';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import { getLocaleDirection, getTextAlign } from '../utils/rtl';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const Step2TumourScreen: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigation = useNavigation<NavProp>();
   const { form, setStep2 } = useAssessmentStore();
+  const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
+  const localeTextStyle = {
+    writingDirection: getLocaleDirection(activeLanguage),
+    textAlign: getTextAlign(activeLanguage),
+  };
 
   const gradeOptions = [
     { value: '1', label: t('tumour:grade1') },
@@ -48,9 +54,9 @@ export const Step2TumourScreen: React.FC = () => {
       <ACRCard title={t('tumour:cardTitle')}>
         <Label text={t('tumour:stage')} optional />
         <View style={styles.pickerShell}>
-          <Text style={styles.pickerText}>{form.step2.stage || t('common:emDash')}</Text>
+          <Text style={[styles.pickerText, localeTextStyle]}>{form.step2.stage || t('common:emDash')}</Text>
         </View>
-        <Text style={styles.hint}>{t('tumour:stageHint')}</Text>
+        <Text style={[styles.hint, localeTextStyle]}>{t('tumour:stageHint')}</Text>
 
         <Label text={t('tumour:grade')} optional />
         <ACRSegmentedControl
@@ -62,7 +68,7 @@ export const Step2TumourScreen: React.FC = () => {
 
         <Label text={t('tumour:histologicalSubtype')} optional />
         <View style={styles.pickerShell}>
-          <Text style={styles.pickerText}>{form.step2.histologicalSubtype || t('common:emDash')}</Text>
+          <Text style={[styles.pickerText, localeTextStyle]}>{form.step2.histologicalSubtype || t('common:emDash')}</Text>
         </View>
 
         <Label text={t('tumour:nodalStatus')} optional />
@@ -86,9 +92,18 @@ export const Step2TumourScreen: React.FC = () => {
 };
 
 const Label: React.FC<{ text: string; optional?: boolean }> = ({ text, optional }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
   return (
-    <Text style={styles.label}>
+    <Text
+      style={[
+        styles.label,
+        {
+          writingDirection: getLocaleDirection(activeLanguage),
+          textAlign: getTextAlign(activeLanguage),
+        },
+      ]}
+    >
       {text} {optional ? <Text style={styles.small}>· {t('common:optional')}</Text> : null}
     </Text>
   );
@@ -99,7 +114,6 @@ const styles = StyleSheet.create({
     ...ACRTypography.label,
     marginTop: 9,
     marginBottom: 4,
-    writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
   },
   small: {
     fontWeight: '400',
@@ -122,6 +136,5 @@ const styles = StyleSheet.create({
     ...ACRTypography.hint,
     color: ACRColors.muted,
     marginTop: 3,
-    writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
   },
 });

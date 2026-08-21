@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { ACRColors } from '../theme/colors';
+import { getLocaleDirection } from '../utils/rtl';
 import { ACRHeader } from './ACRHeader';
 import { ACRBanner } from './ACRBanner';
 import { ACRStepIndicator } from './ACRStepIndicator';
@@ -25,18 +27,23 @@ export const ScreenLayout: React.FC<Props> = ({
   steps,
   children,
   footer,
-}) => (
-  <SafeAreaView style={styles.safe}>
-    <View style={styles.island} />
-    <ACRHeader title={title} subtitle={subtitle} titleStyle={titleStyle} />
-    {bannerText ? <ACRBanner text={bannerText} variant={bannerVariant} /> : null}
-    {steps ? <ACRStepIndicator total={steps.total} current={steps.current} /> : null}
-    <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
-      {children}
-    </ScrollView>
-    {footer ? <View style={styles.footer}>{footer}</View> : null}
-  </SafeAreaView>
-);
+}) => {
+  const { i18n } = useTranslation();
+  const direction = getLocaleDirection(i18n.resolvedLanguage ?? i18n.language);
+
+  return (
+    <SafeAreaView style={[styles.safe, { direction }]}>
+      <View style={styles.island} />
+      <ACRHeader title={title} subtitle={subtitle} titleStyle={titleStyle} />
+      {bannerText ? <ACRBanner text={bannerText} variant={bannerVariant} /> : null}
+      {steps ? <ACRStepIndicator total={steps.total} current={steps.current} /> : null}
+      <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
+        {children}
+      </ScrollView>
+      {footer ? <View style={styles.footer}>{footer}</View> : null}
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   safe: {
