@@ -36,7 +36,7 @@
     "title": "Before you begin",
     "description1": "This app is a presentation client for the ACR-Platform reasoner. All reasoning happens server-side.",
     "description2": "Synthetic data only. Do not enter live, coded or pseudonymised patient information.",
-    "description3": "No intentional clinical data at rest. Entries exist in memory for one assessment only.",
+    "description3": "The app does not intentionally store clinical data. Entries are held in memory for the current assessment only.",
     "description4": "Not for diagnosis or treatment.",
     "beginButton": "I understand — Begin",
     "languageSelector": "Language"
