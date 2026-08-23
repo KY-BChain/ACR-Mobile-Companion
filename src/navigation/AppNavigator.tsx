@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
+import { PosterScreen } from '../screens/PosterScreen';
 import { WelcomeScreen } from '../screens/WelcomeScreen';
 import { Step1ReceptorsScreen } from '../screens/Step1ReceptorsScreen';
 import { Step2TumourScreen } from '../screens/Step2TumourScreen';
@@ -16,6 +18,7 @@ import { useAssessmentStore } from '../store/assessmentStore';
 import { isRTL } from '../utils/rtl';
 
 export type RootStackParamList = {
+  Poster: undefined;
   Welcome: undefined;
   Step1: undefined;
   Step2: undefined;
@@ -34,6 +37,7 @@ export const AppNavigator: React.FC = () => {
   const { i18n } = useTranslation();
   const { setAttestation } = useAssessmentStore();
   const isRtl = isRTL(i18n.resolvedLanguage ?? i18n.language);
+  const isAndroid = Platform.OS === 'android';
 
   useEffect(() => {
     // Initial attestation check on app launch
@@ -50,8 +54,9 @@ export const AppNavigator: React.FC = () => {
           headerShown: false,
           animation: isRtl ? 'slide_from_left' : 'slide_from_right',
         }}
-        initialRouteName="Welcome"
+        initialRouteName={isAndroid ? 'Poster' : 'Welcome'}
       >
+        {isAndroid && <Stack.Screen name="Poster" component={PosterScreen} />}
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Step1" component={Step1ReceptorsScreen} />
         <Stack.Screen name="Step2" component={Step2TumourScreen} />

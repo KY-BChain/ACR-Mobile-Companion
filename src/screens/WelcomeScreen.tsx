@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,10 @@ import {
   Modal,
   TouchableOpacity,
   FlatList,
+  Platform,
   useWindowDimensions,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ACRColors, ACRTypography } from '../theme/colors';
@@ -44,6 +45,22 @@ export const WelcomeScreen: React.FC = () => {
   const isRtl = isRTL(activeLanguage);
   const localeTextStyle = { writingDirection: direction, textAlign };
   const currentLangMeta = SUPPORTED_LANGUAGES.find((l) => l.code === currentLang);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== 'android' || langModalVisible) {
+        return undefined;
+      }
+
+      const posterTimer = setTimeout(() => {
+        if (navigation.isFocused()) {
+          navigation.replace('Poster');
+        }
+      }, 3000);
+
+      return () => clearTimeout(posterTimer);
+    }, [langModalVisible, navigation]),
+  );
 
   const handleSelectLanguage = async (code: LanguageCode) => {
     if (languageChangeInProgress.current) {
