@@ -2,7 +2,7 @@
   "expo": {
     "name": "ACR Companion",
     "slug": "acr-mobile-companion",
-    "version": "0.1.0",
+    "version": "0.5.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,7 +14,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.anonymous.acr-mobile-companion",
-      "buildNumber": "42",
+      "buildNumber": "43",
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -22,7 +22,7 @@
     },
     "android": {
     "package": "com.anonymous.acr_mobile_companion",
-    "versionCode": 42
+    "versionCode": 43
     }
   }
 }

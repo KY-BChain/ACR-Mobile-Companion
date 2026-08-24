@@ -37,7 +37,7 @@ export const AppNavigator: React.FC = () => {
   const { i18n } = useTranslation();
   const { setAttestation } = useAssessmentStore();
   const isRtl = isRTL(i18n.resolvedLanguage ?? i18n.language);
-  const isAndroid = Platform.OS === 'android';
+  const supportsPoster = Platform.OS === 'android' || Platform.OS === 'ios';
 
   useEffect(() => {
     // Initial attestation check on app launch
@@ -54,9 +54,9 @@ export const AppNavigator: React.FC = () => {
           headerShown: false,
           animation: isRtl ? 'slide_from_left' : 'slide_from_right',
         }}
-        initialRouteName={isAndroid ? 'Poster' : 'Welcome'}
+        initialRouteName={supportsPoster ? 'Poster' : 'Welcome'}
       >
-        {isAndroid && <Stack.Screen name="Poster" component={PosterScreen} />}
+        {supportsPoster && <Stack.Screen name="Poster" component={PosterScreen} />}
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
         <Stack.Screen name="Step1" component={Step1ReceptorsScreen} />
         <Stack.Screen name="Step2" component={Step2TumourScreen} />

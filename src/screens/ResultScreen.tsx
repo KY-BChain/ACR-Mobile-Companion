@@ -7,6 +7,7 @@ import { ScreenLayout } from '../components/ScreenLayout';
 import { ACRCard } from '../components/ACRCard';
 import { ACRButton } from '../components/ACRButton';
 import { ACRBadge } from '../components/ACRBadge';
+import { MOBILE_PROVENANCE_BUILD_ID } from '../config/appIdentity';
 import { useAssessmentStore } from '../store/assessmentStore';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
@@ -84,7 +85,7 @@ export const ResultScreen: React.FC = () => {
 reasoner: ${data.provenance.reasonerVersion}
 responseContract: ${data.provenance.responseContract}
 timestamp: ${result.completedAt}
-buildId: mob-v0.1.0 (42)
+buildId: ${MOBILE_PROVENANCE_BUILD_ID}
 ontologySHA256: ${data.provenance.ontologySha256.substring(0, 16)}… `}
           <Text style={styles.tapHint}>{t('result:tapToExpand')}</Text>
         </Text>

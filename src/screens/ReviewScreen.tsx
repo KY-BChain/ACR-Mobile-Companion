@@ -11,6 +11,7 @@ import { useAssessmentStore } from '../store/assessmentStore';
 import { checkAttestation } from '../api/attestation';
 import { submitAssessment } from '../api/infer';
 import { generateRequestId } from '../utils/uuid';
+import { MOBILE_BUILD_ID } from '../config/appIdentity';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { getLocaleDirection, getTextAlign } from '../utils/rtl';
@@ -66,7 +67,7 @@ export const ReviewScreen: React.FC = () => {
         },
         client: {
           channel: 'MOBILE' as const,
-          buildId: 'mob-v0.1.0+42',
+          buildId: MOBILE_BUILD_ID,
           environment: 'EVALUATION' as const,
         },
       };

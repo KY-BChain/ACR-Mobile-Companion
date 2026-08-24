@@ -54,14 +54,15 @@ assert.match(poster, /navigation\.replace\('Welcome'\)/);
 console.log('STATIC PASS local assets, responsive contain rendering, vertical gesture, route replacement');
 
 const navigator = read('src/navigation/AppNavigator.tsx');
-assert.match(navigator, /Platform\.OS === 'android'/);
-assert.match(navigator, /initialRouteName=\{isAndroid \? 'Poster' : 'Welcome'\}/);
-assert.match(navigator, /\{isAndroid && <Stack\.Screen name="Poster" component=\{PosterScreen\} \/>\}/);
-console.log('STATIC PASS Android-only route boundary and unchanged iOS initial route');
+assert.match(navigator, /Platform\.OS === 'android' \|\| Platform\.OS === 'ios'/);
+assert.match(navigator, /initialRouteName=\{supportsPoster \? 'Poster' : 'Welcome'\}/);
+assert.match(navigator, /\{supportsPoster && <Stack\.Screen name="Poster" component=\{PosterScreen\} \/>\}/);
+console.log('STATIC PASS Android/iOS route boundary with unsupported-platform fallback');
 
 const welcome = read('src/screens/WelcomeScreen.tsx');
 assert.match(welcome, /useFocusEffect/);
-assert.match(welcome, /Platform\.OS !== 'android' \|\| langModalVisible/);
+assert.match(welcome, /Platform\.OS === 'android' \|\| Platform\.OS === 'ios'/);
+assert.match(welcome, /if \(!supportsPoster \|\| langModalVisible\)/);
 assert.match(welcome, /setTimeout\(\(\) => \{/);
 assert.match(welcome, /navigation\.isFocused\(\)/);
 assert.match(welcome, /navigation\.replace\('Poster'\)/);
@@ -69,4 +70,4 @@ assert.match(welcome, /\}, 3000\)/);
 assert.match(welcome, /clearTimeout\(posterTimer\)/);
 console.log('STATIC PASS focused timer cleanup, modal safeguard, and non-Welcome redirect guard');
 
-console.log('PASS Android poster/Welcome automated evidence');
+console.log('PASS Android/iOS poster/Welcome automated evidence');

@@ -48,7 +48,8 @@ export const WelcomeScreen: React.FC = () => {
 
   useFocusEffect(
     useCallback(() => {
-      if (Platform.OS !== 'android' || langModalVisible) {
+      const supportsPoster = Platform.OS === 'android' || Platform.OS === 'ios';
+      if (!supportsPoster || langModalVisible) {
         return undefined;
       }
 

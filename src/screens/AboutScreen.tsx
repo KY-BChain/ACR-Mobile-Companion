@@ -11,6 +11,7 @@ import { useAssessmentStore } from '../store/assessmentStore';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { getLocaleDirection, getTextAlign } from '../utils/rtl';
+import { APP_VERSION_LABEL } from '../config/appIdentity';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -52,6 +53,7 @@ export const AboutScreen: React.FC = () => {
         <ACRCard title={t('about:page3Title')}><Text accessibilityRole="text" style={[styles.bodyText, localeTextStyle]}>{t('about:page3Text')}</Text></ACRCard>
         <ACRCard title={t('about:page4Title')}><Text accessibilityRole="text" style={[styles.bodyText, localeTextStyle]}>{t('about:page4Text')}</Text></ACRCard>
         <ACRCard title={t('about:dataHandlingSection')}><Text style={[styles.bodyText, localeTextStyle]}>{t('about:dataHandlingText')}</Text></ACRCard>
+        <Text accessibilityRole="text" style={[styles.versionLabel, localeTextStyle]}>{APP_VERSION_LABEL}</Text>
       </>}
     </ScreenLayout>
   );
@@ -95,6 +97,12 @@ const styles = StyleSheet.create({
   },
   aboutTitle: {
     fontSize: 25,
+  },
+  versionLabel: {
+    ...ACRTypography.hint,
+    color: ACRColors.muted,
+    marginTop: 8,
+    textAlign: 'center',
   },
   hint: {
     ...ACRTypography.hint,
