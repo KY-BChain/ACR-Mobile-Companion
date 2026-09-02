@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "files": ["App.tsx"],
+  "include": [],
+  "exclude": ["src/screens/archived", "src/i18n/locales/v1"]
+}

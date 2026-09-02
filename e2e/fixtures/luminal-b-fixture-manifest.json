@@ -1,0 +1,7 @@
+{
+  "verificationStatus": "UNIT_TEST_ONLY",
+  "syntheticOrigin": true,
+  "captureRoute": "MOCK_AUTHORED_BUILD_43",
+  "eligibleForDeliveredReplay": false,
+  "reason": "This reduced response was authored as a Build 43 mock and is not an exact capture from the canonical platform route."
+}

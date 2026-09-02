@@ -1,12 +1,16 @@
 # ACR Mobile Companion
 
-Generic React Native + TypeScript codebase for the ACR Clinical Decision Support Companion.
+React Native + TypeScript source for ACR Mobile Companion v0.6.0 Build 44,
+including its thin same-backend gateway, versioned contracts and integration
+tests. The repository is sufficient to reinstall dependencies and rebuild the
+iOS and Android applications; generated dependencies and build outputs are not
+stored in Git.
 
 ## Scope
 
-- **UI-only** mobile app (iOS & Android)
+- **Transport/UI-only** mobile app (iOS & Android); clinical inference remains platform-owned
 - In-memory assessment flow — no persistence, no AsyncStorage
-- Synthetic data channel (`/m/v1`) only
+- Live Platform and explicit synthetic demonstration channels under `/m/v1`
 - No Phase 4 / governance / federated learning surfaces
 - Fail-closed attestation per ACR-DD-014 §3.2 & §6.4
 
@@ -29,12 +33,16 @@ src/
   types/         — TypeScript contracts from ACR-DD-014
   utils/         — UUID generators
 App.tsx          — Entry point
+gateway/         — Thin authentication/validation/transport interface
+schemas/         — Versioned request, response, error and attestation contracts
+e2e/             — Same-backend and explicit-replay integration tests
+docs/loop/       — Build 44 execution record and Build 45 review backlog
 ```
 
 ## Getting Started
 
 ```bash
-# Install dependencies
+# Install mobile dependencies
 npm install
 
 # iOS (Xcode)
@@ -42,6 +50,11 @@ npx expo run:ios
 
 # Android
 npx expo run:android
+
+# Install and verify the gateway
+cd gateway
+npm ci
+npm test
 ```
 
 ## Xcode Review
@@ -74,13 +87,18 @@ Open `ios/ACRMobileCompanion.xcworkspace` in Xcode after the first `expo run:ios
 
 ## Environment
 
-Set `BASE_URL` in `src/api/client.ts` to the actual gateway endpoint before build.
+The reviewed Build 44 endpoint policy is defined in `src/config/gateway.ts`.
+Any endpoint or network-security change requires a new reviewed native build.
+See `gateway/README.md` for gateway configuration and fixture policy.
 
 ## Build Identity
 
-- Marketing version: `0.1.0`
-- Native build: `42`
-- EAS profile: `trial-internal`
+- Marketing version: `0.6.0`
+- Native build: `44`
 - Response contract: `m1`
 - Reasoner: `v2.2.1`
 - Reasoning mode: `OPENLLET_SWRL`
+
+Build 44 is a controlled evaluation build for synthetic or explicitly
+authorised non-patient test data. It is not approved for diagnosis, treatment
+decisions, public distribution or unsupervised clinical use.

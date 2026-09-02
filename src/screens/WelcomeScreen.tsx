@@ -134,7 +134,7 @@ export const WelcomeScreen: React.FC = () => {
           <ACRButton
             title={t('welcome:beginButton')}
             variant="primary"
-            onPress={() => navigation.navigate('Step1')}
+            onPress={() => navigation.navigate('GatewayAccess')}
           />
         </View>
       </ScreenLayout>

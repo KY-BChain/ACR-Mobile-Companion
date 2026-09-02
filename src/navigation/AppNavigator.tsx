@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react';
-import { Platform } from 'react-native';
+import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTranslation } from 'react-i18next';
 import { PosterScreen } from '../screens/PosterScreen';
 import { WelcomeScreen } from '../screens/WelcomeScreen';
+import { GatewayAccessScreen } from '../screens/GatewayAccessScreen';
 import { Step1ReceptorsScreen } from '../screens/Step1ReceptorsScreen';
 import { Step2TumourScreen } from '../screens/Step2TumourScreen';
 import { Step3MarkersScreen } from '../screens/Step3MarkersScreen';
@@ -13,13 +13,12 @@ import { ReviewScreen } from '../screens/ReviewScreen';
 import { ResultScreen } from '../screens/ResultScreen';
 import { AboutScreen } from '../screens/AboutScreen';
 import { FailClosedScreen } from '../screens/FailClosedScreen';
-import { checkAttestation } from '../api/attestation';
-import { useAssessmentStore } from '../store/assessmentStore';
 import { isRTL } from '../utils/rtl';
 
 export type RootStackParamList = {
   Poster: undefined;
   Welcome: undefined;
+  GatewayAccess: undefined;
   Step1: undefined;
   Step2: undefined;
   Step3: undefined;
@@ -35,29 +34,18 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const AppNavigator: React.FC = () => {
   const { i18n } = useTranslation();
-  const { setAttestation } = useAssessmentStore();
   const isRtl = isRTL(i18n.resolvedLanguage ?? i18n.language);
-  const supportsPoster = Platform.OS === 'android' || Platform.OS === 'ios';
-
-  useEffect(() => {
-    // Initial attestation check on app launch
-    checkAttestation()
-      .then(setAttestation)
-      .catch(() => {
-        setAttestation(null);
-      });
-  }, [setAttestation]);
-
   return (
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
           animation: isRtl ? 'slide_from_left' : 'slide_from_right',
         }}
-        initialRouteName={supportsPoster ? 'Poster' : 'Welcome'}
+        initialRouteName="GatewayAccess"
       >
-        {supportsPoster && <Stack.Screen name="Poster" component={PosterScreen} />}
+        <Stack.Screen name="Poster" component={PosterScreen} />
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="GatewayAccess" component={GatewayAccessScreen} />
         <Stack.Screen name="Step1" component={Step1ReceptorsScreen} />
         <Stack.Screen name="Step2" component={Step2TumourScreen} />
         <Stack.Screen name="Step3" component={Step3MarkersScreen} />

@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acragent.com/schemas/acr.cds.v1.request.schema.json",
+  "title": "ACR Mobile CDS Build 44 Request",
+  "description": "Transport-only request for all 20 five-screen assessment values. Optional values may be omitted or explicitly null; the mapper sends them to the platform as null.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "requestId", "assessment", "client"],
+  "properties": {
+    "contract": { "const": "acr.cds.v1" },
+    "requestId": { "type": "string", "format": "uuid" },
+    "assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["patientId", "erStatus", "prStatus", "her2Status", "ki67", "bayesianEnhanced"],
+      "properties": {
+        "patientId": { "type": "string", "pattern": "^mob-[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$" },
+        "erStatus": { "type": "string", "enum": ["positive", "negative"] },
+        "prStatus": { "type": "string", "enum": ["positive", "negative"] },
+        "her2Status": { "type": "string", "enum": ["positive", "negative"] },
+        "ki67": { "type": "number", "minimum": 0, "maximum": 100 },
+        "stage": { "type": ["string", "null"], "enum": ["0", "I", "IA", "IB", "II", "IIA", "IIB", "III", "IIIA", "IIIB", "IIIC", "IV", null] },
+        "grade": { "type": ["string", "null"], "enum": ["1", "2", "3", null] },
+        "histologicalSubtype": { "type": ["string", "null"], "enum": ["IDC", "ILC", "DCIS", "PAGET", null] },
+        "nodalStatus": { "type": ["string", "null"], "enum": ["N0", "N1", "N2", "N3", null] },
+        "age": { "type": ["integer", "null"], "minimum": 18, "maximum": 120 },
+        "ca153": { "type": ["number", "null"], "minimum": 0 },
+        "cea": { "type": ["number", "null"], "minimum": 0 },
+        "surgeryDate": { "type": ["string", "null"], "format": "date", "description": "Strict actual YYYY-MM-DD date; future dates travel unchanged." },
+        "bayesianEnhanced": { "type": "boolean" },
+        "tumorSize": { "type": ["number", "null"], "exclusiveMinimum": 0, "description": "Raw positive number, unchanged. Unit pending clinical confirmation; no conversion." },
+        "gender": { "type": ["string", "null"], "enum": ["female", "male", "other", "unknown", null] },
+        "ecogScore": { "type": ["integer", "null"], "minimum": 0, "maximum": 4 },
+        "pdl1Status": { "type": ["string", "null"], "enum": ["positive", "negative", "not_tested", null] },
+        "her2Low": { "type": ["string", "null"], "enum": ["positive", "negative", "unknown", null], "description": "Platform mapping is lossy: blank/null and explicit unknown both become null." },
+        "lvef": { "type": ["number", "null"], "minimum": 0, "maximum": 100 },
+        "treatmentIntent": { "type": ["string", "null"], "enum": ["neoadjuvant", "adjuvant", "unspecified", null] }
+      }
+    },
+    "client": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["channel", "buildId", "environment"],
+      "properties": {
+        "channel": { "const": "MOBILE" },
+        "buildId": { "const": "mob-v0.6.0+44" },
+        "environment": { "const": "EVALUATION" }
+      }
+    }
+  }
+}

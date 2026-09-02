@@ -1,10 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { ACRColors, ACRTypography } from '../theme/colors';
-import type { Provenance } from '../types/api';
-
 interface Props {
-  provenance: Provenance;
+  provenance: string;
 }
 
 export const ACRBadge: React.FC<Props> = ({ provenance }) => {

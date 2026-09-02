@@ -1,0 +1,26 @@
+{
+  "name": "acr-mobile-same-backend-gateway",
+  "version": "0.6.0",
+  "description": "Build 44 transport gateway and verified synthetic-fixture replay interface.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/listener.js",
+    "dev": "nodemon src/listener.js",
+    "capture:candidate": "node src/capture-tool.js",
+    "test": "jest --runInBand && npm run test:e2e",
+    "test:e2e": "NODE_PATH=./node_modules node --test ../e2e/tests/gateway.e2e.test.js",
+    "test:watch": "jest --watch"
+  },
+  "dependencies": {
+    "express": "4.19.2",
+    "ajv": "8.16.0",
+    "uuid": "9.0.1",
+    "cors": "2.8.5",
+    "helmet": "7.1.0"
+  },
+  "devDependencies": {
+    "jest": "29.7.0",
+    "supertest": "7.0.0",
+    "nodemon": "3.1.4"
+  }
+}

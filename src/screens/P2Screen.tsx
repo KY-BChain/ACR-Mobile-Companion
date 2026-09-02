@@ -8,6 +8,7 @@ import { ACRCard } from '../components/ACRCard';
 import { ACRSegmentedControl } from '../components/ACRSegmentedControl';
 import { ACRInput } from '../components/ACRInput';
 import { ACRButton } from '../components/ACRButton';
+import { WalkthroughNotice } from '../components/WalkthroughNotice';
 import { useAssessmentStore, type ProvisionalHer2Low, type ProvisionalStatus, type TreatmentIntent } from '../store/assessmentStore';
 import { isEcogValid, isLvefValid } from '../utils/provisionalValidation';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -43,6 +44,7 @@ export const P2Screen: React.FC = () => {
       <ACRButton title={t('common:back')} variant="secondary" onPress={() => navigation.goBack()} />
       <ACRButton title={t('common:review')} variant="primary" disabled={!ecogValid || !lvefValid} onPress={goToReview} />
     </>}>
+      <WalkthroughNotice />
       <ACRCard title={t('p2:cardTitle')}>
         <Text style={[styles.label, localeTextStyle]}>{t('p2:ecogScore')} <Text style={styles.small}>· {t('common:optional')}</Text></Text>
         <ACRInput value={p2.ecogScore} onChangeText={(value) => setP2({ ecogScore: value })} keyboardType="numeric" hint={t('p2:ecogHint')} />

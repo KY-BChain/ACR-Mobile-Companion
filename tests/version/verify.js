@@ -5,8 +5,8 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '../..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const appConfig = JSON.parse(read('app.json'));
-const expectedVersion = '0.5.1';
-const expectedBuild = '43';
+const expectedVersion = '0.6.0';
+const expectedBuild = '44';
 
 assert.equal(appConfig.expo.name, 'ACR Companion');
 assert.equal(appConfig.expo.version, expectedVersion);
@@ -37,11 +37,25 @@ const about = read('src/screens/AboutScreen.tsx');
 assert.match(about, /import \{ APP_VERSION_LABEL \} from '\.\.\/config\/appIdentity'/);
 assert.match(about, />\{APP_VERSION_LABEL\}<\/Text>/);
 const review = read('src/screens/ReviewScreen.tsx');
-assert.match(review, /buildId: MOBILE_BUILD_ID/);
+assert.match(review, /buildAssessmentRequest/);
 assert.doesNotMatch(review, /mob-v0\.1\.0\+42/);
-const result = read('src/screens/ResultScreen.tsx');
-assert.match(result, /buildId: \$\{MOBILE_PROVENANCE_BUILD_ID\}/);
-assert.doesNotMatch(result, /mob-v0\.1\.0 \(42\)/);
+
+const requestBuilder = read('src/api/requestBuilder.ts');
+assert.match(requestBuilder, /MOBILE_BUILD_ID/);
+assert.match(requestBuilder, /mob-v0\.6\.0\+44/);
+
+assert.match(infoPlist, /<key>NSAllowsArbitraryLoads<\/key>\s*<false\/>/);
+assert.match(infoPlist, /<key>NSAllowsLocalNetworking<\/key>\s*<true\/>/);
+assert.match(infoPlist, /ACR Companion connects to the locally operated ACR evaluation gateway/);
+const mainManifest = read('android/app/src/main/AndroidManifest.xml');
+assert.match(mainManifest, /android:usesCleartextTraffic="false"/);
+assert.match(mainManifest, /android:networkSecurityConfig="@xml\/network_security_config"/);
+const debugManifest = read('android/app/src/debug/AndroidManifest.xml');
+assert.doesNotMatch(debugManifest, /usesCleartextTraffic="true"/);
+const networkConfig = read('android/app/src/main/res/xml/network_security_config.xml');
+assert.match(networkConfig, /base-config cleartextTrafficPermitted="false"/);
+assert.match(networkConfig, /domain-config cleartextTrafficPermitted="true"/);
+assert.match(networkConfig, />192\.168\.1\.94<\/domain>/);
 
 const english = JSON.parse(read('src/i18n/locales/en-GB.json'));
 assert.equal(
@@ -49,4 +63,4 @@ assert.equal(
   'The app does not intentionally store clinical data. Entries are held in memory for the current assessment only.',
 );
 
-console.log('PASS version consistency: Expo, Android, iOS, active build IDs, and About label are 0.5.1 / 43');
+console.log('PASS version/native consistency: Expo, Android, iOS and derived gateway build ID are 0.6.0 / 44; local-network policy is narrow');

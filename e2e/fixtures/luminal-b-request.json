@@ -1,0 +1,25 @@
+{
+  "contract": "acr.cds.v1",
+  "requestId": "6ad39ab4-6be6-46e8-ad97-d46748a7d671",
+  "assessment": {
+    "patientId": "mob-3f9c1e84-77a2-4b16-9d05-2ce8a1b47f30",
+    "erStatus": "positive",
+    "prStatus": "positive",
+    "her2Status": "negative",
+    "ki67": 25.0,
+    "stage": "II",
+    "grade": "2",
+    "histologicalSubtype": "IDC",
+    "nodalStatus": "N0",
+    "age": 52,
+    "ca153": 40.0,
+    "cea": 6.0,
+    "surgeryDate": "2026-03-14",
+    "bayesianEnhanced": true
+  },
+  "client": {
+    "channel": "MOBILE",
+    "buildId": "mob-v0.1.0+42",
+    "environment": "EVALUATION"
+  }
+}

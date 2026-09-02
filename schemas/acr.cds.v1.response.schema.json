@@ -1,0 +1,205 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acragent.com/schemas/acr.cds.v1.response.schema.json",
+  "title": "ACR Mobile CDS Build 44 Response",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "requestId", "status", "completedAt", "resultMode", "reasoningMode", "data", "platformResponse", "delivery", "warnings"],
+  "properties": {
+    "contract": { "const": "acr.cds.v1" },
+    "requestId": { "type": "string", "format": "uuid" },
+    "status": { "const": "COMPLETED" },
+    "completedAt": { "type": "string", "format": "date-time" },
+    "resultMode": { "type": "string", "enum": ["LIVE_REASONER", "PLATFORM_FALLBACK", "LOCAL_SYNTHETIC_DEMO"] },
+    "reasoningMode": { "type": "string", "enum": ["OPENLLET_SWRL", "JAVA_HARDCODED_FALLBACK", "NOT_EXECUTED"] },
+    "data": { "$ref": "#/definitions/platformData" },
+    "platformResponse": { "oneOf": [{ "$ref": "#/definitions/platformResponse" }, { "type": "null" }] },
+    "delivery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "currentExecution", "currentVerificationState", "currentPlatformEvidence", "capturedPlatform"],
+      "properties": {
+        "source": { "type": "string", "enum": ["CONFIGURED_PLATFORM", "VERIFIED_SYNTHETIC_FIXTURE"] },
+        "currentExecution": { "type": "boolean" },
+        "currentVerificationState": { "type": "string", "enum": ["VERIFIED", "MISMATCH", "UNAVAILABLE"] },
+        "currentPlatformEvidence": { "$ref": "acr.attestation.v1.schema.json#/definitions/observedEvidence" },
+        "capturedPlatform": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["response", "reasoningMode", "provenance"],
+              "properties": {
+                "response": { "$ref": "#/definitions/platformResponse" },
+                "reasoningMode": { "type": "string", "enum": ["OPENLLET_SWRL", "JAVA_HARDCODED_FALLBACK"] },
+                "provenance": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["reasonerVersion", "reasoningMode", "ontologySha256", "logicalRuleCount", "physicalRuleCount", "activeRuleCount", "loadedRuleCount", "queryCount", "capturedAt", "captureRoute"],
+                  "properties": {
+                    "reasonerVersion": { "type": "string", "minLength": 1 },
+                    "reasoningMode": { "type": "string", "enum": ["OPENLLET_SWRL", "JAVA_HARDCODED_FALLBACK"] },
+                    "ontologySha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+                    "logicalRuleCount": { "type": "integer", "minimum": 0 },
+                    "physicalRuleCount": { "type": "integer", "minimum": 0 },
+                    "activeRuleCount": { "type": "integer", "minimum": 0 },
+                    "loadedRuleCount": { "type": "integer", "minimum": 0 },
+                    "queryCount": { "type": "integer", "minimum": 0 },
+                    "capturedAt": { "type": "string", "format": "date-time" },
+                    "captureRoute": { "type": "string", "minLength": 1 }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "warnings": { "type": "array", "items": { "type": "string" } }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "resultMode": { "const": "LIVE_REASONER" } } },
+      "then": {
+        "properties": {
+          "reasoningMode": { "const": "OPENLLET_SWRL" },
+          "platformResponse": { "$ref": "#/definitions/platformResponse" },
+          "delivery": {
+            "type": "object",
+            "properties": {
+              "source": { "const": "CONFIGURED_PLATFORM" },
+              "currentExecution": { "const": true },
+              "currentVerificationState": { "const": "VERIFIED" },
+              "capturedPlatform": { "type": "null" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "resultMode": { "const": "PLATFORM_FALLBACK" } } },
+      "then": {
+        "properties": {
+          "reasoningMode": { "const": "JAVA_HARDCODED_FALLBACK" },
+          "platformResponse": { "$ref": "#/definitions/platformResponse" },
+          "delivery": {
+            "type": "object",
+            "properties": {
+              "source": { "const": "CONFIGURED_PLATFORM" },
+              "currentExecution": { "const": true },
+              "currentVerificationState": { "const": "VERIFIED" },
+              "capturedPlatform": { "type": "null" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": { "properties": { "resultMode": { "const": "LOCAL_SYNTHETIC_DEMO" } } },
+      "then": {
+        "properties": {
+          "reasoningMode": { "const": "NOT_EXECUTED" },
+          "platformResponse": { "type": "null" },
+          "delivery": {
+            "type": "object",
+            "properties": {
+              "source": { "const": "VERIFIED_SYNTHETIC_FIXTURE" },
+              "currentExecution": { "const": false },
+              "capturedPlatform": { "type": "object" }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "platformResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["success", "message", "data", "executionTimeMs", "apiVersion", "timestamp"],
+      "properties": {
+        "success": { "const": true },
+        "message": { "type": "string" },
+        "data": { "$ref": "#/definitions/platformData" },
+        "executionTimeMs": { "type": "number", "minimum": 0 },
+        "apiVersion": { "type": "string" },
+        "timestamp": { "type": "string", "minLength": 1 }
+      }
+    },
+    "platformData": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["patientId", "timestamp", "molecularSubtype", "deterministic", "bayesian", "reasoning", "riskLevel", "dataCompleteness", "reasoningMode"],
+      "properties": {
+        "patientId": { "type": "string", "minLength": 1 },
+        "timestamp": { "type": "string", "minLength": 1 },
+        "molecularSubtype": { "$ref": "#/definitions/canonicalSubtype" },
+        "deterministic": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["molecularSubtype", "riskLevel", "treatments", "biomarkers", "reasoningMode"],
+          "properties": {
+            "molecularSubtype": { "$ref": "#/definitions/canonicalSubtype" },
+            "riskLevel": { "type": ["string", "null"] },
+            "treatments": { "type": "array", "items": { "type": "string" } },
+            "biomarkers": { "type": "object", "additionalProperties": { "type": "string" } },
+            "reasoningMode": { "type": "string", "enum": ["OPENLLET_SWRL", "JAVA_HARDCODED_FALLBACK"] }
+          }
+        },
+        "bayesian": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["confidence", "posterior", "uncertaintyBounds", "enabled"],
+          "properties": {
+            "confidence": { "type": "number" },
+            "posterior": { "type": "object", "additionalProperties": { "type": "number" } },
+            "uncertaintyBounds": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } },
+            "enabled": { "type": "boolean" }
+          }
+        },
+        "reasoning": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["rulesFired", "firedRules", "evidence", "trace"],
+          "properties": {
+            "rulesFired": { "type": "array", "items": { "type": "string" } },
+            "firedRules": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["ruleId", "label", "provenance", "status"],
+                "properties": {
+                  "ruleId": { "type": "string" },
+                  "label": { "type": "string" },
+                  "provenance": { "type": "string" },
+                  "status": { "const": "FIRED" }
+                }
+              }
+            },
+            "evidence": { "type": "array", "items": { "type": "string" } },
+            "trace": { "type": "string" }
+          }
+        },
+        "riskLevel": { "type": ["string", "null"] },
+        "dataCompleteness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tier", "missingFields", "rulesBlocked", "warning"],
+          "properties": {
+            "tier": { "type": "integer", "minimum": 1, "maximum": 3 },
+            "missingFields": { "type": "array", "items": { "type": "string" } },
+            "rulesBlocked": { "type": "integer", "minimum": 0 },
+            "warning": { "type": "string" }
+          }
+        },
+        "reasoningMode": { "type": "string", "enum": ["OPENLLET_SWRL", "JAVA_HARDCODED_FALLBACK"] }
+      }
+    },
+    "canonicalSubtype": {
+      "type": "string",
+      "enum": ["LuminalA", "LuminalB_HER2Negative", "LuminalB_HER2Positive", "HER2Enriched", "TripleNegative", "NormalLike", "Unknown"]
+    }
+  }
+}

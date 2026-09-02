@@ -1,213 +1,163 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
-import { ACRColors, ACRTypography } from '../theme/colors';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScreenLayout } from '../components/ScreenLayout';
 import { ACRCard } from '../components/ACRCard';
 import { ACRButton } from '../components/ACRButton';
 import { ACRStateBadge } from '../components/ACRStateBadge';
+import { WalkthroughNotice } from '../components/WalkthroughNotice';
+import { ACRColors, ACRTypography } from '../theme/colors';
 import { useAssessmentStore } from '../store/assessmentStore';
-import { checkAttestation } from '../api/attestation';
-import { submitAssessment } from '../api/infer';
+import { buildAssessmentRequest, AssessmentValidationError } from '../api/requestBuilder';
+import { GatewayError, gatewayClient, toFailureState } from '../api/client';
 import { generateRequestId } from '../utils/uuid';
-import { MOBILE_BUILD_ID } from '../config/appIdentity';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../navigation/AppNavigator';
 import { getLocaleDirection, getTextAlign } from '../utils/rtl';
+import type { RootStackParamList } from '../navigation/AppNavigator';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const ReviewScreen: React.FC = () => {
   const { t, i18n } = useTranslation();
   const navigation = useNavigation<NavProp>();
-  const { form, p1, p2, sessionId, attestation, setAttestation, setResult, reset } = useAssessmentStore();
+  const store = useAssessmentStore();
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
-  const localeTextStyle = {
-    writingDirection: getLocaleDirection(activeLanguage),
-    textAlign: getTextAlign(activeLanguage),
+  const language = i18n.resolvedLanguage ?? i18n.language;
+  const localText = { writingDirection: getLocaleDirection(language), textAlign: getTextAlign(language) };
+  const blank = t('common:emDash');
+  const value = (input: string | number | boolean | null, unit = '') => input === null || input === ''
+    ? blank
+    : `${typeof input === 'boolean' ? (input ? t('common:on') : t('common:off')) : input}${unit}`;
+
+  const fail = (error: unknown) => {
+    const failure = toFailureState(error);
+    if (['AUTHENTICATION_REQUIRED', 'DEVICE_BINDING_MISMATCH', 'CLIENT_BUILD_MISMATCH', 'TOKEN_REUSE_DETECTED'].includes(failure.code)) {
+      gatewayClient.clearSession();
+      store.setAccessReady(false);
+      store.setAttestation(null);
+    }
+    store.setResult(null);
+    store.setFailure(failure);
+    navigation.navigate('FailClosed');
   };
 
-  const isVerified = attestation?.verificationState === 'VERIFIED';
-
   const handleSubmit = async () => {
+    if (store.walkthroughOnly) {
+      gatewayClient.clearSession();
+      store.resetCycle();
+      store.setFailure({
+        code: 'DEMO_FIXTURE_NOT_AVAILABLE',
+        message: t('build44:fixtureUnavailable'),
+        retryable: false,
+        outcome: 'NOT_SUBMITTED',
+        fieldErrors: [],
+      });
+      navigation.reset({ index: 0, routes: [{ name: 'FailClosed' }] });
+      return;
+    }
+    if (!store.accessReady || !gatewayClient.hasSession()) {
+      gatewayClient.clearSession();
+      store.setAccessReady(false);
+      store.setAttestation(null);
+      store.setFailure({ code: 'AUTHENTICATION_REQUIRED', message: t('build44:authExpired'), retryable: false, outcome: 'NOT_SUBMITTED', fieldErrors: [] });
+      store.setResult(null);
+      navigation.navigate('GatewayAccess');
+      return;
+    }
     setSubmitting(true);
-    setError(null);
-
+    store.setResult(null);
+    store.setFailure(null);
     try {
-      const att = await checkAttestation();
-      setAttestation(att);
-
-      if (att.verificationState !== 'VERIFIED') {
-        navigation.navigate('FailClosed');
-        setSubmitting(false);
-        return;
+      if (store.deliveryChoice === 'LIVE_PLATFORM') {
+        const attestation = await gatewayClient.checkAttestation();
+        store.setAttestation(attestation);
+        if (attestation.verificationState !== 'VERIFIED') {
+          fail(new GatewayError(
+            attestation.verificationState === 'MISMATCH' ? 'ATTESTATION_MISMATCH' : 'ATTESTATION_UNAVAILABLE',
+            attestation.verificationState === 'MISMATCH' ? t('build44:baselineMismatch') : t('build44:serverNotConnected'),
+            attestation.verificationState === 'UNAVAILABLE', 'NOT_SUBMITTED',
+          ));
+          return;
+        }
       }
-
-      const request = {
-        contract: 'acr.cds.v1' as const,
-        requestId: generateRequestId(),
-        assessment: {
-          patientId: sessionId,
-          erStatus: form.step1.erStatus,
-          prStatus: form.step1.prStatus,
-          her2Status: form.step1.her2Status,
-          ki67: Number(form.step1.ki67),
-          stage: form.step2.stage || null,
-          grade: form.step2.grade || null,
-          histologicalSubtype: form.step2.histologicalSubtype || null,
-          nodalStatus: form.step2.nodalStatus || null,
-          age: form.step2.age ? Number(form.step2.age) : null,
-          ca153: form.step3.ca153 ? Number(form.step3.ca153) : null,
-          cea: form.step3.cea ? Number(form.step3.cea) : null,
-          surgeryDate: form.step3.surgeryDate || null,
-          bayesianEnhanced: form.step3.bayesianEnhanced,
-        },
-        client: {
-          channel: 'MOBILE' as const,
-          buildId: MOBILE_BUILD_ID,
-          environment: 'EVALUATION' as const,
-        },
-      };
-
-      const response = await submitAssessment(request);
-      setResult(response);
+      const request = buildAssessmentRequest({ form: store.form, p1: store.p1, p2: store.p2, patientId: store.sessionId, requestId: generateRequestId() });
+      const response = await gatewayClient.submit(request, store.deliveryChoice);
+      store.setResult(response);
       navigation.navigate('Result');
-    } catch (err: any) {
-      setError(err.message || t('review:submissionFailed'));
+    } catch (error) {
+      if (error instanceof AssessmentValidationError) {
+        store.setFailure({ code: 'CLINICAL_INPUT_REJECTED', message: t('build44:validationError'), retryable: false, outcome: 'NOT_SUBMITTED', fieldErrors: error.fieldErrors });
+        store.setResult(null);
+        navigation.navigate('FailClosed');
+      } else fail(error);
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <ScreenLayout
-      title={t('review:title')}
-      subtitle={t('review:subtitle')}
-      bannerText={t('assessment:clinicalTransparencyBanner')}
-      footer={
-        <>
-          <ACRButton title={t('common:edit')} variant="secondary" onPress={() => navigation.navigate('Step1')} />
-          <ACRButton
-            title={t('common:submit')}
-            variant="primary"
-            disabled={!isVerified || submitting}
-            onPress={handleSubmit}
-          />
-        </>
-      }
-    >
-      <ACRCard title={t('review:enteredValues')}>
-        <Row label={t('review:erPrHer2')} value={`${form.step1.erStatus.slice(0,3)} / ${form.step1.prStatus.slice(0,3)} / ${form.step1.her2Status.slice(0,3)}`} />
-        <Row label={t('review:ki67')} value={`${form.step1.ki67} %`} />
-        <Row label={t('review:stageGrade')} value={`${form.step2.stage || t('common:emDash')} / ${form.step2.grade || t('common:emDash')}`} />
-        <Row label={t('review:histology')} value={form.step2.histologicalSubtype || t('common:emDash')} />
-        <Row label={t('review:nodalStatus')} value={form.step2.nodalStatus || t('common:emDash')} />
-        <Row label={t('review:age')} value={form.step2.age || t('common:emDash')} />
-        <Row label={t('review:ca153Cea')} value={`${form.step3.ca153 || t('common:emDash')} / ${form.step3.cea || t('common:emDash')}`} />
-        <Row label={t('review:surgeryDate')} value={form.step3.surgeryDate || t('common:emDash')} />
+    <ScreenLayout title={t('review:title')} subtitle={t('review:subtitle')} bannerText={t('assessment:clinicalTransparencyBanner')} footer={<>
+      <ACRButton title={t('common:edit')} variant="secondary" onPress={() => navigation.navigate('Step1')} />
+      <ACRButton title={store.walkthroughOnly ? t('gatewayAccess:finishWalkthrough') : t('common:submit')} variant="primary" disabled={submitting || (!store.accessReady && !store.walkthroughOnly)} onPress={handleSubmit} />
+    </>}>
+      <WalkthroughNotice />
+      <ACRCard title={t('build44:deliveryMode')}>
+        <Row label={t('build44:deliveryMode')} value={store.deliveryChoice === 'LIVE_PLATFORM' ? t('gatewayAccess:liveMode') : t('gatewayAccess:demoMode')} />
+        <Text style={[styles.hint, localText]}>{store.deliveryChoice === 'LIVE_PLATFORM' ? t('build44:liveReviewHint') : t('build44:demoReviewHint')}</Text>
       </ACRCard>
 
-      <ACRCard title={t('review:reasoningOptions')}>
-        <Row label={t('review:bayesianLayer')} value={form.step3.bayesianEnhanced ? t('common:on') : t('common:off')} />
-        <Text style={[styles.hint, localeTextStyle]}>{t('review:bayesianHint')}</Text>
+      <ACRCard title={t('review:enteredValues')}>
+        <Row label={t('build44:patientId')} value={store.sessionId} />
+        <Row label={t('receptors:erStatus')} value={store.form.step1.erStatus} />
+        <Row label={t('receptors:prStatus')} value={store.form.step1.prStatus} />
+        <Row label={t('receptors:her2Status')} value={store.form.step1.her2Status} />
+        <Row label={t('receptors:ki67')} value={value(store.form.step1.ki67, ' %')} />
+        <Row label={t('tumour:stage')} value={value(store.form.step2.stage)} />
+        <Row label={t('tumour:grade')} value={value(store.form.step2.grade)} />
+        <Row label={t('tumour:histologicalSubtype')} value={value(store.form.step2.histologicalSubtype)} />
+        <Row label={t('tumour:nodalStatus')} value={value(store.form.step2.nodalStatus)} />
+        <Row label={t('tumour:age')} value={value(store.form.step2.age, store.form.step2.age ? ` ${t('build44:years')}` : '')} />
+        <Row label={t('markers:ca153')} value={value(store.form.step3.ca153, store.form.step3.ca153 ? ' U/mL' : '')} />
+        <Row label={t('markers:cea')} value={value(store.form.step3.cea, store.form.step3.cea ? ' ng/mL' : '')} />
+        <Row label={t('markers:surgeryDate')} value={value(store.form.step3.surgeryDate)} />
+        <Row label={t('review:bayesianLayer')} value={value(store.form.step3.bayesianEnhanced)} />
       </ACRCard>
 
       <ACRCard title={t('review:p1Title')}>
-        <Row label={t('p1:tumorSize')} value={p1.tumorSize || t('common:emDash')} />
-        <Row label={t('p1:gender')} value={p1.gender || t('common:emDash')} />
-        <Text style={[styles.hint, localeTextStyle]}>{t('review:provisionalHint')}</Text>
+        <Row label={t('p1:tumorSize')} value={value(store.p1.tumorSize, store.p1.tumorSize ? ` ${t('build44:tumorUnitPending')}` : '')} />
+        <Row label={t('p1:gender')} value={value(store.p1.gender)} />
+        <Text style={[styles.hint, localText]}>{t('review:provisionalHint')}</Text>
       </ACRCard>
 
       <ACRCard title={t('review:p2Title')}>
-        <Row label={t('p2:ecogScore')} value={p2.ecogScore || t('common:emDash')} />
-        <Row label={t('p2:pdl1Status')} value={p2.pdl1Status || t('common:emDash')} />
-        <Row label={t('p2:her2Low')} value={p2.her2Low || t('common:emDash')} />
-        <Row label={t('p2:lvef')} value={p2.lvef || t('common:emDash')} />
-        <Row label={t('p2:treatmentIntent')} value={p2.treatmentIntent || t('common:emDash')} />
-        <Text style={[styles.hint, localeTextStyle]}>{t('review:provisionalHint')}</Text>
+        <Row label={t('p2:ecogScore')} value={value(store.p2.ecogScore)} />
+        <Row label={t('p2:pdl1Status')} value={value(store.p2.pdl1Status)} />
+        <Row label={t('p2:her2Low')} value={value(store.p2.her2Low)} />
+        <Row label={t('p2:lvef')} value={value(store.p2.lvef, store.p2.lvef ? ' %' : '')} />
+        <Row label={t('p2:treatmentIntent')} value={value(store.p2.treatmentIntent)} />
+        <Text style={[styles.hint, localText]}>{t('build44:her2Loss')} {t('p2:unknown')} / {blank} → null.</Text>
       </ACRCard>
 
       <ACRCard title={t('review:baseline')}>
-        <Row
-          label={t('review:attestation')}
-          valueComponent={
-            attestation ? (
-              <ACRStateBadge state={attestation.verificationState} />
-            ) : (
-              <Text style={[styles.muted, localeTextStyle]}>{t('review:checking')}</Text>
-            )
-          }
-        />
-        <Text style={[styles.hint, localeTextStyle]}>{t('review:baselineHint')}</Text>
+        <Row label={t('review:attestation')} valueComponent={store.attestation ? <ACRStateBadge state={store.attestation.verificationState} /> : <Text style={[styles.muted, localText]}>{t('common:unavailable')}</Text>} />
+        <Text style={[styles.hint, localText]}>{t('review:baselineHint')}</Text>
       </ACRCard>
-
-      {error ? (
-        <View style={styles.errorBox}>
-          <Text style={[styles.errorText, localeTextStyle]}>{error}</Text>
-        </View>
-      ) : null}
     </ScreenLayout>
   );
 };
 
-const Row: React.FC<{ label: string; value?: string; valueComponent?: React.ReactNode }> = ({
-  label,
-  value,
-  valueComponent,
-}) => {
+const Row: React.FC<{ label: string; value?: string; valueComponent?: React.ReactNode }> = ({ label, value, valueComponent }) => {
   const { i18n } = useTranslation();
-  const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
-  const localeTextStyle = {
-    writingDirection: getLocaleDirection(activeLanguage),
-    textAlign: getTextAlign(activeLanguage),
-  };
-
-  return (
-    <View style={styles.row}>
-      <Text style={[styles.rowLabel, localeTextStyle]}>{label}</Text>
-      {valueComponent || <Text style={[styles.rowValue, localeTextStyle]}>{value}</Text>}
-    </View>
-  );
+  const language = i18n.resolvedLanguage ?? i18n.language;
+  const localText = { writingDirection: getLocaleDirection(language), textAlign: getTextAlign(language) };
+  return <View style={styles.row}><Text style={[styles.rowLabel, localText]}>{label}</Text>{valueComponent ?? <Text selectable style={[styles.rowValue, localText]}>{value}</Text>}</View>;
 };
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: ACRColors.line,
-    borderStyle: 'dashed',
-  },
-  rowLabel: {
-    fontSize: 11,
-    color: ACRColors.ink,
-  },
-  rowValue: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: ACRColors.ink,
-  },
-  hint: {
-    ...ACRTypography.hint,
-    color: ACRColors.muted,
-    marginTop: 4,
-  },
-  muted: {
-    fontSize: 11,
-    color: ACRColors.muted,
-  },
-  errorBox: {
-    backgroundColor: ACRColors.stopBg,
-    borderRadius: 8,
-    padding: 10,
-    marginTop: 10,
-  },
-  errorText: {
-    color: ACRColors.stopBorder,
-    fontSize: 11,
-  },
+  row: { flexDirection: 'row', justifyContent: 'space-between', gap: 10, paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: ACRColors.line, borderStyle: 'dashed' },
+  rowLabel: { flex: 1, fontSize: 11, color: ACRColors.ink },
+  rowValue: { flex: 1, fontSize: 11, fontWeight: '600', color: ACRColors.ink },
+  hint: { ...ACRTypography.hint, color: ACRColors.muted, marginTop: 5 },
+  muted: { fontSize: 11, color: ACRColors.muted },
 });

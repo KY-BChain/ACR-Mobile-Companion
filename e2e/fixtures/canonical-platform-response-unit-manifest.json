@@ -1,0 +1,7 @@
+{
+  "verificationStatus": "UNIT_TEST_ONLY",
+  "sourceShape": "Spring InferenceResponseDTO with Jackson InferenceResult getter discovery",
+  "eligibleForDeliveredReplay": false,
+  "requiredCompatibilityProperty": "data.molecularSubtype",
+  "reason": "Source-faithful contract fixture only; not a live platform capture or clinical oracle."
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://acragent.com/schemas/acr.attestation.v1.schema.json",
+  "title": "ACR Baseline Attestation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "verificationState", "expected", "observed", "lastVerificationTimestamp", "lastSuccessfulVerificationTimestamp"],
+  "properties": {
+    "contract": { "const": "acr.attestation.v1" },
+    "verificationState": { "type": "string", "enum": ["VERIFIED", "MISMATCH", "UNAVAILABLE"] },
+    "expected": { "$ref": "#/definitions/expectedEvidence" },
+    "observed": { "$ref": "#/definitions/observedEvidence" },
+    "lastVerificationTimestamp": { "type": "string", "format": "date-time" },
+    "lastSuccessfulVerificationTimestamp": { "type": ["string", "null"], "format": "date-time" }
+  },
+  "definitions": {
+    "expectedEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reasonerVersion", "reasoningMode", "ontologySha256", "logicalRuleCount", "physicalRuleCount", "activeRuleCount", "loadedRuleCount", "queryCount"],
+      "properties": {
+        "reasonerVersion": { "type": "string", "minLength": 1 },
+        "reasoningMode": { "type": "string", "minLength": 1 },
+        "ontologySha256": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+        "logicalRuleCount": { "type": "integer", "minimum": 0 },
+        "physicalRuleCount": { "type": "integer", "minimum": 0 },
+        "activeRuleCount": { "type": "integer", "minimum": 0 },
+        "loadedRuleCount": { "type": "integer", "minimum": 0 },
+        "queryCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "observedEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reasonerVersion", "reasoningMode", "ontologySha256", "logicalRuleCount", "physicalRuleCount", "activeRuleCount", "loadedRuleCount", "queryCount"],
+      "properties": {
+        "reasonerVersion": { "type": ["string", "null"], "minLength": 1 },
+        "reasoningMode": { "type": ["string", "null"], "minLength": 1 },
+        "ontologySha256": { "type": ["string", "null"], "pattern": "^[0-9a-fA-F]{64}$" },
+        "logicalRuleCount": { "type": ["integer", "null"], "minimum": 0 },
+        "physicalRuleCount": { "type": ["integer", "null"], "minimum": 0 },
+        "activeRuleCount": { "type": ["integer", "null"], "minimum": 0 },
+        "loadedRuleCount": { "type": ["integer", "null"], "minimum": 0 },
+        "queryCount": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    }
+  }
+}

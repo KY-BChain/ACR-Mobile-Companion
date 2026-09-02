@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { ACRColors, ACRTypography } from '../theme/colors';
@@ -8,18 +8,21 @@ import { ACRCard } from '../components/ACRCard';
 import { ACRSegmentedControl } from '../components/ACRSegmentedControl';
 import { ACRInput } from '../components/ACRInput';
 import { ACRButton } from '../components/ACRButton';
+import { WalkthroughNotice } from '../components/WalkthroughNotice';
 import { useAssessmentStore } from '../store/assessmentStore';
 import { generatePatientId } from '../utils/uuid';
+import { gatewayClient } from '../api/client';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { getLocaleDirection, getTextAlign } from '../utils/rtl';
+import { isKi67Valid } from '../utils/provisionalValidation';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const Step1ReceptorsScreen: React.FC = () => {
   const { t } = useTranslation();
   const navigation = useNavigation<NavProp>();
-  const { form, setStep1, sessionId, setSessionId } = useAssessmentStore();
+  const { form, setStep1, sessionId, setSessionId, resetCycle } = useAssessmentStore();
 
   React.useEffect(() => {
     if (!sessionId) {
@@ -27,7 +30,12 @@ export const Step1ReceptorsScreen: React.FC = () => {
     }
   }, [sessionId, setSessionId]);
 
-  const isValid = form.step1.ki67 !== '' && !isNaN(Number(form.step1.ki67));
+  const isValid = isKi67Valid(form.step1.ki67);
+  const cancel = () => {
+    gatewayClient.clearSession();
+    resetCycle();
+    navigation.reset({ index: 0, routes: [{ name: 'GatewayAccess' }] });
+  };
 
   const receptorOptions: Array<{ value: 'positive' | 'negative'; label: string }> = [
     { value: 'positive', label: t('common:positive') },
@@ -42,7 +50,7 @@ export const Step1ReceptorsScreen: React.FC = () => {
       steps={{ total: 5, current: 1 }}
       footer={
         <>
-          <ACRButton title={t('common:cancel')} variant="secondary" onPress={() => navigation.navigate('Welcome')} />
+          <ACRButton title={t('common:cancel')} variant="secondary" onPress={cancel} />
           <ACRButton
             title={t('common:next')}
             variant="primary"
@@ -52,6 +60,7 @@ export const Step1ReceptorsScreen: React.FC = () => {
         </>
       }
     >
+      <WalkthroughNotice />
       <ACRCard title={t('receptors:cardTitle')}>
         <Label text={t('receptors:erStatus')} required />
         <ACRSegmentedControl
@@ -84,6 +93,7 @@ export const Step1ReceptorsScreen: React.FC = () => {
           keyboardType="numeric"
           hint={t('receptors:ki67Hint')}
         />
+        {!isValid ? <Text style={styles.error}>{t('build44:ki67Error')}</Text> : null}
       </ACRCard>
 
       <ACRCard title={t('session:cardTitle')}>
@@ -128,4 +138,5 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: ACRColors.muted,
   },
+  error: { ...ACRTypography.hint, color: ACRColors.stopBorder, marginTop: 4 },
 });

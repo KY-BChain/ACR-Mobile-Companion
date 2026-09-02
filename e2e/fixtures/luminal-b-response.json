@@ -1,0 +1,35 @@
+{
+  "contract": "acr.cds.v1",
+  "requestId": "6ad39ab4-6be6-46e8-ad97-d46748a7d671",
+  "status": "COMPLETED",
+  "completedAt": "2026-07-30T20:42:07Z",
+  "data": {
+    "molecularSubtype": { "code": "LuminalB_HER2Negative", "display": "Luminal B, HER2 negative" },
+    "bayesian": { "enabled": true, "confidence": 0.6001915864330829, "band": "MODERATE" },
+    "reasoning": {
+      "reasoningMode": "OPENLLET_SWRL",
+      "rulesFired": [
+        { "ruleId": "R33", "description": "Post-surgical follow-up pathway indicated.", "provenance": "ACR_NATIVE" },
+        { "ruleId": "R69", "description": "CA 15-3 above reference threshold — biomarker alert.", "provenance": "ACR_NATIVE" },
+        { "ruleId": "R12", "description": "Luminal B classification from receptor and proliferation profile.", "provenance": "OPENLLET_NATIVE_VERIFIED" }
+      ],
+      "inferences": []
+    },
+    "recommendations": [
+      { "code": "FOLLOW_UP", "text": "Post-surgical surveillance pathway per R33.", "ruleIds": ["R33"] },
+      { "code": "BIOMARKER", "text": "Elevated CA 15-3 and CEA — correlate clinically and consider repeat testing per local protocol (R69, R70).", "ruleIds": ["R69", "R70"] }
+    ],
+    "provenance": {
+      "reasonerVersion": "2.2.1",
+      "responseContract": "m1",
+      "ontologySha256": "b91025862e54bc907236b68db763e95b366a43e64869a7da5ed2a00d8a8fd4a1",
+      "logicalRuleCount": 71,
+      "physicalRuleCount": 76,
+      "activeRuleCount": 76,
+      "loadedRuleCount": 76,
+      "queryCount": 27,
+      "environment": "EVALUATION"
+    }
+  },
+  "warnings": []
+}

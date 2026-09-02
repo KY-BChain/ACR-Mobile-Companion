@@ -1,180 +1,207 @@
-import React from 'react';
-import { View, Text, StyleSheet, I18nManager } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
-import { ACRColors, ACRTypography } from '../theme/colors';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScreenLayout } from '../components/ScreenLayout';
 import { ACRCard } from '../components/ACRCard';
 import { ACRButton } from '../components/ACRButton';
 import { ACRBadge } from '../components/ACRBadge';
-import { MOBILE_PROVENANCE_BUILD_ID } from '../config/appIdentity';
+import { ACRColors, ACRTypography } from '../theme/colors';
 import { useAssessmentStore } from '../store/assessmentStore';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { gatewayClient } from '../api/client';
+import { getLocaleDirection, getTextAlign } from '../utils/rtl';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import { buildClinicalResultPresentation, formatReturnedProbability, TECHNICAL_DETAILS_DEFAULT_EXPANDED } from './resultPresentation';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 export const ResultScreen: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigation = useNavigation<NavProp>();
-  const { result, reset } = useAssessmentStore();
-
-  if (!result) {
-    return (
-      <View style={styles.empty}>
-        <Text style={styles.emptyText}>{t('result:noResult')}</Text>
-        <ACRButton title={t('result:newAssessment')} variant="primary" onPress={() => { reset(); navigation.navigate('Welcome'); }} />
-      </View>
-    );
-  }
+  const { result, resetCycle } = useAssessmentStore();
+  const [technicalDetailsExpanded, setTechnicalDetailsExpanded] = useState(TECHNICAL_DETAILS_DEFAULT_EXPANDED);
+  const language = i18n.resolvedLanguage ?? i18n.language;
+  const localText = { writingDirection: getLocaleDirection(language), textAlign: getTextAlign(language) };
+  const done = () => {
+    gatewayClient.clearSession();
+    resetCycle();
+    navigation.reset({ index: 0, routes: [{ name: 'GatewayAccess' }] });
+  };
+  if (!result) return <View style={styles.empty}><Text style={[styles.emptyText, localText]}>{t('result:noResult')}</Text><ACRButton title={t('result:newAssessment')} variant="primary" onPress={done} /></View>;
 
   const data = result.data;
+  const modeLabel = result.resultMode === 'LIVE_REASONER' ? t('build44:liveResult')
+    : result.resultMode === 'PLATFORM_FALLBACK' ? t('build44:fallbackResult') : t('build44:demoResult');
+  const current = result.delivery.currentPlatformEvidence;
+  const captured = result.delivery.capturedPlatform;
+  const presentation = buildClinicalResultPresentation(result);
+  const none = t('build44:noneReturned');
+  const list = (items: string[]) => items.length ? items.map((item, index) => <Text key={`${item}-${index}`} style={[styles.listItem, localText]}>• {item}</Text>) : <Text style={[styles.hint, localText]}>{none}</Text>;
 
   return (
-    <ScreenLayout
-      title={t('result:title')}
-      subtitle={t('result:subtitle')}
-      bannerText={t('assessment:clinicalTransparencyBanner')}
-      footer={
-        <>
-          <ACRButton
-            title={t('result:newAssessment')}
-            variant="secondary"
-            onPress={() => { reset(); navigation.navigate('Welcome'); }}
-          />
-          <ACRButton title={t('common:done')} variant="primary" onPress={() => { reset(); navigation.navigate('Welcome'); }} />
-        </>
-      }
-    >
-      <View style={styles.subtypeBox}>
-        <Text style={styles.subtypeLabel}>{t('result:molecularSubtype')}</Text>
-        <Text style={styles.subtypeValue}>{data.molecularSubtype.code}</Text>
-        <Text style={styles.subtypeText}>{data.molecularSubtype.display}</Text>
+    <ScreenLayout title={t('result:title')} subtitle={modeLabel} bannerText={t('assessment:clinicalTransparencyBanner')} footer={<>
+      <ACRButton title={t('result:newAssessment')} variant="secondary" onPress={done} />
+      <ACRButton title={t('common:done')} variant="primary" onPress={done} />
+    </>}>
+      <View style={styles.summaryHeading}>
+        <Text style={[styles.summaryHeadingText, localText]}>{t('result:clinicalSummary')}</Text>
+        <Text style={[styles.summarySource, localText]}>{t(presentation.sourceCopyKey)}</Text>
       </View>
 
-      <ACRCard title={t('result:bayesianConfidence')}>
-        <Text style={styles.confValue}>{data.bayesian.confidence.toString()}</Text>
-        <Text style={styles.hint}>{t('result:bayesianHint')}</Text>
+      <View style={styles.subtypeBox}>
+        <Text style={[styles.subtypeLabel, localText]}>{t('result:molecularSubtype')}</Text>
+        <Text selectable style={[styles.subtypeValue, localText]}>{data.molecularSubtype}</Text>
+        <Text selectable style={[styles.subtypeText, localText]}>{t('build44:risk')}: {data.riskLevel ?? t('common:emDash')}</Text>
+      </View>
+
+      {presentation.warnings.length ? <View style={styles.warningBox}>
+        <Text style={[styles.warningTitle, localText]}>{t('result:warningsAndContext')}</Text>
+        {list(presentation.warnings)}
+      </View> : null}
+
+      <ACRCard title={t('result:informationCompleteness')}>
+        <Row label={t('build44:tier')} value={String(data.dataCompleteness.tier)} />
+        <Row label={t('build44:rulesBlocked')} value={String(data.dataCompleteness.rulesBlocked)} />
+        <Text style={[styles.sectionLabel, localText]}>{t('build44:missingFields')}</Text>
+        {list(data.dataCompleteness.missingFields)}
       </ACRCard>
 
-      <ACRCard title={t('result:rulesFired')}>
-        {data.reasoning.rulesFired.map((rule) => (
-          <View key={rule.ruleId} style={styles.rule}>
-            <Text style={styles.ruleId}>{rule.ruleId}</Text>
-            <Text style={styles.ruleDesc}>{rule.description}</Text>
-            <ACRBadge provenance={rule.provenance} />
-          </View>
-        ))}
-        <Text style={styles.hint}>{t('result:rulesFiredHint')}</Text>
+      <ACRCard title={t('result:treatmentOptions')}>{list(presentation.treatments)}</ACRCard>
+
+      <ACRCard title={t('result:biomarkerResults')}>
+        {Object.entries(data.deterministic.biomarkers).length ? Object.entries(data.deterministic.biomarkers).map(([key, value]) => <Row key={key} label={key} value={value} />) : <Text style={[styles.hint, localText]}>{none}</Text>}
       </ACRCard>
 
-      <ACRCard title={t('result:recommendations')}>
-        {data.recommendations.map((rec) => (
-          <View key={rec.code} style={styles.rule}>
-            <Text style={styles.ruleDesc}>
-              <Text style={styles.bold}>{rec.code}:</Text> {rec.text}
-            </Text>
-          </View>
-        ))}
-        <Text style={styles.hint}>{t('result:recommendationsHint')}</Text>
-      </ACRCard>
+      {presentation.showBayesianSummary ? <ACRCard title={t('result:confidenceSummary')}>
+        <Row label={t('result:classificationConfidence')} value={formatReturnedProbability(data.bayesian.confidence)} />
+        <Row label={t('build44:uncertainty')} value={`${formatReturnedProbability(data.bayesian.uncertaintyBounds[0])} – ${formatReturnedProbability(data.bayesian.uncertaintyBounds[1])}`} />
+        <Text style={[styles.sectionLabel, localText]}>{t('build44:posterior')}</Text>
+        {Object.entries(data.bayesian.posterior).length ? Object.entries(data.bayesian.posterior).map(([key, value]) => <Row key={key} label={key} value={formatReturnedProbability(value)} />) : <Text style={[styles.hint, localText]}>{none}</Text>}
+      </ACRCard> : <ACRCard title={t('result:confidenceSummary')}>
+        <Text style={[styles.hint, localText]}>{t('result:noBayesianEnhancement')}</Text>
+      </ACRCard>}
 
-      <ACRCard title={t('result:reasoningProvenance')}>
-        <Text style={styles.prov}>
-          {`reasoningMode: ${data.reasoning.reasoningMode}
-reasoner: ${data.provenance.reasonerVersion}
-responseContract: ${data.provenance.responseContract}
-timestamp: ${result.completedAt}
-buildId: ${MOBILE_PROVENANCE_BUILD_ID}
-ontologySHA256: ${data.provenance.ontologySha256.substring(0, 16)}… `}
-          <Text style={styles.tapHint}>{t('result:tapToExpand')}</Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ expanded: technicalDetailsExpanded }}
+        accessibilityLabel={technicalDetailsExpanded ? t('result:hideTechnicalDetails') : t('result:showTechnicalDetails')}
+        onPress={() => setTechnicalDetailsExpanded((expanded) => !expanded)}
+        style={({ pressed }) => [styles.technicalToggle, pressed && styles.technicalTogglePressed]}
+      >
+        <Text style={[styles.technicalToggleText, localText]}>
+          {technicalDetailsExpanded ? '▼' : '▶'} {t('result:technicalDetails')}
         </Text>
+        <Text style={[styles.technicalToggleHint, localText]}>
+          {technicalDetailsExpanded ? t('result:hideTechnicalDetails') : t('result:showTechnicalDetails')}
+        </Text>
+      </Pressable>
+
+      {technicalDetailsExpanded ? <View accessibilityLabel={t('result:technicalDetails')}>
+      <ACRCard title={t('result:resultIdentity')}>
+        <Row label={t('result:resultMode')} value={result.resultMode} />
+        <Row label={t('result:reasoningMode')} value={result.reasoningMode} />
+        <Row label={t('result:executionStatus')} value={result.delivery.currentExecution ? t('build44:currentExecution') : t('build44:noCurrentExecution')} />
+        <Row label={t('result:molecularSubtype')} value={data.molecularSubtype} />
+        <Row label={t('result:rootRisk')} value={data.riskLevel ?? t('common:emDash')} />
+        <Row label={t('result:deterministicRisk')} value={data.deterministic.riskLevel ?? t('common:emDash')} />
+        <Row label={t('result:timestamp')} value={data.timestamp} />
+        <Row label={t('build44:patientId')} value={data.patientId} />
       </ACRCard>
 
-      <ACRCard title={t('result:retention')}>
-        <Text style={styles.hint}>
-          {t('result:retentionHint')}
-        </Text>
+      <ACRCard title={t('build44:treatments')}>{list(data.deterministic.treatments)}</ACRCard>
+
+      <ACRCard title={t('build44:biomarkers')}>
+        {Object.entries(data.deterministic.biomarkers).length ? Object.entries(data.deterministic.biomarkers).map(([key, value]) => <Row key={key} label={key} value={value} />) : <Text style={[styles.hint, localText]}>{none}</Text>}
       </ACRCard>
+
+      <ACRCard title={t('build44:firedRules')}>
+        {data.reasoning.firedRules.length ? data.reasoning.firedRules.map((rule) => <View key={rule.ruleId} style={styles.rule}>
+          <Text selectable style={[styles.ruleId, localText]}>{rule.ruleId} · {rule.status}</Text>
+          <Text selectable style={[styles.ruleText, localText]}>{rule.label}</Text>
+          <ACRBadge provenance={rule.provenance} />
+        </View>) : <Text style={[styles.hint, localText]}>{none}</Text>}
+        <Text style={[styles.sectionLabel, localText]}>{t('result:rulesFired')}</Text>
+        {list(data.reasoning.rulesFired)}
+      </ACRCard>
+
+      <ACRCard title={t('build44:evidence')}>
+        {list(data.reasoning.evidence)}
+        <Text style={[styles.sectionLabel, localText]}>{t('build44:trace')}</Text>
+        <Text selectable style={[styles.mono, localText]}>{data.reasoning.trace || none}</Text>
+      </ACRCard>
+
+      <ACRCard title={t('build44:completeness')}>
+        <Row label={t('build44:tier')} value={String(data.dataCompleteness.tier)} />
+        <Row label={t('build44:rulesBlocked')} value={String(data.dataCompleteness.rulesBlocked)} />
+        <Text style={[styles.sectionLabel, localText]}>{t('build44:missingFields')}</Text>
+        {list(data.dataCompleteness.missingFields)}
+        <Text style={[styles.sectionLabel, localText]}>{t('build44:warnings')}</Text>
+        {list([data.dataCompleteness.warning, ...result.warnings].filter(Boolean))}
+      </ACRCard>
+
+      <ACRCard title={t('build44:bayesian')}>
+        <Row label={t('common:on')} value={data.bayesian.enabled ? t('common:yes') : t('common:no')} />
+        <Row label={t('result:bayesianConfidence')} value={String(data.bayesian.confidence)} />
+        <Row label={t('build44:uncertainty')} value={`${data.bayesian.uncertaintyBounds[0]} – ${data.bayesian.uncertaintyBounds[1]}`} />
+        <Text style={[styles.sectionLabel, localText]}>{t('build44:posterior')}</Text>
+        {Object.entries(data.bayesian.posterior).length ? Object.entries(data.bayesian.posterior).map(([key, value]) => <Row key={key} label={key} value={String(value)} />) : <Text style={[styles.hint, localText]}>{none}</Text>}
+      </ACRCard>
+
+      <ACRCard title={t('build44:currentEvidence')}>
+        <Row label={t('failClosed:state')} value={result.delivery.currentVerificationState} />
+        <Row label={t('result:reasonerVersion')} value={current.reasonerVersion ?? t('common:emDash')} />
+        <Row label={t('result:reasoningMode')} value={current.reasoningMode ?? t('common:emDash')} />
+        <Row label={t('result:ontologySHA256')} value={current.ontologySha256 ?? t('common:emDash')} />
+        <Row label="logical / physical / active / loaded / query" value={`${current.logicalRuleCount ?? '—'} / ${current.physicalRuleCount ?? '—'} / ${current.activeRuleCount ?? '—'} / ${current.loadedRuleCount ?? '—'} / ${current.queryCount ?? '—'}`} />
+      </ACRCard>
+
+      {captured ? <ACRCard title={t('build44:capturedEvidence')}>
+        <Row label={t('result:reasoningMode')} value={captured.reasoningMode} />
+        <Row label={t('result:timestamp')} value={captured.provenance.capturedAt} />
+        <Row label="captureRoute" value={captured.provenance.captureRoute} />
+        <Row label={t('result:reasonerVersion')} value={captured.provenance.reasonerVersion} />
+        <Row label={t('result:ontologySHA256')} value={captured.provenance.ontologySha256} />
+        <Row label="logical / physical / active / loaded / query" value={`${captured.provenance.logicalRuleCount} / ${captured.provenance.physicalRuleCount} / ${captured.provenance.activeRuleCount} / ${captured.provenance.loadedRuleCount} / ${captured.provenance.queryCount}`} />
+      </ACRCard> : null}
+
+      <ACRCard title={t('result:retention')}><Text style={[styles.hint, localText]}>{t('result:retentionHint')}</Text></ACRCard>
+      </View> : null}
     </ScreenLayout>
   );
 };
 
+const Row: React.FC<{ label: string; value: string }> = ({ label, value }) => {
+  const { i18n } = useTranslation();
+  const language = i18n.resolvedLanguage ?? i18n.language;
+  const localText = { writingDirection: getLocaleDirection(language), textAlign: getTextAlign(language) };
+  return <View style={styles.row}><Text style={[styles.rowLabel, localText]}>{label}</Text><Text selectable style={[styles.rowValue, localText]}>{value}</Text></View>;
+};
+
 const styles = StyleSheet.create({
-  empty: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: ACRColors.background,
-  },
-  emptyText: {
-    color: ACRColors.muted,
-    marginBottom: 16,
-  },
-  subtypeBox: {
-    backgroundColor: ACRColors.card,
-    borderWidth: 2,
-    borderColor: ACRColors.primary,
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 10,
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  subtypeLabel: {
-    ...ACRTypography.subtypeLabel,
-    color: ACRColors.muted,
-  },
-  subtypeValue: {
-    ...ACRTypography.subtypeValue,
-    color: ACRColors.primary,
-    marginVertical: 5,
-    textAlign: 'center',
-  },
-  subtypeText: {
-    fontSize: 10,
-    color: ACRColors.ink,
-  },
-  confValue: {
-    ...ACRTypography.confValue,
-    color: ACRColors.primaryDark,
-    marginBottom: 4,
-  },
-  hint: {
-    ...ACRTypography.hint,
-    color: ACRColors.muted,
-    marginTop: 4,
-    writingDirection: I18nManager.isRTL ? 'rtl' : 'ltr',
-  },
-  rule: {
-    borderLeftWidth: 3,
-    borderLeftColor: ACRColors.line,
-    paddingLeft: 9,
-    paddingVertical: 6,
-    marginBottom: 8,
-  },
-  ruleId: {
-    fontSize: 11.5,
-    fontWeight: '700',
-    color: ACRColors.primaryDark,
-  },
-  ruleDesc: {
-    fontSize: 10.5,
-    color: ACRColors.ink,
-    marginVertical: 2,
-    lineHeight: 15,
-  },
-  bold: {
-    fontWeight: '700',
-  },
-  prov: {
-    ...ACRTypography.monospace,
-    fontSize: 9.5,
-    color: ACRColors.muted,
-    lineHeight: 16,
-  },
-  tapHint: {
-    fontWeight: '700',
-  },
+  empty: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20, backgroundColor: ACRColors.background },
+  emptyText: { color: ACRColors.muted, marginBottom: 16 },
+  summaryHeading: { backgroundColor: ACRColors.primaryDark, borderRadius: 12, padding: 14, marginBottom: 10 },
+  summaryHeadingText: { fontSize: 18, fontWeight: '800', color: '#fff', marginBottom: 5 },
+  summarySource: { fontSize: 11, color: '#fff', lineHeight: 16 },
+  subtypeBox: { backgroundColor: ACRColors.card, borderWidth: 2, borderColor: ACRColors.primary, borderRadius: 12, padding: 14, alignItems: 'center', marginBottom: 10 },
+  subtypeLabel: { ...ACRTypography.subtypeLabel, color: ACRColors.muted },
+  subtypeValue: { ...ACRTypography.subtypeValue, color: ACRColors.primary, marginVertical: 5 },
+  subtypeText: { fontSize: 11, color: ACRColors.ink },
+  warningBox: { backgroundColor: ACRColors.warningBg, borderWidth: 1.5, borderColor: ACRColors.warningBorder, borderRadius: 12, padding: 12, marginBottom: 10 },
+  warningTitle: { ...ACRTypography.cardTitle, color: ACRColors.warningText, marginBottom: 7 },
+  technicalToggle: { backgroundColor: ACRColors.primary, borderRadius: 12, padding: 12, marginTop: 2, marginBottom: 10 },
+  technicalTogglePressed: { opacity: 0.8 },
+  technicalToggleText: { fontSize: 13, fontWeight: '700', color: '#fff' },
+  technicalToggleHint: { fontSize: 9.5, color: '#fff', marginTop: 3 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', gap: 10, borderBottomWidth: 1, borderBottomColor: ACRColors.line, paddingVertical: 5 },
+  rowLabel: { flex: 1, fontSize: 10.5, color: ACRColors.ink },
+  rowValue: { flex: 1, fontSize: 10.5, fontWeight: '600', color: ACRColors.ink },
+  rule: { borderLeftWidth: 3, borderLeftColor: ACRColors.line, paddingLeft: 9, paddingVertical: 6, marginBottom: 8 },
+  ruleId: { fontSize: 11, fontWeight: '700', color: ACRColors.primaryDark },
+  ruleText: { fontSize: 10.5, color: ACRColors.ink, marginVertical: 3 },
+  listItem: { fontSize: 10.5, color: ACRColors.ink, lineHeight: 16 },
+  sectionLabel: { ...ACRTypography.label, color: ACRColors.primaryDark, marginTop: 10, marginBottom: 3 },
+  hint: { ...ACRTypography.hint, color: ACRColors.muted, marginTop: 4 },
+  mono: { ...ACRTypography.monospace, fontSize: 9.5, color: ACRColors.muted, lineHeight: 15 },
 });

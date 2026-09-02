@@ -1,312 +1,174 @@
-/**
- * ACR Mobile Companion API Client
- * Compliant with ACR-DD-014 v0.1 — /m/v1 gateway
- * 
- * Constraints:
- * - No clinical data in logs, headers, or URLs
- * - Attestation must be VERIFIED before infer
- * - Request ID is UUIDv4, header must match body
- * - No auto-retry on INDETERMINATE
- * - Tokens do not contain clinical values
- */
+import { MOBILE_BUILD_ID } from '../config/appIdentity';
+import { GATEWAY_API_BASE } from '../config/gateway';
+import type { ACRError, AssessmentRequest, AssessmentResponse, AttestationResponse, AuthRedeemResponse, DeliveryChoice, ErrorCode, FailureState } from '../types/api';
+import { generateDeviceBinding, generateRequestId } from '../utils/uuid';
+import { parseAssessmentResponse, parseAttestation } from './responseGuard';
 
-import 'react-native-get-random-values'; // polyfill for crypto.getRandomValues
-import { v4 as uuidv4 } from 'uuid';
+type FetchLike = typeof fetch;
+const deviceBinding = generateDeviceBinding();
 
-// ACR-DD-014: Base URL for your local VPS
-const API_BASE_URL = 'https://your-vps-domain.com'; // TODO: Update with your actual VPS URL
+const ERROR_CODES = new Set<ErrorCode>([
+  'SCHEMA_INVALID', 'REQUEST_ID_MISMATCH', 'AUTHENTICATION_REQUIRED', 'INVITE_CONFIGURATION_REQUIRED', 'INVITE_INVALID',
+  'DEVICE_BINDING_MISMATCH', 'CLIENT_BUILD_MISMATCH', 'AUTHORISED_SCOPE_REQUIRED', 'TOKEN_REUSE_DETECTED',
+  'PAYLOAD_TOO_LARGE', 'CLINICAL_INPUT_REJECTED', 'RATE_LIMITED', 'ATTESTATION_MISMATCH', 'ATTESTATION_UNAVAILABLE',
+  'UPSTREAM_NOT_CONFIGURED', 'UPSTREAM_TIMEOUT', 'UPSTREAM_HTTP_ERROR', 'INVALID_UPSTREAM_RESPONSE',
+  'BAYESIAN_ENHANCEMENT_UNAVAILABLE', 'DEMO_FIXTURE_NOT_AVAILABLE', 'SERVICE_UNAVAILABLE',
+  'INFERENCE_OUTCOME_INDETERMINATE', 'INFERENCE_FAILED',
+]);
+const SESSION_INVALIDATING_CODES = new Set<ErrorCode>([
+  'AUTHENTICATION_REQUIRED', 'DEVICE_BINDING_MISMATCH', 'CLIENT_BUILD_MISMATCH', 'TOKEN_REUSE_DETECTED',
+]);
 
-// ACR-DD-014: Contract identifiers
-const CONTRACT_CDS = 'acr.cds.v1';
-const CONTRACT_ATTESTATION = 'acr.attestation.v1';
-const CONTRACT_ERROR = 'acr.error.v1';
-
-// ACR-DD-014: Security headers
-const HEADERS = {
-  'Content-Type': 'application/json',
-  'Accept': 'application/json',
-  'X-ACR-Contract': CONTRACT_CDS,
-  'Cache-Control': 'no-store',
-};
-
-// Token storage (in-memory only per ACR-DD-014 §11.3)
-let accessToken: string | null = null;
-let refreshToken: string | null = null;
-let tokenExpiry: Date | null = null;
-
-// Types from ACR-DD-014
-export interface AttestationResponse {
-  contract: string;
-  verificationState: 'VERIFIED' | 'MISMATCH' | 'UNAVAILABLE';
-  expected: {
-    reasonerVersion: string;
-    reasoningMode: string;
-    ontologySha256: string;
-    ruleCount: number;
-    queryCount: number;
-  };
-  observed: {
-    reasonerVersion: string | null;
-    reasoningMode: string | null;
-    ontologySha256: string | null;
-    ruleCount: number | null;
-    queryCount: number | null;
-  };
-  lastVerificationTimestamp: string;
-  lastSuccessfulVerificationTimestamp: string | null;
+export class GatewayError extends Error implements FailureState {
+  constructor(
+    public code: ErrorCode,
+    message: string,
+    public retryable = false,
+    public outcome: 'NOT_SUBMITTED' | 'INDETERMINATE' | 'FAILED' = 'FAILED',
+    public fieldErrors: string[] = [],
+    public statusCode = 0,
+  ) { super(message); }
+  toFailure(): FailureState { return { code: this.code, message: this.message, retryable: this.retryable, outcome: this.outcome, fieldErrors: this.fieldErrors }; }
 }
 
-export interface InferRequest {
-  contract: string;
-  requestId: string;
-  assessment: {
-    patientId: string;
-    erStatus: 'positive' | 'negative';
-    prStatus: 'positive' | 'negative';
-    her2Status: 'positive' | 'negative';
-    ki67: number;
-    stage?: string | null;
-    grade?: '1' | '2' | '3' | null;
-    histologicalSubtype?: 'IDC' | 'ILC' | 'DCIS' | 'PAGET' | null;
-    nodalStatus?: 'N0' | 'N1' | 'N2' | 'N3' | null;
-    age?: number | null;
-    ca153?: number | null;
-    cea?: number | null;
-    surgeryDate?: string | null;
-    bayesianEnhanced: boolean;
-  };
-  client: {
-    channel: 'MOBILE';
-    buildId: string;
-    environment: 'EVALUATION';
-  };
-}
+export class GatewayClient {
+  private accessToken: string | null = null;
+  private refreshToken: string | null = null;
+  private accessExpiresAt = 0;
+  private refreshExpiresAt = 0;
 
-export interface InferResponse {
-  contract: string;
-  requestId: string;
-  status: 'COMPLETED';
-  completedAt: string;
-  data: {
-    molecularSubtype: {
-      code: string;
-      display: string;
-    };
-    bayesian: {
-      enabled: boolean;
-      confidence: number;
-      band: string;
-    };
-    reasoning: {
-      reasoningMode: string;
-      rulesFired: Array<{
-        ruleId: string;
-        description: string;
-        provenance: 'ACR_NATIVE' | 'OPENLLET_NATIVE_VERIFIED';
-      }>;
-      inferences: string[];
-    };
-    recommendations: Array<{
-      code: string;
-      text: string;
-      ruleIds: string[];
-    }>;
-    provenance: {
-      reasonerVersion: string;
-      responseContract: string;
-      ontologySha256: string;
-      ruleCount: number;
-      queryCount: number;
-      environment: string;
-    };
-  };
-  warnings: string[];
-}
+  constructor(private fetchImpl: FetchLike = fetch) {}
 
-export interface ErrorResponse {
-  contract: string;
-  requestId: string;
-  error: {
-    code: string;
-    message: string;
-    retryable: boolean;
-    outcome: 'NOT_SUBMITTED' | 'INDETERMINATE' | 'FAILED';
-    fieldErrors: string[];
-  };
-}
+  hasSession(): boolean { return this.accessToken !== null && this.refreshToken !== null && Date.now() < this.refreshExpiresAt; }
+  clearSession(): void { this.accessToken = null; this.refreshToken = null; this.accessExpiresAt = 0; this.refreshExpiresAt = 0; }
 
-// ACR-DD-014 §4.3: Generate fresh request ID
-const generateRequestId = (): string => uuidv4();
-
-// ACR-DD-014 §5.2: Generate fresh patient ID
-const generatePatientId = (): string => `mob-${uuidv4()}`;
-
-// ACR-DD-014 §6.3: Auth redeem
-export const redeemInvite = async (
-  inviteCode: string,
-  deviceBinding: string,
-  buildId: string
-): Promise<{ accessToken: string; refreshToken: string; expiresIn: number }> => {
-  const requestId = generateRequestId();
-  
-  const response = await fetch(`${API_BASE_URL}/m/v1/auth/redeem`, {
-    method: 'POST',
-    headers: {
-      ...HEADERS,
-      'X-Request-ID': requestId,
-    },
-    body: JSON.stringify({
-      inviteCode,
-      deviceBinding,
-      clientBuildId: buildId,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json() as ErrorResponse;
-    throw new Error(error.error?.message || 'Authentication failed');
-  }
-
-  const data = await response.json();
-  accessToken = data.accessToken;
-  refreshToken = data.refreshToken;
-  tokenExpiry = new Date(Date.now() + data.expiresIn * 1000);
-  
-  return data;
-};
-
-// ACR-DD-014 §6.3: Refresh token
-export const refreshAccessToken = async (): Promise<string> => {
-  if (!refreshToken) throw new Error('No refresh token available');
-
-  const requestId = generateRequestId();
-  
-  const response = await fetch(`${API_BASE_URL}/m/v1/auth/refresh`, {
-    method: 'POST',
-    headers: {
-      ...HEADERS,
-      'X-Request-ID': requestId,
-      'Authorization': `Bearer ${refreshToken}`,
-    },
-  });
-
-  if (!response.ok) {
-    // ACR-DD-014 §6.3: Reuse detection revokes entire family
-    accessToken = null;
-    refreshToken = null;
-    throw new Error('Session expired. Please re-authenticate.');
-  }
-
-  const data = await response.json();
-  accessToken = data.accessToken;
-  refreshToken = data.refreshToken;
-  tokenExpiry = new Date(Date.now() + data.expiresIn * 1000);
-  
-  return data.accessToken;
-};
-
-// ACR-DD-014 §6.4: Attestation check
-export const getAttestation = async (): Promise<AttestationResponse> => {
-  if (!accessToken) throw new Error('Not authenticated');
-
-  const requestId = generateRequestId();
-  
-  const response = await fetch(`${API_BASE_URL}/m/v1/attestation`, {
-    method: 'GET',
-    headers: {
-      ...HEADERS,
-      'X-Request-ID': requestId,
-      'Authorization': `Bearer ${accessToken}`,
-    },
-  });
-
-  if (!response.ok) {
-    const error = await response.json() as ErrorResponse;
-    throw new Error(error.error?.message || 'Attestation check failed');
-  }
-
-  return response.json();
-};
-
-// ACR-DD-014 §6.5: Submit inference
-export const submitInfer = async (
-  assessmentData: Omit<InferRequest['assessment'], 'patientId' | 'bayesianEnhanced'> & { bayesianEnhanced: boolean },
-  buildId: string
-): Promise<InferResponse> => {
-  if (!accessToken) throw new Error('Not authenticated');
-
-  // ACR-DD-014 §6.5: Attestation must be VERIFIED
-  const attestation = await getAttestation();
-  if (attestation.verificationState !== 'VERIFIED') {
-    throw new Error(`Attestation ${attestation.verificationState}: Assessment blocked`);
-  }
-
-  const requestId = generateRequestId();
-  const patientId = generatePatientId();
-
-  const payload: InferRequest = {
-    contract: CONTRACT_CDS,
-    requestId,
-    assessment: {
-      ...assessmentData,
-      patientId,
-      bayesianEnhanced: assessmentData.bayesianEnhanced,
-    },
-    client: {
-      channel: 'MOBILE',
-      buildId,
-      environment: 'EVALUATION',
-    },
-  };
-
-  // ACR-DD-014 §4.4: Request ID in header must match body
-  const response = await fetch(`${API_BASE_URL}/m/v1/infer`, {
-    method: 'POST',
-    headers: {
-      ...HEADERS,
-      'X-Request-ID': requestId,
-      'Authorization': `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    const error = await response.json() as ErrorResponse;
-    
-    // ACR-DD-014 §10.2: INDETERMINATE must never be auto-retried
-    if (error.error?.outcome === 'INDETERMINATE') {
-      throw new Error('Assessment outcome uncertain. Do not retry automatically.');
+  private async send(path: string, options: RequestInit): Promise<Response> {
+    try {
+      return await this.fetchImpl(`${GATEWAY_API_BASE}${path}`, options);
+    } catch {
+      throw new GatewayError('SERVICE_UNAVAILABLE', 'Server not connected.', true, 'NOT_SUBMITTED');
     }
-    
-    throw new Error(error.error?.message || 'Inference failed');
   }
 
-  return response.json();
-};
-
-// ACR-DD-014 §6.2: Liveness check (no auth)
-export const checkLive = async (): Promise<{ status: string }> => {
-  const response = await fetch(`${API_BASE_URL}/m/v1/live`, {
-    method: 'GET',
-    headers: {
-      'Accept': 'application/json',
-      'Cache-Control': 'no-store',
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error('Service is not live');
+  private async errorFrom(response: Response): Promise<GatewayError> {
+    let envelope: ACRError | null = null;
+    try { envelope = await response.json() as ACRError; } catch { /* safe generic error below */ }
+    const error = envelope?.contract === 'acr.error.v1' ? envelope.error : null;
+    const code = error && ERROR_CODES.has(error.code) ? error.code : 'SERVICE_UNAVAILABLE';
+    return new GatewayError(
+      code,
+      error?.message || 'The gateway returned an unavailable response.',
+      error?.retryable ?? false,
+      error?.outcome || 'FAILED',
+      Array.isArray(error?.fieldErrors) ? error.fieldErrors.filter((item): item is string => typeof item === 'string') : [],
+      response.status,
+    );
   }
 
-  return response.json();
-};
+  private baseHeaders(): Record<string, string> {
+    return { Accept: 'application/json', 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
+  }
 
-// Utility: Clear all auth state
-export const revokeSession = () => {
-  accessToken = null;
-  refreshToken = null;
-  tokenExpiry = null;
-};
+  private protectedHeaders(extra: Record<string, string> = {}): Record<string, string> {
+    if (!this.accessToken) throw new GatewayError('AUTHENTICATION_REQUIRED', 'Evaluation access is required.', false, 'NOT_SUBMITTED');
+    return {
+      ...this.baseHeaders(), Authorization: `Bearer ${this.accessToken}`,
+      'X-Device-Binding': deviceBinding, 'X-Client-Build-ID': MOBILE_BUILD_ID, ...extra,
+    };
+  }
 
-// Export generators for store use
-export { generateRequestId, generatePatientId };
+  async checkLive(): Promise<'UP'> {
+    const response = await this.send('/live', { method: 'GET', headers: { Accept: 'application/json', 'Cache-Control': 'no-store' } });
+    if (!response.ok) throw await this.errorFrom(response);
+    const body = await response.json() as { status?: unknown };
+    if (body?.status !== 'UP') throw new GatewayError('SERVICE_UNAVAILABLE', 'Server not connected.', true, 'NOT_SUBMITTED');
+    return 'UP';
+  }
+
+  async redeemInvite(inviteCode: string): Promise<void> {
+    this.clearSession();
+    const response = await this.send('/auth/redeem', {
+      method: 'POST', headers: this.baseHeaders(),
+      body: JSON.stringify({ inviteCode, deviceBinding, clientBuildId: MOBILE_BUILD_ID }),
+    });
+    if (!response.ok) throw await this.errorFrom(response);
+    this.acceptTokens(await response.json() as AuthRedeemResponse);
+  }
+
+  private acceptTokens(tokens: AuthRedeemResponse): void {
+    const refreshExpiry = Date.parse(tokens?.refreshExpiresAt);
+    if (tokens?.tokenType !== 'Bearer' || typeof tokens.accessToken !== 'string' || !tokens.accessToken
+        || typeof tokens.refreshToken !== 'string' || !tokens.refreshToken
+        || !Number.isInteger(tokens.expiresIn) || tokens.expiresIn <= 0 || typeof tokens.refreshExpiresAt !== 'string'
+        || !Number.isFinite(refreshExpiry) || refreshExpiry <= Date.now()) {
+      this.clearSession();
+      throw new GatewayError('SERVICE_UNAVAILABLE', 'The gateway returned an invalid access session.', false, 'FAILED');
+    }
+    this.accessToken = tokens.accessToken;
+    this.refreshToken = tokens.refreshToken;
+    this.accessExpiresAt = Date.now() + tokens.expiresIn * 1000;
+    this.refreshExpiresAt = refreshExpiry;
+  }
+
+  private async refreshAccess(): Promise<void> {
+    if (!this.refreshToken || Date.now() >= this.refreshExpiresAt) { this.clearSession(); throw new GatewayError('AUTHENTICATION_REQUIRED', 'Evaluation access has expired.', false, 'NOT_SUBMITTED'); }
+    const currentRefreshToken = this.refreshToken;
+    try {
+      const response = await this.send('/auth/refresh', {
+        method: 'POST', headers: this.baseHeaders(),
+        body: JSON.stringify({ refreshToken: currentRefreshToken, deviceBinding, clientBuildId: MOBILE_BUILD_ID }),
+      });
+      if (!response.ok) throw await this.errorFrom(response);
+      this.acceptTokens(await response.json() as AuthRedeemResponse);
+    } catch (error) {
+      this.clearSession();
+      throw error;
+    }
+  }
+
+  private async protectedResponse(path: string, options: RequestInit, extraHeaders: Record<string, string> = {}): Promise<Response> {
+    if (!this.hasSession()) throw new GatewayError('AUTHENTICATION_REQUIRED', 'Evaluation access is required.', false, 'NOT_SUBMITTED');
+    if (Date.now() >= this.accessExpiresAt - 30_000) await this.refreshAccess();
+    let response = await this.send(path, { ...options, headers: this.protectedHeaders(extraHeaders) });
+    if (response.status === 401) {
+      const firstError = await this.errorFrom(response);
+      if (firstError.code !== 'AUTHENTICATION_REQUIRED') throw firstError;
+      await this.refreshAccess();
+      response = await this.send(path, { ...options, headers: this.protectedHeaders(extraHeaders) });
+      if (response.status === 401) {
+        const retryError = await this.errorFrom(response);
+        this.clearSession();
+        throw retryError;
+      }
+    }
+    if (response.status === 403 || response.status === 409) {
+      const protectedError = await this.errorFrom(response);
+      if (SESSION_INVALIDATING_CODES.has(protectedError.code)) this.clearSession();
+      throw protectedError;
+    }
+    return response;
+  }
+
+  async checkAttestation(): Promise<AttestationResponse> {
+    const response = await this.protectedResponse('/attestation', { method: 'GET' });
+    if (!response.ok) throw await this.errorFrom(response);
+    try { return parseAttestation(await response.json()); }
+    catch { throw new GatewayError('INVALID_UPSTREAM_RESPONSE', 'Baseline verification response was invalid.', false, 'FAILED'); }
+  }
+
+  async submit(request: AssessmentRequest, choice: DeliveryChoice): Promise<AssessmentResponse> {
+    const path = choice === 'SYNTHETIC_DEMO' ? '/demo/infer' : '/infer';
+    const response = await this.protectedResponse(path, { method: 'POST', body: JSON.stringify(request) }, {
+      'X-ACR-Contract': 'acr.cds.v1', 'X-Request-ID': request.requestId,
+    });
+    if (!response.ok) throw await this.errorFrom(response);
+    try { return parseAssessmentResponse(await response.json(), request, choice); }
+    catch { throw new GatewayError('INVALID_UPSTREAM_RESPONSE', 'The gateway returned an incomplete or mismatched result.', false, 'FAILED'); }
+  }
+}
+
+export const gatewayClient = new GatewayClient();
+export const toFailureState = (error: unknown): FailureState => error instanceof GatewayError
+  ? error.toFailure()
+  : { code: 'SERVICE_UNAVAILABLE', message: 'Server not connected.', retryable: true, outcome: 'NOT_SUBMITTED', fieldErrors: [] };
+export const newRequestId = generateRequestId;

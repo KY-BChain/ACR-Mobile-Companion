@@ -1,0 +1,44 @@
+{
+  "success": true,
+  "message": "Inference completed successfully",
+  "data": {
+    "patientId": "mob-3f9c1e84-77a2-4b16-9d05-2ce8a1b47f30",
+    "timestamp": "2026-08-31T10:00:00Z",
+    "deterministic": {
+      "molecularSubtype": "LuminalB_HER2Negative",
+      "riskLevel": "INTERMEDIATE",
+      "treatments": [],
+      "biomarkers": {
+        "ER": "positive",
+        "PR": "positive",
+        "HER2": "negative",
+        "Ki67": "25.0%"
+      },
+      "reasoningMode": "OPENLLET_SWRL"
+    },
+    "bayesian": {
+      "confidence": 0,
+      "posterior": {},
+      "uncertaintyBounds": [0, 0],
+      "enabled": false
+    },
+    "reasoning": {
+      "rulesFired": [],
+      "firedRules": [],
+      "evidence": [],
+      "trace": "Source-faithful unit serialisation fixture"
+    },
+    "riskLevel": "INTERMEDIATE",
+    "dataCompleteness": {
+      "tier": 3,
+      "missingFields": [],
+      "rulesBlocked": 0,
+      "warning": ""
+    },
+    "reasoningMode": "OPENLLET_SWRL",
+    "molecularSubtype": "LuminalB_HER2Negative"
+  },
+  "executionTimeMs": 12,
+  "apiVersion": "2.0",
+  "timestamp": "2026-08-31T10:00:00"
+}

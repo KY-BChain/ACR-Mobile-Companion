@@ -8,7 +8,9 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "eslint . --ext .ts,.tsx",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "typecheck:active": "tsc --noEmit -p tsconfig.active.json",
+    "verify:mobile": "node tests/mobile/verify.js && node tests/mobile/offlineWalkthrough.verify.js && node tests/mobile/resultPresentation.verify.js && node tests/p1p2/verify.js && node tests/version/verify.js && node tests/poster/verify.js && node tests/rtl/verify.js"
   },
   "dependencies": {
     "@react-navigation/native": "^6.1.17",

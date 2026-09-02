@@ -8,6 +8,7 @@ import { ACRCard } from '../components/ACRCard';
 import { ACRSegmentedControl } from '../components/ACRSegmentedControl';
 import { ACRInput } from '../components/ACRInput';
 import { ACRButton } from '../components/ACRButton';
+import { WalkthroughNotice } from '../components/WalkthroughNotice';
 import { useAssessmentStore, type ProvisionalGender } from '../store/assessmentStore';
 import { isTumorSizeValid } from '../utils/provisionalValidation';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -40,6 +41,7 @@ export const P1Screen: React.FC = () => {
         <ACRButton title={t('common:next')} variant="primary" disabled={!tumorSizeValid} onPress={() => navigation.navigate('P2')} />
       </>}
     >
+      <WalkthroughNotice />
       <ACRCard title={t('p1:cardTitle')}>
         <Text style={[styles.label, localeTextStyle]}>{t('p1:tumorSize')} <Text style={styles.small}>· {t('common:optional')}</Text></Text>
         <ACRInput value={p1.tumorSize} onChangeText={(value) => setP1({ tumorSize: value })} keyboardType="numeric" hint={t('p1:tumorSizeHint')} />

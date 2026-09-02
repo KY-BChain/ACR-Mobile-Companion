@@ -41,6 +41,11 @@ for (const [locale, expectedDirection] of localeMatrix) {
 assert.equal(isRTL('ar'), true, 'i18next Arabic base-language form');
 assert.equal(isRTL('AR_sa'), true, 'normalised Arabic locale form');
 assert.equal(isRTL(undefined), false, 'missing locale fails safely to LTR');
+assert.deepEqual(
+  ['ar-SA', 'en-GB'].map((locale) => [getLocaleDirection(locale), getTextAlign(locale)]),
+  [['rtl', 'right'], ['ltr', 'left']],
+  'Arabic-to-LTR switch recalculates direction and alignment without reload/native mutation',
+);
 console.log('PURE PASS direction matrix: ar-SA RTL; seven registered locales LTR');
 
 const config = read('src/i18n/config.ts');
@@ -77,6 +82,20 @@ const navigator = read('src/navigation/AppNavigator.tsx');
 assert.match(navigator, /isRtl \? 'slide_from_left' : 'slide_from_right'/);
 const segmented = read('src/components/ACRSegmentedControl.tsx');
 assert.match(segmented, /isRtl \? styles\.borderLeft : styles\.borderRight/);
+for (const file of ['src/screens/GatewayAccessScreen.tsx', 'src/screens/ReviewScreen.tsx', 'src/screens/ResultScreen.tsx', 'src/screens/FailClosedScreen.tsx']) {
+  const source = read(file);
+  assert.match(source, /getLocaleDirection\(/, `${file} reactive direction`);
+  assert.match(source, /getTextAlign\(/, `${file} reactive alignment`);
+  assert.doesNotMatch(source, /I18nManager|forceRTL|allowRTL/, `${file} has no static native direction`);
+}
+const input = read('src/components/ACRInput.tsx');
+assert.match(input, /useTranslation\(\)/, 'shared input subscribes to reactive i18next state');
+assert.match(input, /i18n\.resolvedLanguage \?\? i18n\.language/, 'shared input uses current resolved locale');
+assert.match(input, /getLocaleDirection\(language\)/, 'shared input derives reactive direction');
+assert.match(input, /getTextAlign\(language\)/, 'shared input derives reactive text alignment');
+assert.match(input, /style=\{\[styles\.input, \{ direction, textAlign \}/, 'input and translated placeholder follow locale');
+assert.match(input, /style=\{\[styles\.hint, \{ direction, textAlign \}\]\}/, 'translated hint follows locale');
+assert.doesNotMatch(input, /I18nManager|forceRTL|allowRTL|reloadAsync/, 'shared input uses no reload/native mutation');
 console.log('STATIC PASS reactive root, navigation, and segmented-control direction wiring');
 
 const localeDir = path.join(root, 'src/i18n/locales');
@@ -120,7 +139,7 @@ const p1p2 = spawnSync(process.execPath, [path.join(root, 'tests/p1p2/verify.js'
   encoding: 'utf8',
 });
 assert.equal(p1p2.status, 0, p1p2.stderr || p1p2.stdout);
-console.log('STATIC PASS existing P1/P2/About invariant verifier remains green');
+console.log('STATIC PASS positive all-field P1/P2/About invariant verifier remains green');
 
 console.log('PASS RTL language-switch static/pure regression evidence');
 console.log('LIMITATION rendered responsiveness and visual direction require simulator/device review');

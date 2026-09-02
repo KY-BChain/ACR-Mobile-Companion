@@ -1,0 +1,224 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ACR Mobile Evaluation API",
+    "version": "build-44",
+    "description": "Local/private-LAN Build 44 gateway contract. The upstream inference URL must be explicitly configured to the verified same backend used by the website."
+  },
+  "servers": [
+    { "url": "http://127.0.0.1:3001/m/v1", "description": "Default loopback listener" }
+  ],
+  "paths": {
+    "/live": {
+      "get": {
+        "summary": "Process liveness",
+        "description": "Minimal health check. Returns no clinical baseline details.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Service is up",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "const": "UP" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/redeem": {
+      "post": {
+        "summary": "Invite redemption",
+        "description": "One-time invite code → token family. ACR-DD-014 §6.3",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["inviteCode", "deviceBinding", "clientBuildId"],
+                "properties": {
+                  "inviteCode": { "type": "string" },
+                  "deviceBinding": { "type": "string", "minLength": 8, "maxLength": 256 },
+                  "clientBuildId": { "const": "mob-v0.6.0+44" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token family issued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tokenType": { "type": "string", "const": "Bearer" },
+                    "accessToken": { "type": "string" },
+                    "expiresIn": { "type": "integer" },
+                    "refreshToken": { "type": "string" },
+                    "refreshExpiresAt": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "summary": "Rotate refresh credential",
+        "description": "Issue new short-lived access token. ACR-DD-014 §6.3",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["refreshToken", "deviceBinding", "clientBuildId"],
+                "properties": {
+                  "refreshToken": { "type": "string" },
+                  "deviceBinding": { "type": "string", "minLength": 8, "maxLength": 256 },
+                  "clientBuildId": { "const": "mob-v0.6.0+44" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "New token family" },
+          "409": { "$ref": "#/components/responses/TokenReuse" }
+        }
+      }
+    },
+    "/attestation": {
+      "get": {
+        "summary": "Baseline verification",
+        "description": "Fail-closed gate reporting separate logical, physical, active, loaded and query counts (approved baseline 71/76/76/76/27). ACR-DD-014 §6.4",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/DeviceBinding" },
+          { "$ref": "#/components/parameters/ClientBuild" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Attestation result",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "acr.attestation.v1.schema.json" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/infer": {
+      "post": {
+        "summary": "Submit assessment to the configured same-backend platform route",
+        "description": "Never falls back automatically to a synthetic result. Blocked if attestation is not VERIFIED.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/DeviceBinding" },
+          { "$ref": "#/components/parameters/ClientBuild" },
+          { "name": "X-ACR-Contract", "in": "header", "required": true, "schema": { "type": "string" } },
+          { "name": "X-Request-ID", "in": "header", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "acr.cds.v1.request.schema.json" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful reasoning",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "acr.cds.v1.response.schema.json" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/SchemaInvalid" },
+          "503": { "$ref": "#/components/responses/AttestationFailed" },
+          "504": { "$ref": "#/components/responses/Indeterminate" }
+        }
+      }
+    },
+    "/demo/infer": {
+      "post": {
+        "summary": "Explicit verified synthetic-fixture replay",
+        "description": "Requires an immutable exact canonical request match and an independently verified platform-capture manifest with logical/physical/active/loaded/query provenance. No current inference is executed.",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "$ref": "#/components/parameters/DeviceBinding" },
+          { "$ref": "#/components/parameters/ClientBuild" },
+          { "name": "X-ACR-Contract", "in": "header", "required": true, "schema": { "const": "acr.cds.v1" } },
+          { "name": "X-Request-ID", "in": "header", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "acr.cds.v1.request.schema.json" } } } },
+        "responses": {
+          "200": { "description": "Exact verified replay", "content": { "application/json": { "schema": { "$ref": "acr.cds.v1.response.schema.json" } } } },
+          "404": { "description": "DEMO_FIXTURE_NOT_AVAILABLE" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "Opaque"
+      }
+    },
+    "parameters": {
+      "DeviceBinding": {
+        "name": "X-Device-Binding", "in": "header", "required": true,
+        "schema": { "type": "string", "minLength": 8, "maxLength": 256 }
+      },
+      "ClientBuild": {
+        "name": "X-Client-Build-ID", "in": "header", "required": true,
+        "schema": { "const": "mob-v0.6.0+44" }
+      }
+    },
+    "responses": {
+      "SchemaInvalid": {
+        "description": "Malformed request",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "acr.error.v1.schema.json" }
+          }
+        }
+      },
+      "RateLimited": {
+        "description": "Too many requests",
+        "headers": {
+          "Retry-After": { "schema": { "type": "integer" } }
+        }
+      },
+      "TokenReuse": {
+        "description": "Refresh token family revoked"
+      },
+      "AttestationFailed": {
+        "description": "Baseline verification failed"
+      },
+      "Indeterminate": {
+        "description": "Timeout after possible submission. Do not auto-retry."
+      }
+    }
+  }
+}

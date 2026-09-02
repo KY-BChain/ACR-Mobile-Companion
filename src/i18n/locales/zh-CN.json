@@ -120,13 +120,32 @@
     "checking": "检查中…",
     "ki67": "Ki-67",
     "nodalStatus": "淋巴结状态",
-    "submissionFailed": "提交失败", "p1Title": "临时 P1", "p2Title": "临时 P2", "provisionalHint": "仅用于合成数据的临时字段。不发送到 API，也不用于生成结果。",
+    "submissionFailed": "提交失败", "p1Title": "临时 P1", "p2Title": "临时 P2", "provisionalHint": "临时字段会传输到所选网关路由；其临床含义和实际后端使用仍需审核。",
     "subtitle": "提交前确认输入内容",
     "surgeryDate": "手术日期",
     "title": "复核"
   },
   "result": {
     "title": "评估结果",
+    "clinicalSummary": "临床摘要",
+    "sourceLive": "结果由已验证的实时 ACR 平台返回。",
+    "sourceFallback": "结果由平台回退模式返回。",
+    "sourceDemo": "先前捕获的已验证合成结果。本次未执行推理。",
+    "warningsAndContext": "警告和背景",
+    "informationCompleteness": "信息完整性",
+    "treatmentOptions": "返回的治疗选项",
+    "biomarkerResults": "返回的生物标志物结果",
+    "confidenceSummary": "分类置信度",
+    "classificationConfidence": "分类置信度",
+    "noBayesianEnhancement": "此结果未使用贝叶斯增强。",
+    "technicalDetails": "技术详情",
+    "showTechnicalDetails": "显示推理和来源",
+    "hideTechnicalDetails": "隐藏推理和来源",
+    "resultIdentity": "结果标识",
+    "resultMode": "结果模式",
+    "executionStatus": "执行状态",
+    "rootRisk": "显示的风险",
+    "deterministicRisk": "确定性风险字段",
     "subtitle": "服务器端推理 · 合成档案",
     "molecularSubtype": "分子亚型",
     "bayesianConfidence": "贝叶斯置信度",
@@ -171,7 +190,7 @@
     "ontologyHashLabel": "本体 SHA-256（已观察，只读挂载）",
     "dataHandlingSection": "数据处理",
     "dataHandlingText": "不保留任何临床数据。无分析。第一阶段禁用崩溃报告。禁用无线更新 — 每次更改都需要新的经过审核的构建。",
-    "unknownValue": "不可用", "pageIndicator": "关于 {{current}} / {{total}}", "page1Title": "什么是 ACR 平台", "page1Text": "ACR 平台是一个研究性的临床决策支持平台。临床合作伙伴和临床试验专家指导收集的临床事实，并审查其受治理的医学知识模型和决策支持规则。", "page2Title": "ACR 如何工作", "page2Text": "授权用户输入经批准的结构化临床事实。配套应用仅向连接的 ACR 服务发送经批准的评估请求，并返回结果和推理来源。", "page3Title": "数据留存，规则随行。", "page3Text": "在临床部署中，患者数据保留在授权的临床基础设施内。本移动演示仅使用合成数据。", "page4Title": "可解释性与安全", "page4Text": "ACR 结果仅用于决策支持。P1 和 P2 是临时演示字段，不发送到 API，也不用于生成结果。", "page5Title": "构建与已验证基线",
+    "unknownValue": "不可用", "pageIndicator": "关于 {{current}} / {{total}}", "page1Title": "什么是 ACR 平台", "page1Text": "ACR 平台是一个研究性的临床决策支持平台。临床合作伙伴和临床试验专家指导收集的临床事实，并审查其受治理的医学知识模型和决策支持规则。", "page2Title": "ACR 如何工作", "page2Text": "授权用户输入经批准的结构化临床事实。配套应用仅向连接的 ACR 服务发送经批准的评估请求，并返回结果和推理来源。", "page3Title": "数据留存，规则随行。", "page3Text": "在临床部署中，患者数据保留在授权的临床基础设施内。本移动演示仅使用合成数据。", "page4Title": "可解释性与安全", "page4Text": "ACR 结果仅用于决策支持。Build 44 将全部 P1 和 P2 字段传输到所选网关路由，并且只显示经过守卫的服务器或已验证样例内容；设备端不进行临床推导。", "page5Title": "构建与已验证基线",
     "application": "应用",
     "baselineAttestation": "基线认证",
     "dataHandling": "数据处理",
@@ -201,8 +220,8 @@
     "state": "状态",
     "verificationHint": "预期值来自已接受的基线清单；它们永远不会被报告为观察值。"
   },
-  "p1": { "title": "临时 P1", "stepTitle": "合同字段", "banner": "仅限合成演示 · 临时字段", "cardTitle": "肿瘤与性别", "tumorSize": "肿瘤大小", "tumorSizeHint": "大于零的有限数值。单位待定。", "tumorSizeError": "请输入大于零的有限值。", "gender": "性别", "female": "女性", "male": "男性", "other": "其他", "unknown": "未知", "genderPending": "性别待定，不会阻止此演示流程。", "nodalWarningTitle": "淋巴结映射提示", "nodalWarning": "N0–N3 不得静默映射为阳性或阴性。" },
-  "p2": { "title": "临时 P2", "stepTitle": "其他演示字段", "banner": "仅限合成演示 · 临时字段", "cardTitle": "其他字段", "ecogScore": "ECOG评分", "ecogHint": "可选整数，范围为0至4。", "ecogError": "请输入0至4的整数。", "pdl1Status": "PD-L1状态", "her2Low": "HER2低表达", "lvef": "LVEF（%）", "lvefHint": "可选有限值，范围为0至100。", "lvefError": "请输入0至100的有限值。", "treatmentIntent": "治疗意图", "notTested": "未检测", "unknown": "未知", "neoadjuvant": "新辅助", "adjuvant": "辅助", "unspecified": "未指定" },
+  "p1": { "title": "临时 P1", "stepTitle": "合同字段", "banner": "仅限评估 · 临时字段", "cardTitle": "肿瘤与性别", "tumorSize": "肿瘤大小", "tumorSizeHint": "大于零的有限数值。单位待定。", "tumorSizeError": "请输入大于零的有限值。", "gender": "性别", "female": "女性", "male": "男性", "other": "其他", "unknown": "未知", "genderPending": "性别为可选项，并仍待临床审核。", "nodalWarningTitle": "淋巴结映射提示", "nodalWarning": "N0–N3 不得静默映射为阳性或阴性。" },
+  "p2": { "title": "临时 P2", "stepTitle": "其他合同字段", "banner": "仅限评估 · 临时字段", "cardTitle": "其他字段", "ecogScore": "ECOG评分", "ecogHint": "可选整数，范围为0至4。", "ecogError": "请输入0至4的整数。", "pdl1Status": "PD-L1状态", "her2Low": "HER2低表达", "lvef": "LVEF（%）", "lvefHint": "可选有限值，范围为0至100。", "lvefError": "请输入0至100的有限值。", "treatmentIntent": "治疗意图", "notTested": "未检测", "unknown": "未知", "neoadjuvant": "新辅助", "adjuvant": "辅助", "unspecified": "未指定" },
   "provenance": {
     "acrNative": "ACR_NATIVE",
     "openlletVerified": "OPENLLET_NATIVE_VERIFIED",
@@ -234,5 +253,11 @@
     "cardTitle": "会话",
     "sessionId": "会话ID",
     "sessionIdHint": "每次评估生成新的UUIDv4。从不输入、从不复用、从不持久化。"
+  },
+  "gatewayAccess": {
+    "title": "评估访问", "subtitle": "连接固定的 ACR 评估网关", "modeTitle": "交付模式", "liveMode": "实时平台", "demoMode": "合成演示", "liveHint": "使用已配置的平台。推理前必须通过基线验证。", "demoHint": "仅使用明确验证的合成样例，不执行当前推理。", "inviteTitle": "邀请码", "invitePlaceholder": "输入邀请码", "inviteHint": "仅保存在内存中，本次尝试后即清除。", "connect": "安全连接", "disconnect": "断开访问", "continueOffline": "浏览全部五个页面", "finishWalkthrough": "结束且不生成结果", "serverAlert": "无法连接 ACR 评估服务器。没有可用的 CDS 结果。", "walkthroughNotice": "没有可用的已验证合成样例。您可以在五个页面中检查和编辑全部 20 个字段；不会提交任何内容、不会创建 CDS 结果，并会在浏览结束时清除输入。", "statusTitle": "连接证据", "gateway": "网关", "connected": "已连接", "notConnected": "服务器未连接", "checking": "正在检查…", "attestation": "基线证明", "privacy": "邀请码、令牌和设备绑定绝不会写入设备存储。"
+  },
+  "build44": {
+    "validationError": "请检查无效的评估字段。", "ki67Error": "请输入 0 到 100 的值。", "ageError": "请输入 18 到 120 的整数年龄，或留空。", "markerError": "请输入非负有限值，或留空。", "dateError": "请使用 YYYY-MM-DD 格式的有效日期，或留空。", "deliveryMode": "交付模式", "liveResult": "实时 Openllet/SWRL 结果", "fallbackResult": "平台回退结果", "demoResult": "已验证的合成演示", "liveReviewHint": "提交时会重新验证基线，并且仅使用实时推理路由。", "demoReviewHint": "提交仅使用明确的合成演示路由，绝不会自动切换。", "tumorUnitPending": "原始值 · 单位待定", "her2Loss": "HER2-low 将按选择原样传输；设备端不进行临床解释。", "patientId": "生成的患者 ID", "years": "岁", "noneReturned": "未返回内容", "risk": "风险", "treatments": "治疗", "biomarkers": "生物标志物", "firedRules": "触发规则和来源", "evidence": "证据与追踪", "trace": "推理追踪", "completeness": "数据完整性", "tier": "层级", "missingFields": "缺失字段", "rulesBlocked": "受阻规则", "warnings": "警告", "bayesian": "贝叶斯增强", "posterior": "后验分布", "uncertainty": "不确定性界限", "currentEvidence": "当前平台证据", "capturedEvidence": "已捕获样例来源", "currentExecution": "当前执行", "noCurrentExecution": "无当前推理", "serverNotConnected": "服务器未连接", "baselineMismatch": "连接的推理器与已接受的基线不匹配。", "authExpired": "评估访问不存在或已过期。请使用邀请码重新连接。", "fixtureUnavailable": "已验证的合成样例不可用。", "indeterminate": "推理结果不确定，未自动重试。", "retryVerification": "重试验证", "backToAccess": "返回访问"
   }
 }

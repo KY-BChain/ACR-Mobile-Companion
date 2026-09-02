@@ -120,13 +120,32 @@
     "checking": "確認中…",
     "ki67": "Ki-67",
     "nodalStatus": "リンパ節状態",
-    "submissionFailed": "送信に失敗しました", "p1Title": "暫定 P1", "p2Title": "暫定 P2", "provisionalHint": "合成データ専用の暫定フィールドです。APIには送信せず、結果の生成にも使用しません。",
+    "submissionFailed": "送信に失敗しました", "p1Title": "暫定 P1", "p2Title": "暫定 P2", "provisionalHint": "暫定フィールドは選択したゲートウェイルートへ送信され、臨床的意味と実際の使用はレビュー対象です。",
     "subtitle": "送信前に入力内容を確認してください",
     "surgeryDate": "手術日",
     "title": "確認"
   },
   "result": {
     "title": "評価結果",
+    "clinicalSummary": "臨床サマリー",
+    "sourceLive": "検証済みのライブ ACR プラットフォームから返された結果です。",
+    "sourceFallback": "プラットフォームのフォールバックモードから返された結果です。",
+    "sourceDemo": "以前に取得した検証済み合成結果です。現在の推論は実行されていません。",
+    "warningsAndContext": "警告とコンテキスト",
+    "informationCompleteness": "情報の完全性",
+    "treatmentOptions": "返された治療選択肢",
+    "biomarkerResults": "返されたバイオマーカー結果",
+    "confidenceSummary": "分類信頼度",
+    "classificationConfidence": "分類信頼度",
+    "noBayesianEnhancement": "この結果ではベイズ拡張は使用されていません。",
+    "technicalDetails": "技術詳細",
+    "showTechnicalDetails": "推論と由来を表示",
+    "hideTechnicalDetails": "推論と由来を非表示",
+    "resultIdentity": "結果の識別情報",
+    "resultMode": "結果モード",
+    "executionStatus": "実行状態",
+    "rootRisk": "表示リスク",
+    "deterministicRisk": "決定論的リスクフィールド",
     "subtitle": "サーバー側推論 · 合成プロファイル",
     "molecularSubtype": "分子亜型",
     "bayesianConfidence": "ベイズ信頼度",
@@ -171,7 +190,7 @@
     "ontologyHashLabel": "オントロジーSHA-256（観測済み、読み取り専用マウント）",
     "dataHandlingSection": "データ処理",
     "dataHandlingText": "臨床データの意図的な保存はありません。分析なし。ウェーブ1ではクラッシュレポートを無効化。OTAアップデート無効 — 変更ごとに新しいレビュービルドが必要です。",
-    "unknownValue": "利用不可", "pageIndicator": "About {{current}} / {{total}}", "page1Title": "ACRプラットフォームとは", "page1Text": "ACR Platformは研究用の臨床意思決定支援プラットフォームです。臨床パートナーと臨床試験の専門家が収集する臨床情報を導き、医学知識モデルと意思決定ルールを確認します。", "page2Title": "ACRの仕組み", "page2Text": "承認された利用者が承認済みの構造化臨床情報を入力します。アプリは承認済みの評価リクエストだけをACRサービスへ送り、結果と推論の出典を受け取ります。", "page3Title": "データは留まり、ルールは移動します。", "page3Text": "臨床環境では患者データは承認済みの基盤内に残ります。このモバイルデモは合成データのみを使用します。", "page4Title": "説明可能性と安全性", "page4Text": "ACRの結果は意思決定支援のみを目的とします。P1とP2は暫定デモ項目で、APIに送信せず結果生成にも使用しません。", "page5Title": "ビルドと検証済みベースライン",
+    "unknownValue": "利用不可", "pageIndicator": "About {{current}} / {{total}}", "page1Title": "ACRプラットフォームとは", "page1Text": "ACR Platformは研究用の臨床意思決定支援プラットフォームです。臨床パートナーと臨床試験の専門家が収集する臨床情報を導き、医学知識モデルと意思決定ルールを確認します。", "page2Title": "ACRの仕組み", "page2Text": "承認された利用者が承認済みの構造化臨床情報を入力します。アプリは承認済みの評価リクエストだけをACRサービスへ送り、結果と推論の出典を受け取ります。", "page3Title": "データは留まり、ルールは移動します。", "page3Text": "臨床環境では患者データは承認済みの基盤内に残ります。このモバイルデモは合成データのみを使用します。", "page4Title": "説明可能性と安全性", "page4Text": "ACRの結果は意思決定支援のみを目的とします。Build 44 はすべての P1/P2 項目を選択したゲートウェイルートへ転送し、検査済みサーバーまたは検証済みフィクスチャの内容だけを表示します。端末上で臨床的導出は行いません。", "page5Title": "ビルドと検証済みベースライン",
     "application": "アプリケーション",
     "baselineAttestation": "ベースライン検証",
     "dataHandling": "データ処理",
@@ -201,8 +220,8 @@
     "state": "状態",
     "verificationHint": "予想値は受け入れられたベースラインマニフェストから取得されます。観測として報告されることはありません。"
   },
-  "p1": { "title": "暫定 P1", "stepTitle": "契約フィールド", "banner": "合成デモのみ · 暫定フィールド", "cardTitle": "腫瘍と性別", "tumorSize": "腫瘍サイズ", "tumorSizeHint": "0より大きい有限の数値。単位は保留中です。", "tumorSizeError": "0より大きい有限値を入力してください。", "gender": "性別", "female": "女性", "male": "男性", "other": "その他", "unknown": "不明", "genderPending": "性別は保留中ですが、このデモの流れは妨げません。", "nodalWarningTitle": "リンパ節マッピング通知", "nodalWarning": "N0–N3を陽性または陰性に暗黙変換しないでください。" },
-  "p2": { "title": "暫定 P2", "stepTitle": "追加デモフィールド", "banner": "合成デモのみ · 暫定フィールド", "cardTitle": "追加フィールド", "ecogScore": "ECOGスコア", "ecogHint": "0から4までの任意の整数です。", "ecogError": "0から4までの整数を入力してください。", "pdl1Status": "PD-L1状態", "her2Low": "HER2-low", "lvef": "LVEF（%）", "lvefHint": "0から100までの任意の有限値です。", "lvefError": "0から100までの値を入力してください。", "treatmentIntent": "治療意図", "notTested": "未検査", "unknown": "不明", "neoadjuvant": "術前", "adjuvant": "術後", "unspecified": "未指定" },
+  "p1": { "title": "暫定 P1", "stepTitle": "契約フィールド", "banner": "評価専用 · 暫定フィールド", "cardTitle": "腫瘍と性別", "tumorSize": "腫瘍サイズ", "tumorSizeHint": "0より大きい有限の数値。単位は保留中です。", "tumorSizeError": "0より大きい有限値を入力してください。", "gender": "性別", "female": "女性", "male": "男性", "other": "その他", "unknown": "不明", "genderPending": "性別は任意で、臨床レビュー用の暫定項目です。", "nodalWarningTitle": "リンパ節マッピング通知", "nodalWarning": "N0–N3を陽性または陰性に暗黙変換しないでください。" },
+  "p2": { "title": "暫定 P2", "stepTitle": "追加契約フィールド", "banner": "評価専用 · 暫定フィールド", "cardTitle": "追加フィールド", "ecogScore": "ECOGスコア", "ecogHint": "0から4までの任意の整数です。", "ecogError": "0から4までの整数を入力してください。", "pdl1Status": "PD-L1状態", "her2Low": "HER2-low", "lvef": "LVEF（%）", "lvefHint": "0から100までの任意の有限値です。", "lvefError": "0から100までの値を入力してください。", "treatmentIntent": "治療意図", "notTested": "未検査", "unknown": "不明", "neoadjuvant": "術前", "adjuvant": "術後", "unspecified": "未指定" },
   "provenance": {
     "acrNative": "ACR_NATIVE",
     "openlletVerified": "OPENLLET_NATIVE_VERIFIED",
@@ -234,5 +253,11 @@
     "cardTitle": "セッション",
     "sessionId": "セッションID",
     "sessionIdHint": "評価ごとに新しいUUIDv4が生成されます。入力せず、再利用せず、永続化しません。"
+  },
+  "gatewayAccess": {
+    "title": "評価アクセス", "subtitle": "固定された ACR 評価ゲートウェイに接続", "modeTitle": "配信モード", "liveMode": "ライブプラットフォーム", "demoMode": "合成デモ", "liveHint": "設定済みプラットフォームを使用します。推論前にベースラインの検証が必要です。", "demoHint": "明示的に検証済みの合成フィクスチャのみを使用し、現在の推論は実行しません。", "inviteTitle": "招待コード", "invitePlaceholder": "招待コードを入力", "inviteHint": "メモリ内だけに保持し、この試行後に消去します。", "connect": "安全に接続", "disconnect": "アクセスを切断", "continueOffline": "5 つの画面を確認", "finishWalkthrough": "結果なしで終了", "serverAlert": "ACR 評価サーバーに接続できません。CDS 結果は利用できません。", "walkthroughNotice": "検証済み合成フィクスチャは利用できません。5 画面の全 20 項目を確認・編集できますが、送信されず、CDS 結果も作成されず、終了時に入力は消去されます。", "statusTitle": "接続エビデンス", "gateway": "ゲートウェイ", "connected": "接続済み", "notConnected": "サーバー未接続", "checking": "確認中…", "attestation": "ベースライン証明", "privacy": "招待、トークン、デバイスバインドは端末ストレージに書き込みません。"
+  },
+  "build44": {
+    "validationError": "無効な評価フィールドを確認してください。", "ki67Error": "0 から 100 の値を入力してください。", "ageError": "18 から 120 の整数年齢を入力するか、空欄にしてください。", "markerError": "0 以上の有限値を入力するか、空欄にしてください。", "dateError": "YYYY-MM-DD 形式の実在する日付を入力するか、空欄にしてください。", "deliveryMode": "配信モード", "liveResult": "ライブ Openllet/SWRL 結果", "fallbackResult": "プラットフォーム代替結果", "demoResult": "検証済み合成デモ", "liveReviewHint": "送信時にベースラインを再検証し、ライブ推論ルートのみを使用します。", "demoReviewHint": "明示的な合成デモルートのみを使用し、自動切替は行いません。", "tumorUnitPending": "生値 · 単位未確定", "her2Loss": "HER2-low は選択どおりに転送され、端末上で臨床解釈は行いません。", "patientId": "生成された患者 ID", "years": "歳", "noneReturned": "返却なし", "risk": "リスク", "treatments": "治療", "biomarkers": "バイオマーカー", "firedRules": "発火ルールと来歴", "evidence": "エビデンスとトレース", "trace": "推論トレース", "completeness": "データ完全性", "tier": "階層", "missingFields": "不足フィールド", "rulesBlocked": "ブロックされたルール", "warnings": "警告", "bayesian": "ベイズ拡張", "posterior": "事後分布", "uncertainty": "不確実性境界", "currentEvidence": "現在のプラットフォームエビデンス", "capturedEvidence": "取得済みフィクスチャの来歴", "currentExecution": "現在の実行", "noCurrentExecution": "現在の推論なし", "serverNotConnected": "サーバー未接続", "baselineMismatch": "接続された推論器は承認済みベースラインと一致しません。", "authExpired": "評価アクセスがないか期限切れです。招待コードで再接続してください。", "fixtureUnavailable": "検証済み合成フィクスチャを利用できません。", "indeterminate": "推論結果は不確定です。自動再試行は行われませんでした。", "retryVerification": "検証を再試行", "backToAccess": "アクセスへ戻る"
   }
 }

@@ -120,13 +120,32 @@
     "checking": "확인 중…",
     "ki67": "Ki-67",
     "nodalStatus": "림프절 상태",
-    "submissionFailed": "제출 실패", "p1Title": "임시 P1", "p2Title": "임시 P2", "provisionalHint": "합성 데이터 전용 임시 필드입니다. API로 전송되지 않으며 결과 생성에 사용되지 않습니다.",
+    "submissionFailed": "제출 실패", "p1Title": "임시 P1", "p2Title": "임시 P2", "provisionalHint": "임시 필드는 선택한 게이트웨이 경로로 전송되며 임상적 의미와 실제 사용은 검토 대상입니다.",
     "subtitle": "제출 전 입력 내용을 확인하세요",
     "surgeryDate": "수술 날짜",
     "title": "검토"
   },
   "result": {
     "title": "평가 결과",
+    "clinicalSummary": "임상 요약",
+    "sourceLive": "검증된 실시간 ACR 플랫폼이 반환한 결과입니다.",
+    "sourceFallback": "플랫폼 폴백 모드가 반환한 결과입니다.",
+    "sourceDemo": "이전에 캡처한 검증된 합성 결과입니다. 현재 추론은 실행되지 않았습니다.",
+    "warningsAndContext": "경고 및 맥락",
+    "informationCompleteness": "정보 완전성",
+    "treatmentOptions": "반환된 치료 옵션",
+    "biomarkerResults": "반환된 바이오마커 결과",
+    "confidenceSummary": "분류 신뢰도",
+    "classificationConfidence": "분류 신뢰도",
+    "noBayesianEnhancement": "이 결과에는 베이지안 향상이 사용되지 않았습니다.",
+    "technicalDetails": "기술 세부 정보",
+    "showTechnicalDetails": "추론 및 출처 표시",
+    "hideTechnicalDetails": "추론 및 출처 숨기기",
+    "resultIdentity": "결과 식별",
+    "resultMode": "결과 모드",
+    "executionStatus": "실행 상태",
+    "rootRisk": "표시된 위험",
+    "deterministicRisk": "결정론적 위험 필드",
     "subtitle": "서버 측 추론 · 합성 프로필",
     "molecularSubtype": "분자 하위 유형",
     "bayesianConfidence": "베이지안 신뢰도",
@@ -171,7 +190,7 @@
     "ontologyHashLabel": "온톨로지 SHA-256 (관찰됨, 읽기 전용 마운트)",
     "dataHandlingSection": "데이터 처리",
     "dataHandlingText": "의도적인 임상 데이터 저장이 없습니다. 분석 없음. 1차 웨이브용 충돌 보고 비활성화됨. OTA 업데이트 비활성화됨 — 모든 변경에는 새로 검토된 빌드가 필요합니다.",
-    "unknownValue": "사용 불가", "pageIndicator": "정보 {{current}} / {{total}}", "page1Title": "ACR 플랫폼이란", "page1Text": "ACR 플랫폼은 임상 의사결정을 지원하는 연구 플랫폼입니다. 임상 파트너와 임상시험 전문가는 수집할 임상 사실과 의료 지식 모델 및 의사결정 규칙을 검토합니다.", "page2Title": "ACR 작동 방식", "page2Text": "승인된 사용자가 승인된 구조화 임상 사실을 입력합니다. 앱은 승인된 평가 요청만 ACR 서비스로 보내고 결과와 추론 근거를 받습니다.", "page3Title": "데이터는 머물고 규칙은 이동합니다.", "page3Text": "임상 배포에서 환자 데이터는 승인된 인프라에 남습니다. 이 모바일 데모는 합성 데이터만 사용합니다.", "page4Title": "설명 가능성과 안전", "page4Text": "ACR 결과는 의사결정 지원 전용입니다. P1과 P2는 임시 데모 필드이며 API로 전송되거나 결과 생성에 사용되지 않습니다.", "page5Title": "빌드 및 검증된 기준선",
+    "unknownValue": "사용 불가", "pageIndicator": "정보 {{current}} / {{total}}", "page1Title": "ACR 플랫폼이란", "page1Text": "ACR 플랫폼은 임상 의사결정을 지원하는 연구 플랫폼입니다. 임상 파트너와 임상시험 전문가는 수집할 임상 사실과 의료 지식 모델 및 의사결정 규칙을 검토합니다.", "page2Title": "ACR 작동 방식", "page2Text": "승인된 사용자가 승인된 구조화 임상 사실을 입력합니다. 앱은 승인된 평가 요청만 ACR 서비스로 보내고 결과와 추론 근거를 받습니다.", "page3Title": "데이터는 머물고 규칙은 이동합니다.", "page3Text": "임상 배포에서 환자 데이터는 승인된 인프라에 남습니다. 이 모바일 데모는 합성 데이터만 사용합니다.", "page4Title": "설명 가능성과 안전", "page4Text": "ACR 결과는 의사결정 지원 전용입니다. Build 44는 모든 P1/P2 필드를 선택한 게이트웨이 경로로 전송하고 검증된 서버 또는 픽스처 내용만 표시하며, 기기에서 임상적 도출을 하지 않습니다.", "page5Title": "빌드 및 검증된 기준선",
     "application": "애플리케이션",
     "baselineAttestation": "기준선 검증",
     "dataHandling": "데이터 처리",
@@ -201,8 +220,8 @@
     "state": "상태",
     "verificationHint": "예상 값은 수락된 기준 매니페스트에서 가져옵니다. 관찰로 보고되지 않습니다."
   },
-  "p1": { "title": "임시 P1", "stepTitle": "계약 필드", "banner": "합성 데모 전용 · 임시 필드", "cardTitle": "종양 및 성별", "tumorSize": "종양 크기", "tumorSizeHint": "0보다 큰 유한 숫자입니다. 단위는 보류 중입니다.", "tumorSizeError": "0보다 큰 유한 값을 입력하세요.", "gender": "성별", "female": "여성", "male": "남성", "other": "기타", "unknown": "알 수 없음", "genderPending": "성별은 보류 중이며 데모 흐름을 막지 않습니다.", "nodalWarningTitle": "림프절 매핑 알림", "nodalWarning": "N0–N3을 양성 또는 음성으로 조용히 매핑하면 안 됩니다." },
-  "p2": { "title": "임시 P2", "stepTitle": "추가 데모 필드", "banner": "합성 데모 전용 · 임시 필드", "cardTitle": "추가 필드", "ecogScore": "ECOG 점수", "ecogHint": "0에서 4 사이의 선택적 정수입니다.", "ecogError": "0에서 4 사이의 정수를 입력하세요.", "pdl1Status": "PD-L1 상태", "her2Low": "HER2-low", "lvef": "LVEF (%)", "lvefHint": "0에서 100 사이의 선택적 값입니다.", "lvefError": "0에서 100 사이의 값을 입력하세요.", "treatmentIntent": "치료 의도", "notTested": "검사하지 않음", "unknown": "알 수 없음", "neoadjuvant": "신보조", "adjuvant": "보조", "unspecified": "지정되지 않음" },
+  "p1": { "title": "임시 P1", "stepTitle": "계약 필드", "banner": "평가 전용 · 임시 필드", "cardTitle": "종양 및 성별", "tumorSize": "종양 크기", "tumorSizeHint": "0보다 큰 유한 숫자입니다. 단위는 보류 중입니다.", "tumorSizeError": "0보다 큰 유한 값을 입력하세요.", "gender": "성별", "female": "여성", "male": "남성", "other": "기타", "unknown": "알 수 없음", "genderPending": "성별은 선택 사항이며 임상 검토를 위해 임시 상태로 유지됩니다.", "nodalWarningTitle": "림프절 매핑 알림", "nodalWarning": "N0–N3을 양성 또는 음성으로 조용히 매핑하면 안 됩니다." },
+  "p2": { "title": "임시 P2", "stepTitle": "추가 계약 필드", "banner": "평가 전용 · 임시 필드", "cardTitle": "추가 필드", "ecogScore": "ECOG 점수", "ecogHint": "0에서 4 사이의 선택적 정수입니다.", "ecogError": "0에서 4 사이의 정수를 입력하세요.", "pdl1Status": "PD-L1 상태", "her2Low": "HER2-low", "lvef": "LVEF (%)", "lvefHint": "0에서 100 사이의 선택적 값입니다.", "lvefError": "0에서 100 사이의 값을 입력하세요.", "treatmentIntent": "치료 의도", "notTested": "검사하지 않음", "unknown": "알 수 없음", "neoadjuvant": "신보조", "adjuvant": "보조", "unspecified": "지정되지 않음" },
   "provenance": {
     "acrNative": "ACR_NATIVE",
     "openlletVerified": "OPENLLET_NATIVE_VERIFIED",
@@ -234,5 +253,11 @@
     "cardTitle": "세션",
     "sessionId": "세션 ID",
     "sessionIdHint": "평가마다 새로운 UUIDv4가 생성됩니다. 입력되지 않고, 재사용되지 않으며, 저장되지 않습니다."
+  },
+  "gatewayAccess": {
+    "title": "평가 접근", "subtitle": "고정 ACR 평가 게이트웨이에 연결", "modeTitle": "전달 모드", "liveMode": "라이브 플랫폼", "demoMode": "합성 데모", "liveHint": "구성된 플랫폼을 사용합니다. 추론 전에 기준선 검증이 필요합니다.", "demoHint": "명시적으로 검증된 합성 픽스처만 사용하며 현재 추론은 실행하지 않습니다.", "inviteTitle": "초대 코드", "invitePlaceholder": "초대 코드 입력", "inviteHint": "메모리에만 보관하고 이번 시도 후 삭제합니다.", "connect": "안전하게 연결", "disconnect": "접근 연결 해제", "continueOffline": "다섯 화면 모두 살펴보기", "finishWalkthrough": "결과 없이 종료", "serverAlert": "ACR 평가 서버에 연결할 수 없습니다. CDS 결과를 사용할 수 없습니다.", "walkthroughNotice": "검증된 합성 픽스처를 사용할 수 없습니다. 다섯 화면의 20개 필드를 모두 확인하고 편집할 수 있지만 전송되지 않고 CDS 결과도 생성되지 않으며 종료 시 입력이 지워집니다.", "statusTitle": "연결 증거", "gateway": "게이트웨이", "connected": "연결됨", "notConnected": "서버가 연결되지 않음", "checking": "확인 중…", "attestation": "기준선 증명", "privacy": "초대, 토큰 및 기기 바인딩은 기기 저장소에 기록되지 않습니다."
+  },
+  "build44": {
+    "validationError": "유효하지 않은 평가 필드를 확인하십시오.", "ki67Error": "0에서 100 사이의 값을 입력하십시오.", "ageError": "18에서 120 사이의 정수 나이를 입력하거나 비워 두십시오.", "markerError": "0 이상의 유한값을 입력하거나 비워 두십시오.", "dateError": "YYYY-MM-DD 형식의 실제 날짜를 입력하거나 비워 두십시오.", "deliveryMode": "전달 모드", "liveResult": "라이브 Openllet/SWRL 결과", "fallbackResult": "플랫폼 대체 결과", "demoResult": "검증된 합성 데모", "liveReviewHint": "제출 시 기준선을 다시 검증하고 라이브 추론 경로만 사용합니다.", "demoReviewHint": "명시적 합성 데모 경로만 사용하며 자동 전환하지 않습니다.", "tumorUnitPending": "원시 값 · 단위 미정", "her2Loss": "HER2-low는 선택한 그대로 전송되며 기기에서 임상 해석을 하지 않습니다.", "patientId": "생성된 환자 ID", "years": "세", "noneReturned": "반환된 항목 없음", "risk": "위험", "treatments": "치료", "biomarkers": "바이오마커", "firedRules": "실행 규칙 및 출처", "evidence": "증거 및 추적", "trace": "추론 추적", "completeness": "데이터 완전성", "tier": "단계", "missingFields": "누락 필드", "rulesBlocked": "차단된 규칙", "warnings": "경고", "bayesian": "베이지안 강화", "posterior": "사후 분포", "uncertainty": "불확실성 경계", "currentEvidence": "현재 플랫폼 증거", "capturedEvidence": "캡처된 픽스처 출처", "currentExecution": "현재 실행", "noCurrentExecution": "현재 추론 없음", "serverNotConnected": "서버가 연결되지 않음", "baselineMismatch": "연결된 추론기가 승인된 기준선과 일치하지 않습니다.", "authExpired": "평가 접근 권한이 없거나 만료되었습니다. 초대 코드로 다시 연결하십시오.", "fixtureUnavailable": "검증된 합성 픽스처를 사용할 수 없습니다.", "indeterminate": "추론 결과가 불확정입니다. 자동 재시도하지 않았습니다.", "retryVerification": "검증 재시도", "backToAccess": "접근 화면으로"
   }
 }

@@ -1,17 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { ACRColors, ACRTypography } from '../theme/colors';
 import { ScreenLayout } from '../components/ScreenLayout';
 import { ACRCard } from '../components/ACRCard';
 import { ACRSegmentedControl } from '../components/ACRSegmentedControl';
+import { ACRChoiceGrid } from '../components/ACRChoiceGrid';
 import { ACRInput } from '../components/ACRInput';
 import { ACRButton } from '../components/ACRButton';
+import { WalkthroughNotice } from '../components/WalkthroughNotice';
 import { useAssessmentStore } from '../store/assessmentStore';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { getLocaleDirection, getTextAlign } from '../utils/rtl';
+import { isAgeValid } from '../utils/provisionalValidation';
+import type { HistologicalSubtype, Stage } from '../types/api';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -24,14 +28,21 @@ export const Step2TumourScreen: React.FC = () => {
     writingDirection: getLocaleDirection(activeLanguage),
     textAlign: getTextAlign(activeLanguage),
   };
+  const ageValid = isAgeValid(form.step2.age);
+  const stageOptions: Array<Stage | ''> = ['', '0', 'I', 'IA', 'IB', 'II', 'IIA', 'IIB', 'III', 'IIIA', 'IIIB', 'IIIC', 'IV'];
+  const stageLabels = [t('common:emDash'), ...stageOptions.slice(1)];
+  const histologyOptions: Array<HistologicalSubtype | ''> = ['', 'IDC', 'ILC', 'DCIS', 'PAGET'];
+  const histologyLabels = [t('common:emDash'), t('tumour:histologyIDC'), t('tumour:histologyILC'), t('tumour:histologyDCIS'), t('tumour:histologyPaget')];
 
   const gradeOptions = [
+    { value: '', label: t('common:emDash') },
     { value: '1', label: t('tumour:grade1') },
     { value: '2', label: t('tumour:grade2') },
     { value: '3', label: t('tumour:grade3') },
   ];
 
   const nodalOptions = [
+    { value: '', label: t('common:emDash') },
     { value: 'N0', label: t('tumour:nodalN0') },
     { value: 'N1', label: t('tumour:nodalN1') },
     { value: 'N2', label: t('tumour:nodalN2') },
@@ -47,15 +58,14 @@ export const Step2TumourScreen: React.FC = () => {
       footer={
         <>
           <ACRButton title={t('common:back')} variant="secondary" onPress={() => navigation.goBack()} />
-          <ACRButton title={t('common:next')} variant="primary" onPress={() => navigation.navigate('Step3')} />
+          <ACRButton title={t('common:next')} variant="primary" disabled={!ageValid} onPress={() => navigation.navigate('Step3')} />
         </>
       }
     >
+      <WalkthroughNotice />
       <ACRCard title={t('tumour:cardTitle')}>
         <Label text={t('tumour:stage')} optional />
-        <View style={styles.pickerShell}>
-          <Text style={[styles.pickerText, localeTextStyle]}>{form.step2.stage || t('common:emDash')}</Text>
-        </View>
+        <ACRChoiceGrid options={stageOptions} labels={stageLabels} selected={form.step2.stage ?? ''} onSelect={(stage) => setStep2({ stage: stage || null })} />
         <Text style={[styles.hint, localeTextStyle]}>{t('tumour:stageHint')}</Text>
 
         <Label text={t('tumour:grade')} optional />
@@ -63,20 +73,18 @@ export const Step2TumourScreen: React.FC = () => {
           options={gradeOptions.map((o) => o.value)}
           labels={gradeOptions.map((o) => o.label)}
           selected={form.step2.grade || ''}
-          onSelect={(v) => setStep2({ grade: v as '1' | '2' | '3' })}
+          onSelect={(v) => setStep2({ grade: v ? v as '1' | '2' | '3' : null })}
         />
 
         <Label text={t('tumour:histologicalSubtype')} optional />
-        <View style={styles.pickerShell}>
-          <Text style={[styles.pickerText, localeTextStyle]}>{form.step2.histologicalSubtype || t('common:emDash')}</Text>
-        </View>
+        <ACRChoiceGrid options={histologyOptions} labels={histologyLabels} selected={form.step2.histologicalSubtype ?? ''} onSelect={(histologicalSubtype) => setStep2({ histologicalSubtype: histologicalSubtype || null })} />
 
         <Label text={t('tumour:nodalStatus')} optional />
         <ACRSegmentedControl
           options={nodalOptions.map((o) => o.value)}
           labels={nodalOptions.map((o) => o.label)}
           selected={form.step2.nodalStatus || ''}
-          onSelect={(v) => setStep2({ nodalStatus: v as 'N0' | 'N1' | 'N2' | 'N3' })}
+          onSelect={(v) => setStep2({ nodalStatus: v ? v as 'N0' | 'N1' | 'N2' | 'N3' : null })}
         />
 
         <Label text={t('tumour:age')} optional />
@@ -86,6 +94,7 @@ export const Step2TumourScreen: React.FC = () => {
           keyboardType="numeric"
           hint={t('tumour:ageHint')}
         />
+        {!ageValid ? <Text style={[styles.error, localeTextStyle]}>{t('build44:ageError')}</Text> : null}
       </ACRCard>
     </ScreenLayout>
   );
@@ -119,22 +128,10 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: ACRColors.muted,
   },
-  pickerShell: {
-    width: '100%',
-    paddingVertical: 8,
-    paddingHorizontal: 9,
-    borderWidth: 1.4,
-    borderColor: ACRColors.line,
-    borderRadius: 8,
-    backgroundColor: '#fff',
-  },
-  pickerText: {
-    fontSize: 13,
-    color: ACRColors.ink,
-  },
   hint: {
     ...ACRTypography.hint,
     color: ACRColors.muted,
     marginTop: 3,
   },
+  error: { ...ACRTypography.hint, color: ACRColors.stopBorder, marginTop: 4 },
 });

@@ -54,10 +54,9 @@ assert.match(poster, /navigation\.replace\('Welcome'\)/);
 console.log('STATIC PASS local assets, responsive contain rendering, vertical gesture, route replacement');
 
 const navigator = read('src/navigation/AppNavigator.tsx');
-assert.match(navigator, /Platform\.OS === 'android' \|\| Platform\.OS === 'ios'/);
-assert.match(navigator, /initialRouteName=\{supportsPoster \? 'Poster' : 'Welcome'\}/);
-assert.match(navigator, /\{supportsPoster && <Stack\.Screen name="Poster" component=\{PosterScreen\} \/>\}/);
-console.log('STATIC PASS Android/iOS route boundary with unsupported-platform fallback');
+assert.match(navigator, /initialRouteName="GatewayAccess"/);
+assert.match(navigator, /<Stack\.Screen name="Poster" component=\{PosterScreen\} \/>/);
+console.log('STATIC PASS fresh-launch Gateway boundary while the inspected poster remains an available local route');
 
 const welcome = read('src/screens/WelcomeScreen.tsx');
 assert.match(welcome, /useFocusEffect/);
