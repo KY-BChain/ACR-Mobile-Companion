@@ -77,4 +77,3 @@ System free space increased from 2.8 GiB immediately before deletion to 15 GiB a
 Build 44 is technically complete under Kraken's explicit Phase G deferral and has been inspected on both required physical platforms plus the additional Xiaomi device. Remaining clinical semantics—including authoritative risk grade, tumour-size/stage optionality, governed colour coding, and backend Bayesian percentage presentation—are not invented in Build 44.
 
 Build 45 must complete T45-01 through T45-12, including Phase G, privacy-safe platform logging, clinical/web presentation parity, distinct gateway-versus-platform connectivity, per-invitee governance and an independently reviewed HTTPS remote-review design. A future merge, distribution route, new tunnel/deployment, clinical acceptance and real-patient use each require separate authority.
-
