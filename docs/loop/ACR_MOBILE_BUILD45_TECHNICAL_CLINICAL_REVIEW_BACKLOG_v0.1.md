@@ -1,8 +1,8 @@
 # ACR Mobile v0.6.5 Build 45 — Technical and Clinical Review Backlog
 
-Status: **DRAFT FOR KRAKEN AND CLINICAL-TRIAL PARTNER REVIEW**
+Status: **FINAL BUILD 45 TECHNICAL/CLINICAL REVIEW SPECIFICATION — AWAITING PARTNER DECISIONS**
 Prepared: 1 September 2026
-Predecessor under device review: ACR Mobile v0.6.0 Build 44
+Predecessor physically reviewed: ACR Mobile v0.6.0 Build 44
 Proposed refinement: ACR Mobile v0.6.5 Build 45
 
 ## 1. Purpose and decision boundary
@@ -138,6 +138,8 @@ Kraken has explicitly deferred the unresolved Phase G work to Build 45 and reque
 - approve real-patient use or external distribution;
 - constitute clinical acceptance;
 - authorise platform source/configuration repair; or
-- authorise commit, push, deployment, publication or a new tunnel.
+- authorise deployment, publication, distribution or a new tunnel.
+
+After physical review and preservation, Kraken separately authorised local Git/GitHub finalisation and online source push on 2 September 2026. That later authority applies only to preserving the reviewed source branch in the existing public repository; it does not approve merge, deployment, release, distribution or clinical use.
 
 Before each physical review, the reviewer must acknowledge that Build 44 is for controlled synthetic evaluation only. The established order remains iPhone 13 first, standalone relaunch confirmation second, then AndroidDev/Samsung verification and Android build/install; no Android emulator.

@@ -713,3 +713,19 @@ Native agent tools must be actually available in the local Codex session. Do not
 Retained boundaries include all 20 fields, no mobile/gateway clinical inference, truthful provenance, protected canonical clinical source/assets, exact external Android SDK/cache/ADB and internal APK output, existing native projects and signing renewal, no Android emulator/Expo Prebuild, serial builds, recoverable Build 43, no commits/deployment/publication and post-build clinician documentation.
 
 v1.6 implements Kraken's ordered steps 2.1–2.9: archive-aware current inputs; keep-awake ownership; source/local progress while services await Kraken; simulator offline/mock and online inspection as a mandatory stop; explicit simulator approval before iPhone request; unplug/relaunch confirmation before AndroidDev/S8 request; both Android prerequisites before build; final invitation to inspect both phones; and a separate reviewer carrying verified lessons between stages. All validation here is document-only. Runtime/source/build evidence must come from local Codex.
+
+## 21. Execution closure — 2 September 2026
+
+This Loop is conclusively closed with terminal state:
+
+```text
+IMPLEMENTATION_BUILDS_AND_CLINICIAN_PACKAGE_READY_FOR_KRAKEN_REVIEW
+```
+
+Build 44 v0.6.0 was built and inspected on the iPhone 16e simulator, physical iPhone 13/iOS 26.6.1, Samsung S8/SM-G950F and Xiaomi MIX Fold 2. Kraken reported the prescribed offline/online and physical visual checks PASS, including the iPhone USB/Metro-free standalone relaunch. This records technical evaluation only and does not invent clinical, release or distribution acceptance.
+
+Phase G remains `G_COMPLETE=false` under Kraken's explicit owner-directed deferral to v0.6.5 Build 45. The uncompleted engine-comparison, forced-Bayes-failure and operational-log privacy work is mandatory in `ACR_MOBILE_BUILD45_TECHNICAL_CLINICAL_REVIEW_BACKLOG_v0.1.md`.
+
+The reviewed source was committed as `119a2e5ab4c9d84da9632847e9fbec5dab764d75` on `feature/mobile-v0.6.0-build44-cds-parity` and pushed to the existing public `KY-BChain/ACR-Mobile-Companion` repository after Kraken's later explicit Git/GitHub preservation authority. This superseded the original no-commit/no-push restriction only for source preservation. No merge, deployment, distribution, release tag or new tunnel was performed.
+
+Final artifact hashes, test counts, physical-review limits, external backup identities and bounded housekeeping are recorded in `ACR_MOBILE_CDS_PARITY_EXECUTION_EVIDENCE_v1.6.md`. Build 43 remains preserved. Build 44 remains for controlled synthetic or explicitly authorised non-patient evaluation only.
