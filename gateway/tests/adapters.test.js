@@ -32,6 +32,7 @@ describe('PlatformAdapter', () => {
     expect(result.data).toEqual(upstream.data);
     expect(result.platformResponse).toEqual(upstream);
     const sent = JSON.parse(fetchImpl.mock.calls[0][1].body);
+    expect(fetchImpl.mock.calls[0][1].redirect).toBe('error');
     expect(sent.patientData.patientId).toBe(PATIENT_ID);
     expect(sent.bayesianEnhanced).toBe(false);
     expect(sent.analysisVersion).toBe('2.2');

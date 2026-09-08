@@ -1,0 +1,31 @@
+<!--
+  iOS Info.plist additions for Build 45
+
+  These entries configure ATS (App Transport Security) for the
+  approved mobile gateway hostname. No cleartext exceptions.
+
+  Merge through the Expo/native configuration for target ACRCompanion, then
+  verify the generated plist. ATS enforces secure transport; it is not a
+  global domain allowlist for all application networking.
+-->
+
+<!-- ATS Configuration — strict default, explicit domain exception only -->
+<key>NSAppTransportSecurity</key>
+<dict>
+    <!-- Strict default: require HTTPS -->
+    <key>NSAllowsArbitraryLoads</key>
+    <false/>
+    <key>NSAllowsArbitraryLoadsInWebContent</key>
+    <false/>
+    <key>NSAllowsLocalNetworking</key>
+    <false/>
+
+</dict>
+
+<!-- Build-time API endpoint (no runtime editing) -->
+<key>ACR_API_BASE_URL</key>
+<string>https://mobile.acragent.com</string>
+
+<!-- Build identity for gateway validation -->
+<key>ACR_BUILD_IDENTITY</key>
+<string>mob-v0.6.5+45</string>

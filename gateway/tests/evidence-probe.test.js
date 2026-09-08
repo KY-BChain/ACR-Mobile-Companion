@@ -62,7 +62,7 @@ describe('actual read-only platform evidence probe', () => {
     expect(attestation.verificationState).toBe('VERIFIED');
     expect(attestation.observed).toEqual(expected);
     expect(fetchImpl).toHaveBeenCalledTimes(3);
-    for (const call of fetchImpl.mock.calls) expect(call[1]).toEqual(expect.objectContaining({ method: 'GET' }));
+    for (const call of fetchImpl.mock.calls) expect(call[1]).toEqual(expect.objectContaining({ method: 'GET', redirect: 'error' }));
   });
 
   test('actual mismatch remains observed and produces MISMATCH', async () => {

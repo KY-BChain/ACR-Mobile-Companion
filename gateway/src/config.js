@@ -117,6 +117,14 @@ function parseTimeout(value) {
   return timeout;
 }
 
+function parseClientBuildId(value) {
+  const buildId = value || 'mob-v0.6.0+44';
+  if (!/^mob-v\d+\.\d+\.\d+\+\d+$/.test(buildId)) {
+    throw new Error('ACR_EXPECTED_CLIENT_BUILD_ID must use mob-v<semver>+<build> format');
+  }
+  return buildId;
+}
+
 function loadConfig(env = process.env) {
   const host = env.ACR_GATEWAY_HOST || '127.0.0.1';
   if (host !== '127.0.0.1' && host !== '::1' && env.ACR_ALLOW_PRIVATE_LAN !== 'true') {
@@ -159,11 +167,11 @@ function loadConfig(env = process.env) {
     upstreamTimeoutMs: parseTimeout(env.ACR_UPSTREAM_TIMEOUT_MS),
     allowedOrigin: env.ACR_ALLOWED_ORIGIN || false,
     inviteCodeSha256: parseSha256(env.ACR_INVITE_CODE_SHA256, 'ACR_INVITE_CODE_SHA256'),
-    expectedClientBuildId: 'mob-v0.6.0+44',
+    expectedClientBuildId: parseClientBuildId(env.ACR_EXPECTED_CLIENT_BUILD_ID),
     fixtureDirectory,
     evidence: Object.freeze(evidence),
     expectedEvidence: loadPinnedExpectedEvidence(env),
   });
 }
 
-module.exports = { loadConfig, parseTimeout, parseUrl, parseInferUrl, parseEvidenceUrl, parseSha256, parseExpectedCount, parseExpectedMode, loadPinnedExpectedEvidence, assertPinnedExpectedEvidence, PINNED_EXPECTED_EVIDENCE, isLoopbackHost, DEFAULT_TIMEOUT_MS };
+module.exports = { loadConfig, parseTimeout, parseUrl, parseInferUrl, parseEvidenceUrl, parseSha256, parseExpectedCount, parseExpectedMode, parseClientBuildId, loadPinnedExpectedEvidence, assertPinnedExpectedEvidence, PINNED_EXPECTED_EVIDENCE, isLoopbackHost, DEFAULT_TIMEOUT_MS };

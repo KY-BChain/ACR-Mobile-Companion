@@ -36,7 +36,7 @@ export function buildAssessmentRequest(input: { form: AssessmentFormState; p1: P
   if (!/^mob-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(patientId)) fieldErrors.push('patientId');
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) fieldErrors.push('requestId');
   if (fieldErrors.length) throw new AssessmentValidationError(fieldErrors);
-  if (MOBILE_BUILD_ID !== 'mob-v0.6.0+44') throw new Error('Build identity does not match the frozen gateway contract.');
+  if (!/^mob-v\d+\.\d+\.\d+\+\d+$/.test(MOBILE_BUILD_ID)) throw new Error('Build identity is not a valid gateway client identity.');
   return {
     contract: 'acr.cds.v1', requestId,
     assessment: {

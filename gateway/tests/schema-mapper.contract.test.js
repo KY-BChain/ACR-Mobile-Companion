@@ -39,9 +39,11 @@ describe('Build 44 twenty-field request contract', () => {
     expect(validators.request(request)).toBe(true);
   });
 
-  test('rejects wrong build and unknown fields', () => {
-    const wrongBuild = mobileRequest(); wrongBuild.client.buildId = 'mob-v0.5.1+43';
-    expect(validators.request(wrongBuild)).toBe(false);
+  test('accepts version-shaped build for gateway binding and rejects malformed build and unknown fields', () => {
+    const otherBuild = mobileRequest(); otherBuild.client.buildId = 'mob-v0.5.1+43';
+    expect(validators.request(otherBuild)).toBe(true);
+    const malformedBuild = mobileRequest(); malformedBuild.client.buildId = 'build-45';
+    expect(validators.request(malformedBuild)).toBe(false);
     expect(validators.request(mobileRequest({ inventedFact: true }))).toBe(false);
   });
 });

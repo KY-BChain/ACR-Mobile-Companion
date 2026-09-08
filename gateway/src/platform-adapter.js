@@ -29,6 +29,7 @@ class PlatformAdapter {
         headers: { 'content-type': 'application/json', accept: 'application/json' },
         body: JSON.stringify(platformRequest),
         signal: controller.signal,
+        redirect: 'error',
       });
     } catch (error) {
       if (error && (error.name === 'AbortError' || controller.signal.aborted)) {

@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://acragent.com/schemas/acr.cds.v1.request.schema.json",
-  "title": "ACR Mobile CDS Build 44 Request",
+  "title": "ACR Mobile CDS Request",
   "description": "Transport-only request for all 20 five-screen assessment values. Optional values may be omitted or explicitly null; the mapper sends them to the platform as null.",
   "type": "object",
   "additionalProperties": false,
@@ -43,7 +43,7 @@
       "required": ["channel", "buildId", "environment"],
       "properties": {
         "channel": { "const": "MOBILE" },
-        "buildId": { "const": "mob-v0.6.0+44" },
+        "buildId": { "type": "string", "pattern": "^mob-v[0-9]+\\.[0-9]+\\.[0-9]+\\+[0-9]+$" },
         "environment": { "const": "EVALUATION" }
       }
     }

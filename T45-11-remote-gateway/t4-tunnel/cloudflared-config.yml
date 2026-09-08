@@ -1,0 +1,66 @@
+# T4 Cloudflare Tunnel Configuration — Build 45 Remote Review
+# 
+# This file configures cloudflared to create an outbound-only tunnel
+# from the Mac to Cloudflare's edge. No inbound ports are opened.
+#
+# SECURITY: This config file contains the tunnel UUID but NO credentials.
+# The credentials JSON is stored separately and must have 600 permissions.
+#
+# Install cloudflared first:
+#   brew install cloudflare/cloudflare/cloudflared
+#
+# Then authenticate:
+#   cloudflared tunnel login
+#   cloudflared tunnel create acr-mobile-gateway-t4
+#   cloudflared tunnel route dns acr-mobile-gateway-t4 mobile.acragent.com
+
+# Tunnel identity (replace with your actual tunnel UUID)
+tunnel: <YOUR_TUNNEL_UUID>
+credentials-file: /Users/Kraken/.cloudflared/<YOUR_TUNNEL_UUID>.json
+
+# Protocol and transport
+protocol: http2
+
+# Metrics (local only, for monitoring)
+metrics: 127.0.0.1:45678
+
+# Ingress rules: ONLY the six exact approved mobile routes
+# Everything else is denied by the catch-all
+ingress:
+  # T3 gateway health and API routes
+  - hostname: mobile.acragent.com
+    path: ^/m/v1/live$
+    service: http://127.0.0.1:3001
+
+  - hostname: mobile.acragent.com
+    path: ^/m/v1/auth/redeem$
+    service: http://127.0.0.1:3001
+
+  - hostname: mobile.acragent.com
+    path: ^/m/v1/auth/refresh$
+    service: http://127.0.0.1:3001
+
+  - hostname: mobile.acragent.com
+    path: ^/m/v1/attestation$
+    service: http://127.0.0.1:3001
+
+  - hostname: mobile.acragent.com
+    path: ^/m/v1/infer$
+    service: http://127.0.0.1:3001
+
+  - hostname: mobile.acragent.com
+    path: ^/m/v1/demo/infer$
+    service: http://127.0.0.1:3001
+
+  # Deny all other paths explicitly
+  - hostname: mobile.acragent.com
+    service: http_status:404
+
+  # Catch-all: deny everything else
+  - service: http_status:404
+
+# Origin configuration (connection from cloudflared to T3)
+transport-loglevel: warn
+
+# Disable automatic binary updates; this is not a request-retry control.
+no-autoupdate: true

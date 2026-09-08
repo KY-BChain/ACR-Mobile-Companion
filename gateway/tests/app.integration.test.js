@@ -1,7 +1,7 @@
 'use strict';
 
 const request = require('supertest');
-const { createApp } = require('../src/app');
+const { createApp, safeRequestId } = require('../src/app');
 const { InMemoryAuthService } = require('../src/auth');
 const { AttestationService } = require('../src/attestation');
 const { createMetadataLogger } = require('../src/logger');
@@ -47,6 +47,11 @@ function infer(agent, token, body = mobileRequest(), route = '/m/v1/infer', devi
 }
 
 describe('app composition and HTTP contract', () => {
+  test('only a UUIDv4 caller request ID is accepted for correlation', () => {
+    expect(safeRequestId({ headers: { 'x-request-id': REQUEST_ID } })).toBe(REQUEST_ID);
+    const generated = safeRequestId({ headers: { 'x-request-id': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa' } });
+    expect(generated).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+  });
   test('module import exports composition without listening', () => {
     const exported = require('../src');
     expect(exported).toEqual(expect.objectContaining({ createApp: expect.any(Function), startListener: expect.any(Function) }));
@@ -75,6 +80,9 @@ describe('app composition and HTTP contract', () => {
     expect(mismatch.status).toBe(400); expect(mismatch.body.error.code).toBe('REQUEST_ID_MISMATCH');
     const missing = await protectedHeaders(request(app).post('/m/v1/infer'), issued.accessToken).set('X-Request-ID', REQUEST_ID).send(mobileRequest());
     expect(missing.body.error.code).toBe('SCHEMA_INVALID');
+    const wrongBodyBuild = mobileRequest(); wrongBodyBuild.client.buildId = 'mob-v0.6.5+45';
+    const buildMismatch = await infer(request(app), issued.accessToken, wrongBodyBuild);
+    expect(buildMismatch.status).toBe(403); expect(buildMismatch.body.error.code).toBe('CLIENT_BUILD_MISMATCH');
   });
 
   test('schema error reveals no patient values', async () => {

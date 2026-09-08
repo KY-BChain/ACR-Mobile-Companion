@@ -1,4 +1,4 @@
-/** Build 44 mobile/gateway transport types. No clinical inference lives here. */
+/** Versioned mobile/gateway transport types. No clinical inference lives here. */
 
 export type ErStatus = 'positive' | 'negative';
 export type PrStatus = 'positive' | 'negative';
@@ -36,7 +36,7 @@ export interface AssessmentPayload {
 }
 export interface AssessmentRequest {
   contract: 'acr.cds.v1'; requestId: string; assessment: AssessmentPayload;
-  client: { channel: 'MOBILE'; buildId: 'mob-v0.6.0+44'; environment: 'EVALUATION' };
+  client: { channel: 'MOBILE'; buildId: `mob-v${number}.${number}.${number}+${number}`; environment: 'EVALUATION' };
 }
 export interface ExpectedEvidence {
   reasonerVersion: string; reasoningMode: string; ontologySha256: string;

@@ -16,7 +16,8 @@ const { SyntheticFixtureAdapter } = require('./synthetic-fixture-adapter');
 
 function safeRequestId(req) {
   const candidate = req.headers['x-request-id'] || (req.body && req.body.requestId);
-  return typeof candidate === 'string' && /^[0-9a-f-]{36}$/i.test(candidate) ? candidate : crypto.randomUUID();
+  return typeof candidate === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(candidate)
+    ? candidate : crypto.randomUUID();
 }
 
 function createApp(options = {}) {
@@ -58,6 +59,11 @@ function createApp(options = {}) {
     }));
     next();
   });
+  if (options.preRouteMiddleware) {
+    const middleware = Array.isArray(options.preRouteMiddleware)
+      ? options.preRouteMiddleware : [options.preRouteMiddleware];
+    middleware.forEach(item => app.use(item));
+  }
 
   function authenticate(req, res, next) {
     try {
@@ -73,6 +79,9 @@ function createApp(options = {}) {
       throw new GatewayError('SCHEMA_INVALID', 'X-ACR-Contract must be acr.cds.v1.', 400);
     }
     const body = validateAssessmentRequest(req.body);
+    if (body.client.buildId !== config.expectedClientBuildId) {
+      throw new GatewayError('CLIENT_BUILD_MISMATCH', 'Request body is not authorised for this client build.', 403);
+    }
     if (req.headers['x-request-id'] !== body.requestId) {
       throw new GatewayError('REQUEST_ID_MISMATCH', 'Header and body request IDs do not match.', 400);
     }

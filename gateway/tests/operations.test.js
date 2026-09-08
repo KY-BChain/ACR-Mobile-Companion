@@ -18,6 +18,17 @@ const ROUTE = 'https://api.acragent.com/api/infer';
 const INVITE = 'operations-test-invite';
 const INVITE_HASH = crypto.createHash('sha256').update(INVITE).digest('hex');
 
+describe('client build identity configuration', () => {
+  test('preserves Build 44 default and accepts an explicit valid Build 45 identity', () => {
+    expect(loadConfig({}).expectedClientBuildId).toBe('mob-v0.6.0+44');
+    expect(loadConfig({ ACR_EXPECTED_CLIENT_BUILD_ID: 'mob-v0.6.5+45' }).expectedClientBuildId).toBe('mob-v0.6.5+45');
+  });
+
+  test.each(['0.6.5+45', 'mob-v0.6+45', 'mob-v0.6.5+forty-five'])('rejects invalid identity %s', value => {
+    expect(() => loadConfig({ ACR_EXPECTED_CLIENT_BUILD_ID: value })).toThrow(/EXPECTED_CLIENT_BUILD_ID/);
+  });
+});
+
 function approvedFixture(overrides = {}) {
   const fixtureRequest = mobileRequest();
   const response = platformResponse();

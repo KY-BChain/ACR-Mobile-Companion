@@ -12,7 +12,7 @@ async function fetchJson(url, { fetchImpl, timeoutMs }) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const response = await fetchImpl(url, { method: 'GET', headers: { accept: 'application/json' }, signal: controller.signal });
+    const response = await fetchImpl(url, { method: 'GET', headers: { accept: 'application/json' }, signal: controller.signal, redirect: 'error' });
     if (!response || !response.ok) return null;
     const value = await response.json();
     return validObject(value) ? value : null;

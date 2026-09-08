@@ -42,7 +42,8 @@ assert.doesNotMatch(review, /mob-v0\.1\.0\+42/);
 
 const requestBuilder = read('src/api/requestBuilder.ts');
 assert.match(requestBuilder, /MOBILE_BUILD_ID/);
-assert.match(requestBuilder, /mob-v0\.6\.0\+44/);
+assert.match(requestBuilder, /Build identity is not a valid gateway client identity/);
+assert.doesNotMatch(requestBuilder, /MOBILE_BUILD_ID !== ['"]mob-v/);
 
 assert.match(infoPlist, /<key>NSAllowsArbitraryLoads<\/key>\s*<false\/>/);
 assert.match(infoPlist, /<key>NSAllowsLocalNetworking<\/key>\s*<true\/>/);

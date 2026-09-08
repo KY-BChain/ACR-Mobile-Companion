@@ -1,0 +1,8 @@
+{
+  "dependencies_add": {},
+  "scripts_for_gateway_package": {
+    "start:remote-candidate": "node ../T45-11-remote-gateway/t3-gateway/server.js",
+    "invite:remote-candidate": "node ../T45-11-remote-gateway/t3-gateway/invite-admin.js"
+  },
+  "note": "Uses the existing pinned gateway dependencies and Node built-ins; merge scripts only after review."
+}

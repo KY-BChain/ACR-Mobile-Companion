@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android Network Security Config — Build 45
+
+  REMOVES Build 44's cleartext exception.
+  Disables cleartext transport. Android Network Security Config does not
+  domain-allowlist all application traffic; the build-time client URL and
+  code review enforce the approved hostname.
+  No user-configurable endpoints. No cleartext traffic.
+
+  Place in: android/app/src/main/res/xml/network_security_config.xml
+  Reference in AndroidManifest.xml:
+    android:networkSecurityConfig="@xml/network_security_config"
+-->
+<network-security-config>
+    <!-- Base config: cleartext traffic disabled globally -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+    </base-config>
+
+    <!-- Explicit policy for the approved gateway hostname. This is not a
+         global HTTPS domain allowlist; system-CA HTTPS remains possible for
+         other app dependencies. -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">mobile.acragent.com</domain>
+
+        <!-- Pin the certificate (optional — only if backup pin/rotation is reviewed) -->
+        <!-- 
+        <pin-set expiration="2027-01-01">
+            <pin digest="SHA-256">REPLACE_WITH_ACTUAL_PIN</pin>
+            <pin digest="SHA-256">REPLACE_WITH_BACKUP_PIN</pin>
+        </pin-set>
+        <trust-anchors>
+            <certificates src="system"/>
+        </trust-anchors>
+        -->
+    </domain-config>
+
+    <!-- Debug config: ONLY for development builds, never production -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="user"/>
+            <certificates src="system"/>
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>
