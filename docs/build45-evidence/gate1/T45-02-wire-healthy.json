@@ -1,0 +1,76 @@
+{
+  "success" : true,
+  "message" : "Inference completed successfully",
+  "data" : {
+    "patientId" : "mob-3f9c1e84-77a2-4b16-9d05-2ce8a1b47f30",
+    "timestamp" : "2026-09-09T11:07:33.931222Z",
+    "deterministic" : {
+      "molecularSubtype" : "LuminalB_HER2Negative",
+      "riskLevel" : "LOW",
+      "treatments" : [ "Chemotherapy + Endocrine therapy", "Follow-up cadence: every 3-4 months clinical + annual imaging (R33 — 179 days post-surgery, within years 1-2)" ],
+      "biomarkers" : {
+        "PR" : "positive",
+        "Stage" : "II",
+        "HER2" : "negative",
+        "Ki67" : "25.0%",
+        "ER" : "positive"
+      },
+      "reasoningMode" : "OPENLLET_SWRL"
+    },
+    "bayesian" : {
+      "confidence" : 0.6001915864330829,
+      "posterior" : {
+        "HER2_Enriched" : 0.0014028023574872955,
+        "Triple_Negative" : 5.552759331720544E-4,
+        "Normal_Like" : 0.03507005893718239,
+        "Luminal_A" : 0.6001915864330829,
+        "Luminal_B" : 0.3627802763390755
+      },
+      "uncertaintyBounds" : [ 0.47393271744248366, 0.7264504554236821 ],
+      "enabled" : true
+    },
+    "reasoning" : {
+      "rulesFired" : [ "SWRL R2/R3: Luminal B HER2-negative classification", "SWRL R7-R71: 71 logical / 76 physical rules, 76 active at runtime; require staging data to activate", "SWRL R33: fired via ACR-SWRL-API (ACR_NATIVE — OWL-derived swrlb:subtractDateTimes)", "SWRL RE3: fired via ACR-SWRL-API (ACR_NATIVE — OWL-derived Sprint E rule)", "SWRL RE4-1: fired via ACR-SWRL-API (ACR_NATIVE — OWL-derived Sprint E rule)", "SWRL RE4-2: fired via ACR-SWRL-API (ACR_NATIVE — OWL-derived Sprint E rule)", "Bayesian posterior probability layer applied" ],
+      "firedRules" : [ {
+        "ruleId" : "R2/R3",
+        "label" : "Luminal B HER2-negative classification",
+        "provenance" : "OPENLLET_SWRL",
+        "status" : "FIRED"
+      }, {
+        "ruleId" : "RE4-1",
+        "label" : "RE4-1",
+        "provenance" : "ACR_NATIVE",
+        "status" : "FIRED"
+      }, {
+        "ruleId" : "RE3",
+        "label" : "RE3",
+        "provenance" : "ACR_NATIVE",
+        "status" : "FIRED"
+      }, {
+        "ruleId" : "RE4-2",
+        "label" : "RE4-2",
+        "provenance" : "ACR_NATIVE",
+        "status" : "FIRED"
+      }, {
+        "ruleId" : "R33",
+        "label" : "R33",
+        "provenance" : "ACR_NATIVE",
+        "status" : "FIRED"
+      } ],
+      "evidence" : [ "ER: positive", "PR: positive", "HER2: negative", "Ki67: 25.0", "Stage: II" ],
+      "trace" : "Molecular subtype determined via Openllet SWRL engine: LuminalB_HER2Negative. External SWRL load mode: EMBEDDED_ONLY; runtime SWRL axiom count after merge: 76. SWRL rule set v2.2 manifest: 71 logical rules (76 physical atoms, 76 active at runtime; 3 rules skipped by Openllet (swrlb:subtractDateTimes — handled by ACR-SWRL-API ACR_NATIVE). Bayesian confidence layer applied. Treatment mapping: Java-mapped (SWRL R7-R71 require staging data)."
+    },
+    "riskLevel" : null,
+    "dataCompleteness" : {
+      "tier" : 1,
+      "missingFields" : [ "tumorSize" ],
+      "rulesBlocked" : 64,
+      "warning" : "❌ ASSESSMENT BLOCKED — Essential biomarker data missing or invalid: tumorSize"
+    },
+    "reasoningMode" : "OPENLLET_SWRL",
+    "molecularSubtype" : "LuminalB_HER2Negative"
+  },
+  "executionTimeMs" : 12,
+  "apiVersion" : "2.0",
+  "timestamp" : "2026-09-09T13:07:34.121069"
+}

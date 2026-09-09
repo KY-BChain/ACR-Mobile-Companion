@@ -1,0 +1,29 @@
+{
+  "success" : true,
+  "message" : "Inference completed successfully",
+  "data" : {
+    "patientId" : "mob-3f9c1e84-77a2-4b16-9d05-2ce8a1b47f30",
+    "timestamp" : "2026-09-09T11:07:34.012433Z",
+    "deterministic" : {
+      "molecularSubtype" : null,
+      "riskLevel" : null,
+      "treatments" : null,
+      "biomarkers" : null,
+      "reasoningMode" : null
+    },
+    "bayesian" : {
+      "confidence" : 0.0,
+      "posterior" : { },
+      "uncertaintyBounds" : [ 0.0, 0.0 ],
+      "enabled" : false
+    },
+    "reasoning" : null,
+    "riskLevel" : null,
+    "dataCompleteness" : null,
+    "reasoningMode" : "OPENLLET_SWRL",
+    "molecularSubtype" : null
+  },
+  "executionTimeMs" : 12,
+  "apiVersion" : "2.0",
+  "timestamp" : "2026-09-09T13:07:34.183632"
+}

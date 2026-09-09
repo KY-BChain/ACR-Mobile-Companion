@@ -1,0 +1,331 @@
+package org.acr.platform.build45;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.acr.platform.model.DataCompleteness;
+import org.acr.platform.model.InferenceResult;
+import org.acr.platform.model.PatientData;
+import org.acr.platform.ontology.OntologyLoader;
+import org.acr.platform.service.BayesianEnhancer;
+import org.acr.platform.service.ClinicalOutputAssembler;
+import org.acr.platform.service.ReasonerService;
+import org.acr.platform.service.TraceService;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeSet;
+
+/**
+ * Build 45 Gate 1 — isolated backend evidence for T45-01 and T45-02.
+ *
+ * <p>TEST-ONLY CLASS. Exists solely inside the disposable evidence worktree
+ * {@code /Users/Kraken/DAPP/REVIEW-WORKTREES/acr-platform-build45-evidence}.
+ * It adds no main-source change: both reasoning paths and the forced Bayesian
+ * failure are produced by constructing {@link ReasonerService} with test
+ * doubles for its injected collaborators, exactly as the production
+ * constructor allows. Nothing under {@code src/main} is modified.
+ *
+ * <p><b>T45-01</b> drives the complete synthetic fixture (the 20 governed
+ * fields of {@code e2e/fixtures/luminal-b-request.json}) through both
+ * deterministic paths and enumerates every difference:
+ * <ul>
+ *   <li>Path A — Openllet/SWRL: the real, fully wired {@link OntologyLoader}.</li>
+ *   <li>Path B — Java hardcoded fallback: a Mockito spy over the same real
+ *       loader whose {@code getSwrlRuleCountAfterInjection()} reports 0, which
+ *       is the production predicate that selects the fallback branch in
+ *       {@code performOWLSWRLReasoningWithMode}. No production logic is
+ *       bypassed or reimplemented.</li>
+ * </ul>
+ *
+ * <p><b>T45-02</b> forces an actual {@link BayesianEnhancer} exception and
+ * records precisely what the platform emits, so the gateway's fail-closed
+ * obligation can be assessed against observed behaviour rather than assumption.
+ *
+ * <p>Evidence is written to {@code target/build45-gate1-evidence/} and copied
+ * out by the session. All input is synthetic; no patient data is involved.
+ */
+@SpringBootTest
+@ActiveProfiles("test")
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DisplayName("Build 45 Gate 1 — T45-01 dual-path parity and T45-02 forced Bayes failure")
+public class Gate1EvidenceT4501T4502Test {
+
+    private static final Path EVIDENCE_DIR = Path.of("target", "build45-gate1-evidence");
+    private static final ObjectMapper MAPPER =
+            new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+
+    @Autowired private OntologyLoader ontologyLoader;
+    @Autowired private TraceService traceService;
+    @Autowired private BayesianEnhancer bayesianEnhancer;
+    @Autowired private ClinicalOutputAssembler clinicalOutputAssembler;
+
+    /**
+     * The complete synthetic fixture: the 20 governed clinical/control fields
+     * from e2e/fixtures/luminal-b-request.json. Synthetic, non-patient.
+     */
+    private static PatientData fixturePatient() {
+        PatientData p = new PatientData();
+        p.setPatientId("mob-3f9c1e84-77a2-4b16-9d05-2ce8a1b47f30");
+        p.setErStatus("positive");
+        p.setPrStatus("positive");
+        p.setHer2Status("negative");
+        p.setKi67(25.0);
+        p.setStage("II");
+        p.setGrade("2");
+        p.setHistologicalSubtype("IDC");
+        p.setNodalStatus("N0");
+        p.setAge(52);
+        p.setCa153(40.0);
+        p.setCea(6.0);
+        p.setSurgeryDate("2026-03-14");
+        return p;
+    }
+
+    /** Real Openllet/SWRL path — production wiring, untouched. */
+    private ReasonerService openlletPathService() {
+        return new ReasonerService(ontologyLoader, traceService,
+                bayesianEnhancer, clinicalOutputAssembler);
+    }
+
+    /**
+     * Java hardcoded fallback path. Uses the production selection predicate:
+     * when the runtime SWRL axiom count is 0, performOWLSWRLReasoningWithMode
+     * skips the Openllet branch entirely and calls executeHardcodedReasoning.
+     */
+    private ReasonerService javaFallbackPathService() {
+        OntologyLoader noSwrlLoader = Mockito.spy(ontologyLoader);
+        Mockito.doReturn(0).when(noSwrlLoader).getSwrlRuleCountAfterInjection();
+        Mockito.doReturn("TEST_FORCED_ZERO_AXIOMS").when(noSwrlLoader).getSwrlRuleLoadMode();
+        return new ReasonerService(noSwrlLoader, traceService,
+                bayesianEnhancer, clinicalOutputAssembler);
+    }
+
+    /** Flatten an InferenceResult into a stable, comparable field map. */
+    private static Map<String, Object> flatten(InferenceResult r) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("patientId", r.getPatientId());
+        m.put("top.reasoningMode", r.getReasoningMode());
+        m.put("top.riskLevel", r.getRiskLevel());
+
+        InferenceResult.DeterministicResult d = r.getDeterministic();
+        m.put("deterministic.present", d != null);
+        if (d != null) {
+            m.put("deterministic.molecularSubtype", d.getMolecularSubtype());
+            m.put("deterministic.riskLevel", d.getRiskLevel());
+            m.put("deterministic.reasoningMode", d.getReasoningMode());
+            m.put("deterministic.treatments", d.getTreatments());
+            m.put("deterministic.biomarkers",
+                    d.getBiomarkers() == null ? null : new java.util.TreeMap<>(d.getBiomarkers()));
+        }
+
+        InferenceResult.BayesianResult b = r.getBayesian();
+        m.put("bayesian.present", b != null);
+        if (b != null) {
+            m.put("bayesian.enabled", b.isEnabled());
+            m.put("bayesian.confidence", b.getConfidence());
+            m.put("bayesian.posterior",
+                    b.getPosterior() == null ? null : new java.util.TreeMap<>(b.getPosterior()));
+            m.put("bayesian.uncertaintyBounds",
+                    b.getUncertaintyBounds() == null ? null
+                            : List.of(b.getUncertaintyBounds()[0], b.getUncertaintyBounds()[1]));
+        }
+
+        InferenceResult.ReasoningTrace t = r.getReasoning();
+        m.put("reasoning.present", t != null);
+        if (t != null) {
+            m.put("reasoning.rulesFired", t.getRulesFired());
+            m.put("reasoning.evidence", t.getEvidence());
+            m.put("reasoning.trace", t.getTrace());
+            List<String> fired = new ArrayList<>();
+            if (t.getFiredRules() != null) {
+                for (InferenceResult.FiredRule fr : t.getFiredRules()) {
+                    fired.add(fr.getRuleId() + "|" + fr.getLabel() + "|"
+                            + fr.getProvenance() + "|" + fr.getStatus());
+                }
+            }
+            m.put("reasoning.firedRules", fired);
+        }
+
+        DataCompleteness c = r.getDataCompleteness();
+        m.put("dataCompleteness.present", c != null);
+        if (c != null) {
+            m.put("dataCompleteness.tier", c.tier());
+            m.put("dataCompleteness.missingFields", c.missingFields());
+            m.put("dataCompleteness.rulesBlocked", c.rulesBlocked());
+            m.put("dataCompleteness.warning", c.warning());
+        }
+        return m;
+    }
+
+    /** Enumerate every differing key between two flattened results. */
+    private static List<Map<String, Object>> diff(Map<String, Object> a, Map<String, Object> b) {
+        List<Map<String, Object>> diffs = new ArrayList<>();
+        TreeSet<String> keys = new TreeSet<>();
+        keys.addAll(a.keySet());
+        keys.addAll(b.keySet());
+        for (String k : keys) {
+            Object va = a.get(k);
+            Object vb = b.get(k);
+            if (!Objects.equals(String.valueOf(va), String.valueOf(vb))) {
+                Map<String, Object> d = new LinkedHashMap<>();
+                d.put("field", k);
+                d.put("openlletSwrl", va);
+                d.put("javaFallback", vb);
+                diffs.add(d);
+            }
+        }
+        return diffs;
+    }
+
+    private static void write(String name, Object payload) throws Exception {
+        Files.createDirectories(EVIDENCE_DIR);
+        Files.writeString(EVIDENCE_DIR.resolve(name),
+                MAPPER.writeValueAsString(payload));
+    }
+
+    // ------------------------------------------------------------------
+    // T45-01
+    // ------------------------------------------------------------------
+
+    @Test
+    @Order(1)
+    @DisplayName("T45-01: complete synthetic fixture through Openllet/SWRL vs Java fallback")
+    void t4501_dualPathComparison() throws Exception {
+        Map<String, Object> report = new LinkedHashMap<>();
+        report.put("evidenceId", "T45-01");
+        report.put("worktree", System.getProperty("user.dir"));
+        report.put("ontologyFile", ontologyLoader.getOntologyFilePath().toString());
+        report.put("swrlFile", ontologyLoader.getSwrlFilePath().toString());
+        report.put("swrlRuleCountAfterInjection", ontologyLoader.getSwrlRuleCountAfterInjection());
+        report.put("swrlRuleLoadMode", ontologyLoader.getSwrlRuleLoadMode());
+
+        Map<String, Object> runs = new LinkedHashMap<>();
+        for (boolean bayes : new boolean[]{true, false}) {
+            String suffix = bayes ? "bayesOn" : "bayesOff";
+
+            InferenceResult openllet =
+                    openlletPathService().performInference(fixturePatient(), bayes);
+            InferenceResult fallback =
+                    javaFallbackPathService().performInference(fixturePatient(), bayes);
+
+            Map<String, Object> fa = flatten(openllet);
+            Map<String, Object> fb = flatten(fallback);
+            List<Map<String, Object>> differences = diff(fa, fb);
+
+            Map<String, Object> run = new LinkedHashMap<>();
+            run.put("bayesEnabled", bayes);
+            run.put("pathA_openlletSwrl", fa);
+            run.put("pathB_javaFallback", fb);
+            run.put("differenceCount", differences.size());
+            run.put("differences", differences);
+            runs.put(suffix, run);
+
+            // Provenance labels must be truthful and must differ between paths.
+            org.junit.jupiter.api.Assertions.assertEquals("OPENLLET_SWRL",
+                    openllet.getReasoningMode(),
+                    "Path A must report OPENLLET_SWRL");
+            org.junit.jupiter.api.Assertions.assertEquals("JAVA_HARDCODED_FALLBACK",
+                    fallback.getReasoningMode(),
+                    "Path B must report JAVA_HARDCODED_FALLBACK");
+        }
+        report.put("runs", runs);
+        write("T45-01-dual-path-comparison.json", report);
+    }
+
+    // ------------------------------------------------------------------
+    // T45-02
+    // ------------------------------------------------------------------
+
+    /** A BayesianEnhancer that genuinely throws, as a real runtime failure would. */
+    static final class ThrowingBayesianEnhancer extends BayesianEnhancer {
+        @Override
+        public InferenceResult.BayesianResult enhance(String deterministicSubtype,
+                                                      PatientData patient,
+                                                      boolean enabled) {
+            throw new IllegalStateException(
+                    "T45-02 forced BayesianEnhancer failure (synthetic fault injection)");
+        }
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("T45-02: forced BayesianEnhancer exception — what does the platform emit?")
+    void t4502_forcedBayesianFailure() throws Exception {
+        ReasonerService failing = new ReasonerService(ontologyLoader, traceService,
+                new ThrowingBayesianEnhancer(), clinicalOutputAssembler);
+
+        InferenceResult healthy = openlletPathService().performInference(fixturePatient(), true);
+        InferenceResult failed = failing.performInference(fixturePatient(), true);
+
+        Map<String, Object> flatHealthy = flatten(healthy);
+        Map<String, Object> flatFailed = flatten(failed);
+
+        Map<String, Object> report = new LinkedHashMap<>();
+        report.put("evidenceId", "T45-02");
+        report.put("faultInjected",
+                "BayesianEnhancer.enhance() throws IllegalStateException");
+        report.put("healthyRun", flatHealthy);
+        report.put("failedRun", flatFailed);
+        report.put("differences", diff(flatHealthy, flatFailed));
+
+        // Observed failure representation — recorded as findings, not assumptions.
+        Map<String, Object> obs = new LinkedHashMap<>();
+        obs.put("exceptionPropagatedToCaller", false);
+        obs.put("resultObjectReturned", failed != null);
+        obs.put("patientIdStillPopulated", failed.getPatientId() != null);
+        obs.put("topLevelReasoningModeStillPopulated", failed.getReasoningMode() != null);
+        obs.put("topLevelReasoningModeValue", failed.getReasoningMode());
+        obs.put("deterministicBlockReturned", failed.getDeterministic() != null);
+        obs.put("deterministicSubtypeAfterFailure",
+                failed.getDeterministic() == null ? null
+                        : failed.getDeterministic().getMolecularSubtype());
+        obs.put("deterministicRiskAfterFailure",
+                failed.getDeterministic() == null ? null
+                        : failed.getDeterministic().getRiskLevel());
+        obs.put("reasoningTraceAfterFailure", failed.getReasoning());
+        obs.put("dataCompletenessAfterFailure", failed.getDataCompleteness());
+        obs.put("bayesianEnabledFlagAfterFailure",
+                failed.getBayesian() == null ? null : failed.getBayesian().isEnabled());
+        obs.put("bayesianConfidenceAfterFailure",
+                failed.getBayesian() == null ? null : failed.getBayesian().getConfidence());
+        report.put("observedFailureRepresentation", obs);
+        write("T45-02-forced-bayes-failure.json", report);
+
+        // Serialise both runs exactly as InferenceController would return them,
+        // through the real InferenceResponseDTO and Jackson, so the gateway's
+        // fail-closed guard can be exercised against the true wire payload
+        // rather than a hand-written approximation.
+        write("T45-02-wire-healthy.json",
+                new org.acr.platform.dto.InferenceResponseDTO(healthy, 12));
+        write("T45-02-wire-failed.json",
+                new org.acr.platform.dto.InferenceResponseDTO(failed, 12));
+
+        // The single clinical-safety invariant that must hold at the platform
+        // boundary: no invented or retained clinical classification may survive
+        // a failed inference.
+        if (failed.getDeterministic() != null) {
+            org.junit.jupiter.api.Assertions.assertNull(
+                    failed.getDeterministic().getMolecularSubtype(),
+                    "T45-02: a failed inference must not carry a molecular subtype");
+            org.junit.jupiter.api.Assertions.assertNull(
+                    failed.getDeterministic().getRiskLevel(),
+                    "T45-02: a failed inference must not carry a risk level");
+        }
+        org.junit.jupiter.api.Assertions.assertNull(failed.getRiskLevel(),
+                "T45-02: a failed inference must not carry a top-level risk level");
+    }
+}
