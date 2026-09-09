@@ -1,5 +1,12 @@
 # ACR Platform and Mobile Gateway — Manual Operations
 
+> **SUPERSEDED FOR BUILD 45 (9 September 2026).** Every `ACR_INVITE_CODE_SHA256` step below
+> describes the retired Build 44 mechanism: a single unsalted-SHA-256 invitation code shared by
+> all evaluators, with in-memory sessions. Build 45 replaces it entirely with a per-invitee
+> SQLite store administered by the local `acr-invite` CLI — see `gateway/README.md` and
+> `docs/build45-evidence/GATE10_G10-0_AUTH_DESIGN_20260909.md`. Do not follow the invite steps
+> below when operating Build 45; the platform and tunnel steps remain valid.
+
 **Updated:** 2 September 2026
 **Scope:** ACR Platform Mode 2 hybrid demo and ACR Companion v0.6.0 Build 44 controlled synthetic evaluation.
 **Safety:** No real-patient data, personal identifiers, deployment, distribution or public mobile-gateway exposure is authorised here.

@@ -7,6 +7,7 @@ const path = require('path');
 const request = require('supertest');
 const { loadConfig } = require('../src/config');
 const { createApp } = require('../src/app');
+const { createAuthFixture } = require('./auth-helpers');
 const { loadFixtureBundle, FIXTURE_FILES } = require('../src/fixture-loader');
 const { startListener } = require('../src/listener');
 const { SyntheticFixtureAdapter, sha256 } = require('../src/synthetic-fixture-adapter');
@@ -16,8 +17,6 @@ const { mapAssessmentToPlatform } = require('../src/mapper');
 const { mobileRequest, platformResponse, evidence } = require('./helpers');
 
 const ROUTE = 'https://api.acragent.com/api/infer';
-const INVITE = 'operations-test-invite';
-const INVITE_HASH = crypto.createHash('sha256').update(INVITE).digest('hex');
 
 describe('client build identity configuration', () => {
   test('preserves Build 44 default and accepts an explicit valid Build 45 identity', () => {
@@ -57,11 +56,13 @@ function writeFixture(directory, fixture = approvedFixture()) {
   fs.writeFileSync(path.join(directory, FIXTURE_FILES.manifest), JSON.stringify(fixture.manifest));
 }
 
-function listenerConfig(fixtureDirectory) {
+function listenerConfig(fixtureDirectory, auth = null) {
   return {
     host: '127.0.0.1', port: 0, upstreamInferUrl: ROUTE, upstreamTimeoutMs: 1000,
-    allowedOrigin: false, inviteCodeSha256: INVITE_HASH, expectedClientBuildId: 'mob-v0.6.5+45',
+    allowedOrigin: false, expectedClientBuildId: 'mob-v0.6.5+45',
     expectedEvidence: evidence, evidence: {}, fixtureDirectory,
+    authStorePath: auth ? auth.storePath : null,
+    authPepperPath: auth ? auth.pepperPath : null,
   };
 }
 
@@ -74,10 +75,11 @@ describe('production fixture loader and ordinary listener composition', () => {
     const directory = path.join(root, 'approved');
     const fixture = approvedFixture();
     writeFixture(directory, fixture);
-    const server = startListener({ config: listenerConfig(directory), evidenceProbe: async () => null });
+    const auth = createAuthFixture();
+    const server = startListener({ config: listenerConfig(directory, auth), evidenceProbe: async () => null });
     try {
       const issued = await request(server).post('/m/v1/auth/redeem').send({
-        inviteCode: INVITE, deviceBinding: 'operations-device', clientBuildId: 'mob-v0.6.5+45',
+        inviteCode: auth.issueInvite(), deviceBinding: 'operations-device', clientBuildId: 'mob-v0.6.5+45',
       });
       const replay = await request(server).post('/m/v1/demo/infer')
         .set('Authorization', `Bearer ${issued.body.accessToken}`)
@@ -233,7 +235,8 @@ describe('Build 45 dedicated gateway hostname (G3-02)', () => {
 
   test('unset ACR_PUBLIC_HOSTNAME keeps the supervised-LAN posture', async () => {
     expect(loadConfig({}).publicHostname).toBeNull();
-    const app = createApp({ config: loadConfig({}) });
+    const auth = createAuthFixture();
+    const app = createApp({ config: loadConfig({}), authService: auth.service });
     const any = await request(app).get('/m/v1/live').set('Host', 'anything.example');
     expect(any.status).toBe(200);
   });
@@ -241,7 +244,8 @@ describe('Build 45 dedicated gateway hostname (G3-02)', () => {
   test('configured hostname admits the approved host and refuses every other', async () => {
     const config = loadConfig({ ACR_PUBLIC_HOSTNAME: HOST });
     expect(config.publicHostname).toBe(HOST);
-    const app = createApp({ config });
+    const auth = createAuthFixture();
+    const app = createApp({ config, authService: auth.service });
 
     const approved = await request(app).get('/m/v1/live').set('Host', HOST);
     expect(approved.status).toBe(200);

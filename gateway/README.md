@@ -23,7 +23,11 @@ The listener defaults to `127.0.0.1:3001`. A private-LAN host requires both `ACR
 
 Observed attestation is not copied from the expected baseline or from self-declared environment values. Configure the three exact, read-only controller routes `ACR_EVIDENCE_STATUS_URL=/api/ontolator/status`, `ACR_EVIDENCE_MANIFEST_URL=/api/ontolator/manifest`, and `ACR_EVIDENCE_HEALTH_URL=/api/infer/health`, plus the absolute local non-patient ontology asset path `ACR_EVIDENCE_ONTOLOGY_PATH`. All four are required together and the endpoints must share the configured upstream origin. The probe derives and cross-checks 71 logical rules, 76 physical blocks, 76 active blocks, 76 embedded/loaded axioms and 27 queries from actual GET responses, and hashes the configured asset itself. If evidence is incomplete, inconsistent or unavailable, all observed members are reported null and live inference fails closed; internally consistent degraded observations are reported as `MISMATCH`. `ACR_OBSERVED_*` values are deliberately ignored. Explicit replay may still run offline when its independent immutable capture provenance is verified; its response keeps current unavailable evidence separate from captured platform identity.
 
-Local evaluation authentication requires `ACR_INVITE_CODE_SHA256`, the lowercase SHA-256 of the owner-supplied invite code; no plaintext invite is stored in source. Redeem binds the opaque token family to the supplied device binding and exact client build `mob-v0.6.0+44`. Protected calls must send `X-Device-Binding` and `X-Client-Build-ID`, and refresh must repeat both bound values in its JSON body. Rotation and family revocation on refresh-token reuse remain enforced.
+Build 45 authentication uses a per-invitee SQLite store, not a single shared code. `ACR_INVITE_CODE_SHA256` is **retired**: the Build 44 mechanism was one unsalted SHA-256 of one code shared by every evaluator, with sessions held in memory and lost on restart. It could not satisfy T45-08 (per-invitee issue, expiry, individual revocation, lost-code procedure) and is removed rather than left dormant.
+
+Configure `ACR_AUTH_STORE_PATH` and `ACR_AUTH_PEPPER_PATH` (both absolute, both owner-only `0600`, and different files, so a copy of the store alone verifies nothing). Invitations are issued and revoked with the local `acr-invite` CLI; there is deliberately no network administration endpoint. Invitation codes are `ACR45-<selector>-<secret>`: the selector is indexed for O(1) lookup and the secret is verified with scrypt plus the server pepper, so a redemption costs exactly one slow hash regardless of how many invitations exist. Access and refresh tokens are 256-bit random values stored only as keyed HMAC digests.
+
+Redeem binds the session to the supplied device binding and the exact client build `mob-v0.6.5+45`. Protected calls must send `X-Device-Binding` and `X-Client-Build-ID`, and refresh must repeat both bound values in its JSON body. Refresh rotation, replay-family revocation and rate limiting ahead of authentication are enforced. A refresh token expires with its parent session — a flat 30 days from that evaluator's own redemption — so rotation moves the token but never the deadline.
 
 ## Run and test
 
@@ -35,7 +39,18 @@ ACR_EVIDENCE_STATUS_URL=https://api.acragent.com/api/ontolator/status \
 ACR_EVIDENCE_MANIFEST_URL=https://api.acragent.com/api/ontolator/manifest \
 ACR_EVIDENCE_HEALTH_URL=https://api.acragent.com/api/infer/health \
 ACR_EVIDENCE_ONTOLOGY_PATH=/Users/Kraken/DAPP/ACR-platform/ontology/breast-cancer/ACR_Ontology_Full_v2_2.owl \
-ACR_INVITE_CODE_SHA256=<lowercase-sha256> npm start
+# One-time: create the owner-only pepper.
+node src/auth/invite-admin.js init
+
+# Issue an invitation for one named evaluator. The code is printed ONCE.
+node src/auth/invite-admin.js issue --label reviewer-01 --issued-by kraken
+
+# Start the gateway against that store.
+ACR_AUTH_STORE_PATH="$HOME/.acr-gateway/build45-auth.db" \
+ACR_AUTH_PEPPER_PATH="$HOME/.acr-gateway/build45-pepper.bin" npm start
+
+# Revoke (also cascades to every session from that invitation).
+node src/auth/invite-admin.js revoke --label reviewer-01 --reason LOST
 ```
 
 Importing `src/index.js` never starts a listener. `src/listener.js` is the executable entry point.

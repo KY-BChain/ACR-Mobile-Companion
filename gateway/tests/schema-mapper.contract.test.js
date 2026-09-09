@@ -194,11 +194,32 @@ describe('listener/upstream configuration safety', () => {
     expect(() => loadConfig({ [name]: value })).toThrow(/pinned/);
   });
 
-  test('invite policy accepts only a configured SHA-256 and never a plaintext secret field', () => {
-    const hash = 'a'.repeat(64);
-    expect(loadConfig({ ACR_INVITE_CODE_SHA256: hash }).inviteCodeSha256).toBe(hash);
-    expect(() => loadConfig({ ACR_INVITE_CODE_SHA256: 'plaintext-secret' })).toThrow(/SHA-256/);
-    expect(loadConfig({})).not.toHaveProperty('inviteCode');
+  test('invite policy carries no credential in configuration at all (Build 45)', () => {
+    // Build 45 retires ACR_INVITE_CODE_SHA256. The single shared unsalted-SHA
+    // invite is replaced by per-invitee records in the SQLite store, so no
+    // credential material — hashed or otherwise — appears in configuration.
+    const config = loadConfig({ ACR_INVITE_CODE_SHA256: 'a'.repeat(64) });
+    expect(config).not.toHaveProperty('inviteCodeSha256');
+    expect(config).not.toHaveProperty('inviteCode');
+    expect(JSON.stringify(config)).not.toContain('a'.repeat(64));
+
+    // Configuration carries where the store lives, never a secret.
+    expect(config.authStorePath).toBeNull();
+    expect(config.authPepperPath).toBeNull();
+    const configured = loadConfig({
+      ACR_AUTH_STORE_PATH: '/explicit/auth.db', ACR_AUTH_PEPPER_PATH: '/explicit/pepper.bin',
+    });
+    expect(configured.authStorePath).toBe('/explicit/auth.db');
+    expect(configured.authPepperPath).toBe('/explicit/pepper.bin');
+
+    // Relative paths, and a shared store/pepper file, are refused at construction.
+    const { SqliteAuthService } = require('../src/auth/session-store');
+    expect(() => new SqliteAuthService({
+      storePath: 'relative.db', pepperPath: '/explicit/pepper.bin', expectedClientBuildId: 'mob-v0.6.5+45',
+    })).toThrow(/absolute/);
+    expect(() => new SqliteAuthService({
+      storePath: '/explicit/same.bin', pepperPath: '/explicit/same.bin', expectedClientBuildId: 'mob-v0.6.5+45',
+    })).toThrow(/different files/);
   });
 
   test.each(['1', '249', '30001', 'not-a-number'])('rejects unbounded/invalid timeout %s', timeout => {

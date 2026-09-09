@@ -2,7 +2,7 @@
 
 const request = require('supertest');
 const { createApp, safeRequestId } = require('../src/app');
-const { InMemoryAuthService } = require('../src/auth');
+const { createAuthFixture } = require('./auth-helpers');
 const { AttestationService } = require('../src/attestation');
 const { createMetadataLogger } = require('../src/logger');
 const { SyntheticFixtureAdapter, sha256 } = require('../src/synthetic-fixture-adapter');
@@ -10,8 +10,10 @@ const { validators } = require('../src/schema');
 const { mobileRequest, platformResponse, evidence, REQUEST_ID, PATIENT_ID } = require('./helpers');
 const crypto = require('crypto');
 
-const INVITE_CODE = 'correct-local-invite';
-const INVITE_SHA256 = crypto.createHash('sha256').update(INVITE_CODE).digest('hex');
+let authFixture;
+let INVITE_CODE;
+beforeEach(() => { authFixture = createAuthFixture(); INVITE_CODE = authFixture.issueInvite(); });
+afterEach(() => { authFixture.cleanup(); });
 const DEVICE = 'test-device-binding-001';
 const BUILD = 'mob-v0.6.5+45';
 
@@ -19,9 +21,10 @@ function testApp(options = {}) {
   return createApp({
     config: {
       upstreamInferUrl: 'https://configured.example/api/infer', upstreamTimeoutMs: 1000,
-      allowedOrigin: false, expectedEvidence: evidence, inviteCodeSha256: INVITE_SHA256,
+      allowedOrigin: false, expectedEvidence: evidence,
       expectedClientBuildId: BUILD, evidence: {},
     },
+    authService: authFixture.service,
     evidenceProbe: async () => ({ ...evidence }),
     platformAdapter: { infer: async body => ({
       contract: 'acr.cds.v1', requestId: body.requestId, status: 'COMPLETED', completedAt: new Date().toISOString(),
@@ -147,9 +150,12 @@ describe('app composition and HTTP contract', () => {
 
 describe('attestation and token lifecycle', () => {
   test('invite policy rejects missing configuration, bad invite and wrong client build', async () => {
-    const unconfigured = testApp({ authService: new InMemoryAuthService() });
-    expect((await request(unconfigured).post('/m/v1/auth/redeem').send({ inviteCode: INVITE_CODE, deviceBinding: DEVICE, clientBuildId: BUILD })).body.error.code)
-      .toBe('INVITE_CONFIGURATION_REQUIRED');
+    // Build 45: an unconfigured auth store is refused at construction, not at
+    // request time — the gateway cannot start in a state where it would accept
+    // credentials it has no way to verify.
+    const { SqliteAuthService } = require('../src/auth/session-store');
+    expect(() => new SqliteAuthService({ expectedClientBuildId: BUILD }))
+      .toThrow(/Auth store path must be absolute/);
     const app = testApp();
     expect((await request(app).post('/m/v1/auth/redeem').send({ inviteCode: 'wrong-invite', deviceBinding: DEVICE, clientBuildId: BUILD })).body.error.code)
       .toBe('INVITE_INVALID');
@@ -195,7 +201,7 @@ describe('attestation and token lifecycle', () => {
   });
 
   test('refresh rotates and reuse revokes the whole family', () => {
-    const auth = new InMemoryAuthService({ inviteCodeSha256: INVITE_SHA256 });
+    const auth = authFixture.service;
     const first = auth.redeem(INVITE_CODE, DEVICE, BUILD); const second = auth.refresh(first.refreshToken, DEVICE, BUILD);
     expect(() => auth.refresh(first.refreshToken, DEVICE, BUILD)).toThrow(expect.objectContaining({ code: 'TOKEN_REUSE_DETECTED' }));
     expect(() => auth.authenticate(`Bearer ${second.accessToken}`, DEVICE, BUILD)).toThrow(expect.objectContaining({ code: 'AUTHENTICATION_REQUIRED' }));

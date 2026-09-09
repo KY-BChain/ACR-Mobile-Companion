@@ -8,7 +8,8 @@ const { loadConfig } = require('./config');
 const { GatewayError, errorEnvelope } = require('./errors');
 const { createMetadataLogger } = require('./logger');
 const { validateAssessmentRequest, validators } = require('./schema');
-const { InMemoryAuthService } = require('./auth');
+const { SqliteAuthService } = require('./auth/session-store');
+const { createRateLimitMiddleware } = require('./auth/rate-limit');
 const { AttestationService } = require('./attestation');
 const { createPlatformEvidenceProbe } = require('./evidence-probe');
 const { PlatformAdapter } = require('./platform-adapter');
@@ -23,8 +24,9 @@ function safeRequestId(req) {
 function createApp(options = {}) {
   const config = options.config || loadConfig(options.env);
   const logger = options.logger || createMetadataLogger();
-  const auth = options.authService || new InMemoryAuthService({
-    inviteCodeSha256: config.inviteCodeSha256,
+  const auth = options.authService || new SqliteAuthService({
+    storePath: config.authStorePath,
+    pepperPath: config.authPepperPath,
     expectedClientBuildId: config.expectedClientBuildId,
   });
   const evidenceProbe = options.evidenceProbe || createPlatformEvidenceProbe({
@@ -66,6 +68,10 @@ function createApp(options = {}) {
     });
   }
   app.use(express.json({ limit: '16kb' }));
+  // AUTH-08: rate limiting is applied ahead of authentication, so brute force
+  // never reaches credential verification. Persisted in SQLite so a restart
+  // cannot clear a lockout (AT-09 with AT-11).
+  if (auth && auth.db) app.use(createRateLimitMiddleware({ db: auth.db }));
   app.use((req, res, next) => {
     const started = Date.now();
     res.on('finish', () => logger.emit('request.complete', {
