@@ -25,6 +25,9 @@ export const ACRButton: React.FC<Props> = ({ title, variant = 'primary', onPress
 
   return (
     <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: Boolean(disabled) }}
       style={[styles.base, styleMap[variant], disabled && styles.disabled]}
       onPress={onPress}
       disabled={disabled}

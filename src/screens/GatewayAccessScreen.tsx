@@ -131,7 +131,7 @@ const Row: React.FC<{ label: string; value?: string; valueComponent?: React.Reac
   const { i18n } = useTranslation();
   const language = i18n.resolvedLanguage ?? i18n.language;
   const localText = { writingDirection: getLocaleDirection(language), textAlign: getTextAlign(language) };
-  return <View style={styles.row}><Text style={[styles.label, localText]}>{label}</Text>{valueComponent ?? <Text style={[styles.value, localText]}>{value}</Text>}</View>;
+  return <View accessible accessibilityRole="text" accessibilityLabel={`${label}: ${value ?? ''}`} style={styles.row}><Text style={[styles.label, localText]}>{label}</Text>{valueComponent ?? <Text style={[styles.value, localText]}>{value}</Text>}</View>;
 };
 const styles = StyleSheet.create({
   connectionState: { color: ACRColors.ink, fontSize: 12, fontWeight: '700', marginBottom: 6 },

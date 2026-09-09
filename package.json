@@ -10,7 +10,7 @@
     "lint": "eslint . --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
     "typecheck:active": "tsc --noEmit -p tsconfig.active.json",
-    "verify:mobile": "node tests/mobile/verify.js && node tests/mobile/offlineWalkthrough.verify.js && node tests/mobile/resultPresentation.verify.js && node tests/p1p2/verify.js && node tests/version/verify.js && node tests/poster/verify.js && node tests/rtl/verify.js && node tests/contract/verify.js && node tests/transport/verify.js && node tests/parity/verify.js && node tests/gate7/verify.js"
+    "verify:mobile": "node tests/mobile/verify.js && node tests/mobile/offlineWalkthrough.verify.js && node tests/mobile/resultPresentation.verify.js && node tests/p1p2/verify.js && node tests/version/verify.js && node tests/poster/verify.js && node tests/rtl/verify.js && node tests/contract/verify.js && node tests/transport/verify.js && node tests/parity/verify.js && node tests/gate7/verify.js && node tests/gate89/verify.js"
   },
   "dependencies": {
     "@react-navigation/native": "^6.1.17",

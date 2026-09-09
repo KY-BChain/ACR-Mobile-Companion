@@ -7,8 +7,18 @@ interface Props {
   message: string;
 }
 
+/**
+ * A stop/blocked condition. Conveys its meaning through text as well as colour,
+ * and is announced as a single alert so a screen-reader user is told that
+ * something is blocked rather than having to infer it from styling.
+ */
 export const ACRStopBox: React.FC<Props> = ({ title, message }) => (
-  <View style={styles.container}>
+  <View
+    accessible
+    accessibilityRole="alert"
+    accessibilityLabel={`${title}. ${message}`}
+    style={styles.container}
+  >
     <Text style={styles.title}>{title}</Text>
     <Text style={styles.message}>{message}</Text>
   </View>

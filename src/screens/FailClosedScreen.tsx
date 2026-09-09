@@ -54,6 +54,8 @@ export const FailClosedScreen: React.FC = () => {
       <ACRButton title={t('common:about')} variant="secondary" onPress={() => navigation.navigate('About')} />
       <ACRButton title={isAttestation ? t('build44:retryVerification') : t('build44:backToAccess')} variant="primary" onPress={handleAction} disabled={checking} />
     </>}>
+      {/* Gates 8-9: the blocked state is announced as an alert (ACRStopBox
+          carries accessibilityRole="alert"), so it is not conveyed by colour alone. */}
       <ACRStopBox title={code} message={visibleMessage} />
       <ACRCard title={t('failClosed:verificationDetail')}>
         <Row label={t('failClosed:state')} valueComponent={<ACRStateBadge state={state} />} />
@@ -73,7 +75,9 @@ const Row: React.FC<{ label: string; value?: string; valueComponent?: React.Reac
   const { i18n } = useTranslation();
   const language = i18n.resolvedLanguage ?? i18n.language;
   const localText = { writingDirection: getLocaleDirection(language), textAlign: getTextAlign(language) };
-  return <View style={styles.row}><Text style={[styles.rowLabel, localText]}>{label}</Text>{valueComponent ?? <Text selectable style={[styles.rowValue, localText]}>{value}</Text>}</View>;
+  // Gates 8-9: grouped so assistive technology announces the label and its
+  // value as one item, rather than two unrelated text nodes.
+  return <View accessible accessibilityRole="text" accessibilityLabel={`${label}: ${value ?? ''}`} style={styles.row}><Text style={[styles.rowLabel, localText]}>{label}</Text>{valueComponent ?? <Text selectable style={[styles.rowValue, localText]}>{value}</Text>}</View>;
 };
 
 const styles = StyleSheet.create({

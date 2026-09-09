@@ -93,7 +93,7 @@ export const Step1ReceptorsScreen: React.FC = () => {
           keyboardType="numeric"
           hint={t('receptors:ki67Hint')}
         />
-        {!isValid ? <Text style={styles.error}>{t('build44:ki67Error')}</Text> : null}
+        {!isValid ? <Text accessibilityRole="alert" style={styles.error}>{t('build44:ki67Error')}</Text> : null}
       </ACRCard>
 
       <ACRCard title={t('session:cardTitle')}>

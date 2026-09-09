@@ -19,10 +19,13 @@ export const ACRSegmentedControl: React.FC<Props> = ({ options, labels, selected
   const isRtl = isRTL(activeLanguage);
 
   return (
-    <View style={[styles.container, { direction }]}>
+    <View accessibilityRole="radiogroup" style={[styles.container, { direction }]}>
       {options.map((opt, idx) => (
         <TouchableOpacity
           key={opt}
+          accessibilityRole="radio"
+          accessibilityLabel={labels ? labels[idx] : opt}
+          accessibilityState={{ selected: selected === opt }}
           style={[
             styles.segment,
             selected === opt && styles.selected,

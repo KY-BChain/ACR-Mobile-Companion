@@ -14,6 +14,8 @@ interface Props {
   readOnly?: boolean;
   secureTextEntry?: boolean;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  /** Accessible name for the field. Falls back to the placeholder or hint. */
+  accessibilityLabel?: string;
 }
 
 export const ACRInput: React.FC<Props> = ({
@@ -26,6 +28,7 @@ export const ACRInput: React.FC<Props> = ({
   readOnly = false,
   secureTextEntry = false,
   autoCapitalize = 'sentences',
+  accessibilityLabel,
 }) => {
   const { i18n } = useTranslation();
   const language = i18n.resolvedLanguage ?? i18n.language;
@@ -34,6 +37,9 @@ export const ACRInput: React.FC<Props> = ({
   return (
     <View style={{ direction }}>
       <TextInput
+        accessibilityLabel={accessibilityLabel ?? placeholder ?? hint}
+        accessibilityHint={hint}
+        accessibilityState={{ disabled: !(editable && !readOnly) }}
         style={[styles.input, { direction, textAlign }, readOnly && styles.readOnly]}
         value={value}
         onChangeText={onChangeText}
