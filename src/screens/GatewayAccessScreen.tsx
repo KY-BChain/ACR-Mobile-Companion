@@ -13,6 +13,7 @@ import { ACRStateBadge } from '../components/ACRStateBadge';
 import { ACRStopBox } from '../components/ACRStopBox';
 import { ScreenLayout } from '../components/ScreenLayout';
 import { useAssessmentStore } from '../store/assessmentStore';
+import { capabilitiesFor, deriveConnectionState } from './connectionState';
 import { ACRColors, ACRTypography } from '../theme/colors';
 import { getLocaleDirection, getTextAlign } from '../utils/rtl';
 
@@ -74,6 +75,10 @@ export const GatewayAccessScreen: React.FC = () => {
     navigation.navigate('Step1');
   };
 
+  // T45-10 composite connection state, fail-closed by construction.
+  const connectionState = deriveConnectionState(gatewayLive, attestation ? attestation.verificationState : null);
+  const connectionCapabilities = capabilitiesFor(connectionState);
+
   return (
     <ScreenLayout title={t('gatewayAccess:title')} subtitle={t('gatewayAccess:subtitle')} bannerText={t('assessment:clinicalTransparencyBanner')}
       footer={<><ACRButton title={t('common:back')} variant="secondary" onPress={() => navigation.navigate('Welcome')} />
@@ -94,9 +99,22 @@ export const GatewayAccessScreen: React.FC = () => {
         <ACRButton title={t('gatewayAccess:disconnect')} variant="secondary" onPress={disconnect} />
       </> : null}
       <ACRCard title={t('gatewayAccess:statusTitle')}>
+        {/* T45-10: gateway reachability and live-platform availability are one
+            explicitly named composite state, not two rows the reader must
+            combine. The per-component rows remain below as detail. */}
+        <Text accessibilityRole="header" style={[styles.connectionState, textStyle]}>
+          {t(`gatewayAccess:${connectionCapabilities.labelKey}`)}
+        </Text>
+        {!connectionCapabilities.liveSubmissionAllowed && connectionState !== 'CHECKING'
+          ? <Text style={[styles.connectionDetail, textStyle]}>{t('gatewayAccess:stateLiveBlocked')}</Text>
+          : null}
+        {!connectionCapabilities.liveSubmissionAllowed && connectionCapabilities.syntheticReplayAvailable
+          ? <Text style={[styles.connectionDetail, textStyle]}>{t('gatewayAccess:stateReplayAvailable')}</Text>
+          : null}
         <Row label={t('gatewayAccess:gateway')} value={gatewayLive === 'UP' ? t('gatewayAccess:connected') : gatewayLive === 'DOWN' ? t('gatewayAccess:notConnected') : t('gatewayAccess:checking')} />
         <Row label={t('gatewayAccess:attestation')} valueComponent={attestation ? <ACRStateBadge state={attestation.verificationState} /> : undefined} value={attestation ? undefined : t('common:emDash')} />
         {attestation ? <Text style={[styles.evidence, textStyle]}>{`${attestation.expected.logicalRuleCount}/${attestation.expected.physicalRuleCount}/${attestation.expected.activeRuleCount}/${attestation.expected.loadedRuleCount}/${attestation.expected.queryCount}`}</Text> : null}
+        <Text style={[styles.connectionDetail, textStyle]}>{t('gatewayAccess:stateNoLocalInference')}</Text>
       </ACRCard>
       {gatewayLive === 'DOWN' ? <ACRStopBox title={t('gatewayAccess:notConnected')} message={t('gatewayAccess:serverAlert')} /> : null}
       {!accessReady && deliveryChoice === 'SYNTHETIC_DEMO' ? <>
@@ -116,6 +134,8 @@ const Row: React.FC<{ label: string; value?: string; valueComponent?: React.Reac
   return <View style={styles.row}><Text style={[styles.label, localText]}>{label}</Text>{valueComponent ?? <Text style={[styles.value, localText]}>{value}</Text>}</View>;
 };
 const styles = StyleSheet.create({
+  connectionState: { color: ACRColors.ink, fontSize: 12, fontWeight: '700', marginBottom: 6 },
+  connectionDetail: { ...ACRTypography.hint, color: ACRColors.muted, marginBottom: 4 },
   hint: { ...ACRTypography.hint, color: ACRColors.muted, marginTop: 8 }, evidence: { ...ACRTypography.monospace, color: ACRColors.muted, marginTop: 8 },
   row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 }, label: { color: ACRColors.ink, fontSize: 11 }, value: { color: ACRColors.ink, fontSize: 11, fontWeight: '600' },
   error: { padding: 10, backgroundColor: ACRColors.stopBg, borderRadius: 8 }, errorText: { color: ACRColors.stopBorder, fontSize: 11 },
