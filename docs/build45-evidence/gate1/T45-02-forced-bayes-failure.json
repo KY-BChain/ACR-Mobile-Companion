@@ -32,7 +32,7 @@
     "reasoning.rulesFired" : [ "SWRL R2/R3: Luminal B HER2-negative classification", "SWRL R7-R71: 71 logical / 76 physical rules, 76 active at runtime; require staging data to activate", "SWRL R33: fired via ACR-SWRL-API (ACR_NATIVE — OWL-derived swrlb:subtractDateTimes)", "SWRL RE3: fired via ACR-SWRL-API (ACR_NATIVE — OWL-derived Sprint E rule)", "SWRL RE4-1: fired via ACR-SWRL-API (ACR_NATIVE — OWL-derived Sprint E rule)", "SWRL RE4-2: fired via ACR-SWRL-API (ACR_NATIVE — OWL-derived Sprint E rule)", "Bayesian posterior probability layer applied" ],
     "reasoning.evidence" : [ "ER: positive", "PR: positive", "HER2: negative", "Ki67: 25.0", "Stage: II" ],
     "reasoning.trace" : "Molecular subtype determined via Openllet SWRL engine: LuminalB_HER2Negative. External SWRL load mode: EMBEDDED_ONLY; runtime SWRL axiom count after merge: 76. SWRL rule set v2.2 manifest: 71 logical rules (76 physical atoms, 76 active at runtime; 3 rules skipped by Openllet (swrlb:subtractDateTimes — handled by ACR-SWRL-API ACR_NATIVE). Bayesian confidence layer applied. Treatment mapping: Java-mapped (SWRL R7-R71 require staging data).",
-    "reasoning.firedRules" : [ "R2/R3|Luminal B HER2-negative classification|OPENLLET_SWRL|FIRED", "RE4-1|RE4-1|ACR_NATIVE|FIRED", "RE3|RE3|ACR_NATIVE|FIRED", "RE4-2|RE4-2|ACR_NATIVE|FIRED", "R33|R33|ACR_NATIVE|FIRED" ],
+    "reasoning.firedRules" : [ "R2/R3|Luminal B HER2-negative classification|OPENLLET_SWRL|FIRED", "RE4-1|RE4-1|ACR_NATIVE|FIRED", "RE4-2|RE4-2|ACR_NATIVE|FIRED", "RE3|RE3|ACR_NATIVE|FIRED", "R33|R33|ACR_NATIVE|FIRED" ],
     "dataCompleteness.present" : true,
     "dataCompleteness.tier" : 1,
     "dataCompleteness.missingFields" : [ "tumorSize" ],
@@ -131,7 +131,7 @@
     "javaFallback" : null
   }, {
     "field" : "reasoning.firedRules",
-    "openlletSwrl" : [ "R2/R3|Luminal B HER2-negative classification|OPENLLET_SWRL|FIRED", "RE4-1|RE4-1|ACR_NATIVE|FIRED", "RE3|RE3|ACR_NATIVE|FIRED", "RE4-2|RE4-2|ACR_NATIVE|FIRED", "R33|R33|ACR_NATIVE|FIRED" ],
+    "openlletSwrl" : [ "R2/R3|Luminal B HER2-negative classification|OPENLLET_SWRL|FIRED", "RE4-1|RE4-1|ACR_NATIVE|FIRED", "RE4-2|RE4-2|ACR_NATIVE|FIRED", "RE3|RE3|ACR_NATIVE|FIRED", "R33|R33|ACR_NATIVE|FIRED" ],
     "javaFallback" : null
   }, {
     "field" : "reasoning.present",

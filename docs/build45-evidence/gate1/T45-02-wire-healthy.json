@@ -3,7 +3,7 @@
   "message" : "Inference completed successfully",
   "data" : {
     "patientId" : "mob-3f9c1e84-77a2-4b16-9d05-2ce8a1b47f30",
-    "timestamp" : "2026-09-09T11:07:33.931222Z",
+    "timestamp" : "2026-09-09T11:13:10.107546Z",
     "deterministic" : {
       "molecularSubtype" : "LuminalB_HER2Negative",
       "riskLevel" : "LOW",
@@ -42,13 +42,13 @@
         "provenance" : "ACR_NATIVE",
         "status" : "FIRED"
       }, {
-        "ruleId" : "RE3",
-        "label" : "RE3",
+        "ruleId" : "RE4-2",
+        "label" : "RE4-2",
         "provenance" : "ACR_NATIVE",
         "status" : "FIRED"
       }, {
-        "ruleId" : "RE4-2",
-        "label" : "RE4-2",
+        "ruleId" : "RE3",
+        "label" : "RE3",
         "provenance" : "ACR_NATIVE",
         "status" : "FIRED"
       }, {
@@ -72,5 +72,5 @@
   },
   "executionTimeMs" : 12,
   "apiVersion" : "2.0",
-  "timestamp" : "2026-09-09T13:07:34.121069"
+  "timestamp" : "2026-09-09T13:13:10.221664"
 }

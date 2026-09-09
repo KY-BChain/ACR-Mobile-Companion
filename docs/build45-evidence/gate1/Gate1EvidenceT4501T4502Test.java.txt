@@ -95,6 +95,28 @@ public class Gate1EvidenceT4501T4502Test {
         return p;
     }
 
+    /**
+     * The COMPLETE governed fixture: all 21 assessment properties of
+     * schemas/acr.cds.v1.request.schema.json (patientId plus the 20 governed
+     * clinical/control values). The stored e2e fixture omits seven optional
+     * fields — tumorSize, gender, ecogScore, pdl1Status, her2Low, lvef and
+     * treatmentIntent — which caps it at data-completeness Tier 1. Values below
+     * are synthetic and schema-valid, chosen to be clinically coherent with the
+     * existing Luminal-B fixture.
+     */
+    private static PatientData completeFixturePatient() {
+        PatientData p = fixturePatient();
+        p.setTumorSize(22.0);
+        p.setGender("female");
+        p.setEcogScore(1);
+        p.setPdl1Status("negative");
+        // Gateway mapper maps her2Low "positive" -> true (mapper.js mapHer2Low).
+        p.setHer2Low(Boolean.TRUE);
+        p.setLvef(60.0);
+        p.setTreatmentIntent("adjuvant");
+        return p;
+    }
+
     /** Real Openllet/SWRL path — production wiring, untouched. */
     private ReasonerService openlletPathService() {
         return new ReasonerService(ontologyLoader, traceService,
@@ -214,19 +236,22 @@ public class Gate1EvidenceT4501T4502Test {
         report.put("swrlRuleLoadMode", ontologyLoader.getSwrlRuleLoadMode());
 
         Map<String, Object> runs = new LinkedHashMap<>();
+        for (String variant : new String[]{"storedFixture14of21", "completeFixture21of21"}) {
+        boolean complete = variant.startsWith("complete");
         for (boolean bayes : new boolean[]{true, false}) {
-            String suffix = bayes ? "bayesOn" : "bayesOff";
+            String suffix = variant + "_" + (bayes ? "bayesOn" : "bayesOff");
 
-            InferenceResult openllet =
-                    openlletPathService().performInference(fixturePatient(), bayes);
-            InferenceResult fallback =
-                    javaFallbackPathService().performInference(fixturePatient(), bayes);
+            InferenceResult openllet = openlletPathService()
+                    .performInference(complete ? completeFixturePatient() : fixturePatient(), bayes);
+            InferenceResult fallback = javaFallbackPathService()
+                    .performInference(complete ? completeFixturePatient() : fixturePatient(), bayes);
 
             Map<String, Object> fa = flatten(openllet);
             Map<String, Object> fb = flatten(fallback);
             List<Map<String, Object>> differences = diff(fa, fb);
 
             Map<String, Object> run = new LinkedHashMap<>();
+            run.put("fixtureVariant", variant);
             run.put("bayesEnabled", bayes);
             run.put("pathA_openlletSwrl", fa);
             run.put("pathB_javaFallback", fb);
@@ -241,6 +266,7 @@ public class Gate1EvidenceT4501T4502Test {
             org.junit.jupiter.api.Assertions.assertEquals("JAVA_HARDCODED_FALLBACK",
                     fallback.getReasoningMode(),
                     "Path B must report JAVA_HARDCODED_FALLBACK");
+        }
         }
         report.put("runs", runs);
         write("T45-01-dual-path-comparison.json", report);
