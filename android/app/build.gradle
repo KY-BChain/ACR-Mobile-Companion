@@ -114,8 +114,8 @@ android {
         applicationId 'com.anonymous.acr_mobile_companion'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 44
-        versionName "0.6.0"
+        versionCode 45
+        versionName "0.6.5"
     }
     signingConfigs {
         debug {

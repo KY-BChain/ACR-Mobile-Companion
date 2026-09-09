@@ -5,8 +5,8 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '../..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const appConfig = JSON.parse(read('app.json'));
-const expectedVersion = '0.6.0';
-const expectedBuild = '44';
+const expectedVersion = '0.6.5';
+const expectedBuild = '45';
 
 assert.equal(appConfig.expo.name, 'ACR Companion');
 assert.equal(appConfig.expo.version, expectedVersion);
@@ -64,4 +64,4 @@ assert.equal(
   'The app does not intentionally store clinical data. Entries are held in memory for the current assessment only.',
 );
 
-console.log('PASS version/native consistency: Expo, Android, iOS and derived gateway build ID are 0.6.0 / 44; local-network policy is narrow');
+console.log('PASS version/native consistency: Expo, Android, iOS and derived gateway build ID are 0.6.5 / 45; local-network policy is narrow');

@@ -17,7 +17,7 @@ function mobileRequest(overrides = {}) {
       her2Low: 'negative', lvef: 0, treatmentIntent: 'unspecified',
       ...overrides,
     },
-    client: { channel: 'MOBILE', buildId: 'mob-v0.6.0+44', environment: 'EVALUATION' },
+    client: { channel: 'MOBILE', buildId: 'mob-v0.6.5+45', environment: 'EVALUATION' },
   };
 }
 

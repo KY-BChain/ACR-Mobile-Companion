@@ -20,7 +20,7 @@ const INVITE_HASH = crypto.createHash('sha256').update(INVITE).digest('hex');
 
 describe('client build identity configuration', () => {
   test('preserves Build 44 default and accepts an explicit valid Build 45 identity', () => {
-    expect(loadConfig({}).expectedClientBuildId).toBe('mob-v0.6.0+44');
+    expect(loadConfig({}).expectedClientBuildId).toBe('mob-v0.6.5+45');
     expect(loadConfig({ ACR_EXPECTED_CLIENT_BUILD_ID: 'mob-v0.6.5+45' }).expectedClientBuildId).toBe('mob-v0.6.5+45');
   });
 
@@ -59,7 +59,7 @@ function writeFixture(directory, fixture = approvedFixture()) {
 function listenerConfig(fixtureDirectory) {
   return {
     host: '127.0.0.1', port: 0, upstreamInferUrl: ROUTE, upstreamTimeoutMs: 1000,
-    allowedOrigin: false, inviteCodeSha256: INVITE_HASH, expectedClientBuildId: 'mob-v0.6.0+44',
+    allowedOrigin: false, inviteCodeSha256: INVITE_HASH, expectedClientBuildId: 'mob-v0.6.5+45',
     expectedEvidence: evidence, evidence: {}, fixtureDirectory,
   };
 }
@@ -76,11 +76,11 @@ describe('production fixture loader and ordinary listener composition', () => {
     const server = startListener({ config: listenerConfig(directory), evidenceProbe: async () => null });
     try {
       const issued = await request(server).post('/m/v1/auth/redeem').send({
-        inviteCode: INVITE, deviceBinding: 'operations-device', clientBuildId: 'mob-v0.6.0+44',
+        inviteCode: INVITE, deviceBinding: 'operations-device', clientBuildId: 'mob-v0.6.5+45',
       });
       const replay = await request(server).post('/m/v1/demo/infer')
         .set('Authorization', `Bearer ${issued.body.accessToken}`)
-        .set('X-Device-Binding', 'operations-device').set('X-Client-Build-ID', 'mob-v0.6.0+44')
+        .set('X-Device-Binding', 'operations-device').set('X-Client-Build-ID', 'mob-v0.6.5+45')
         .set('X-ACR-Contract', 'acr.cds.v1').set('X-Request-ID', fixture.request.requestId)
         .send(fixture.request);
       expect(replay.status).toBe(200);

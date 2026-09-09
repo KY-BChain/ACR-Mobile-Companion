@@ -16,7 +16,7 @@ const request = {
     tumorSize: 2.5, gender: 'unknown', ecogScore: 0, pdl1Status: 'not_tested', her2Low: 'negative',
     lvef: 0, treatmentIntent: 'unspecified',
   },
-  client: { channel: 'MOBILE', buildId: 'mob-v0.6.0+44', environment: 'EVALUATION' },
+  client: { channel: 'MOBILE', buildId: 'mob-v0.6.5+45', environment: 'EVALUATION' },
 };
 
 function platformResponse() {

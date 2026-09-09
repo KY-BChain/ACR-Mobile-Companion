@@ -13,7 +13,7 @@ const crypto = require('crypto');
 const INVITE_CODE = 'correct-local-invite';
 const INVITE_SHA256 = crypto.createHash('sha256').update(INVITE_CODE).digest('hex');
 const DEVICE = 'test-device-binding-001';
-const BUILD = 'mob-v0.6.0+44';
+const BUILD = 'mob-v0.6.5+45';
 
 function testApp(options = {}) {
   return createApp({
@@ -80,7 +80,8 @@ describe('app composition and HTTP contract', () => {
     expect(mismatch.status).toBe(400); expect(mismatch.body.error.code).toBe('REQUEST_ID_MISMATCH');
     const missing = await protectedHeaders(request(app).post('/m/v1/infer'), issued.accessToken).set('X-Request-ID', REQUEST_ID).send(mobileRequest());
     expect(missing.body.error.code).toBe('SCHEMA_INVALID');
-    const wrongBodyBuild = mobileRequest(); wrongBodyBuild.client.buildId = 'mob-v0.6.5+45';
+    // Superseded Build 44 client identity must be rejected by the Build 45 gateway.
+    const wrongBodyBuild = mobileRequest(); wrongBodyBuild.client.buildId = 'mob-v0.6.0+44';
     const buildMismatch = await infer(request(app), issued.accessToken, wrongBodyBuild);
     expect(buildMismatch.status).toBe(403); expect(buildMismatch.body.error.code).toBe('CLIENT_BUILD_MISMATCH');
   });

@@ -34,9 +34,11 @@ export interface AssessmentPayload {
   pdl1Status: Exclude<ProvisionalStatus, ''> | null; her2Low: Exclude<ProvisionalHer2Low, ''> | null;
   lvef: number | null; treatmentIntent: Exclude<TreatmentIntent, ''> | null;
 }
+/** Gateway client build identity, e.g. `mob-v0.6.5+45`. */
+export type GatewayBuildId = `mob-v${number}.${number}.${number}+${number}`;
 export interface AssessmentRequest {
   contract: 'acr.cds.v1'; requestId: string; assessment: AssessmentPayload;
-  client: { channel: 'MOBILE'; buildId: `mob-v${number}.${number}.${number}+${number}`; environment: 'EVALUATION' };
+  client: { channel: 'MOBILE'; buildId: GatewayBuildId; environment: 'EVALUATION' };
 }
 export interface ExpectedEvidence {
   reasonerVersion: string; reasoningMode: string; ontologySha256: string;

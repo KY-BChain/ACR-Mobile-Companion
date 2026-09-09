@@ -1,5 +1,5 @@
 import { MOBILE_BUILD_ID } from '../config/appIdentity';
-import type { AssessmentFormState, AssessmentRequest, P1State, P2State } from '../types/api';
+import type { AssessmentFormState, AssessmentRequest, GatewayBuildId, P1State, P2State } from '../types/api';
 import { isAgeValid, isEcogValid, isIsoDateValid, isKi67Valid, isLvefValid, isMarkerValid, isTumorSizeValid } from '../utils/provisionalValidation';
 
 export class AssessmentValidationError extends Error {
@@ -8,6 +8,14 @@ export class AssessmentValidationError extends Error {
 const optionalNumber = (value: string): number | null => value.trim() === '' ? null : Number(value.trim());
 const optionalString = <T extends string>(value: T | ''): T | null => value === '' ? null : value;
 const oneOf = (value: unknown, allowed: readonly string[]): boolean => typeof value === 'string' && allowed.includes(value);
+/**
+ * Runtime guard that also narrows the derived build identity to the transport
+ * contract's template-literal type. MOBILE_BUILD_ID is composed at runtime from
+ * app.json, so TypeScript widens it to string; this predicate is what earns the
+ * narrowing, rather than an unchecked cast.
+ */
+const isGatewayBuildId = (value: string): value is GatewayBuildId =>
+  /^mob-v\d+\.\d+\.\d+\+\d+$/.test(value);
 const nullableOneOf = (value: unknown, allowed: readonly string[]): boolean => value === null || oneOf(value, allowed);
 
 export function buildAssessmentRequest(input: { form: AssessmentFormState; p1: P1State; p2: P2State; patientId: string; requestId: string }): AssessmentRequest {
@@ -36,7 +44,7 @@ export function buildAssessmentRequest(input: { form: AssessmentFormState; p1: P
   if (!/^mob-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(patientId)) fieldErrors.push('patientId');
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId)) fieldErrors.push('requestId');
   if (fieldErrors.length) throw new AssessmentValidationError(fieldErrors);
-  if (!/^mob-v\d+\.\d+\.\d+\+\d+$/.test(MOBILE_BUILD_ID)) throw new Error('Build identity is not a valid gateway client identity.');
+  if (!isGatewayBuildId(MOBILE_BUILD_ID)) throw new Error('Build identity is not a valid gateway client identity.');
   return {
     contract: 'acr.cds.v1', requestId,
     assessment: {

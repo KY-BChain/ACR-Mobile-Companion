@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const { GatewayError } = require('./errors');
 
 class InMemoryAuthService {
-  constructor({ now = () => Date.now(), inviteCodeSha256 = null, expectedClientBuildId = 'mob-v0.6.0+44' } = {}) {
+  constructor({ now = () => Date.now(), inviteCodeSha256 = null, expectedClientBuildId = 'mob-v0.6.5+45' } = {}) {
     this.now = now;
     this.accessTokens = new Map();
     this.refreshTokens = new Map();

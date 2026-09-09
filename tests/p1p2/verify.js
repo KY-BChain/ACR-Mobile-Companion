@@ -13,7 +13,7 @@ const compile = (file, localRequire) => {
 };
 const validation = compile('src/utils/provisionalValidation.ts', require);
 const builder = compile('src/api/requestBuilder.ts', (name) => {
-  if (name === '../config/appIdentity') return { MOBILE_BUILD_ID: 'mob-v0.6.0+44' };
+  if (name === '../config/appIdentity') return { MOBILE_BUILD_ID: 'mob-v0.6.5+45' };
   if (name === '../utils/provisionalValidation') return validation;
   return require(name);
 });
@@ -39,7 +39,7 @@ const expectedFields = [
 assert.deepEqual(Object.keys(request.assessment), expectedFields);
 assert.equal(request.contract, 'acr.cds.v1');
 assert.equal(request.requestId, requestId);
-assert.deepEqual(request.client, { channel: 'MOBILE', buildId: 'mob-v0.6.0+44', environment: 'EVALUATION' });
+assert.deepEqual(request.client, { channel: 'MOBILE', buildId: 'mob-v0.6.5+45', environment: 'EVALUATION' });
 assert.equal(request.assessment.ki67, 0, 'required zero preserved');
 assert.equal(request.assessment.ca153, 0, 'optional zero preserved');
 assert.equal(request.assessment.bayesianEnhanced, false, 'false preserved');

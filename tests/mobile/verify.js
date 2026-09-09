@@ -15,7 +15,7 @@ const guard = compile('src/api/responseGuard.ts');
 const request = {
   contract: 'acr.cds.v1', requestId: '22222222-2222-4222-8222-222222222222',
   assessment: { patientId: 'mob-11111111-1111-4111-8111-111111111111', bayesianEnhanced: true },
-  client: { channel: 'MOBILE', buildId: 'mob-v0.6.0+44', environment: 'EVALUATION' },
+  client: { channel: 'MOBILE', buildId: 'mob-v0.6.5+45', environment: 'EVALUATION' },
 };
 const expected = {
   reasonerVersion: 'v2.2', reasoningMode: 'OPENLLET_SWRL', ontologySha256: 'b91025862e54bc907236b68db763e95b366a43e64869a7da5ed2a00d8a8fd4a1',
@@ -110,7 +110,7 @@ const responses = [
   new Response(JSON.stringify(live), { status: 200 }),
 ];
 const clientModule = compile('src/api/client.ts', (name) => {
-  if (name === '../config/appIdentity') return { MOBILE_BUILD_ID: 'mob-v0.6.0+44' };
+  if (name === '../config/appIdentity') return { MOBILE_BUILD_ID: 'mob-v0.6.5+45' };
   if (name === '../config/gateway') return { GATEWAY_API_BASE: 'http://192.168.1.94:3001/m/v1' };
   if (name === '../utils/uuid') return { generateDeviceBinding: () => '44444444-4444-4444-8444-444444444444', generateRequestId: () => request.requestId };
   if (name === './responseGuard') return guard;
@@ -127,8 +127,8 @@ const clientModule = compile('src/api/client.ts', (name) => {
     'http://192.168.1.94:3001/m/v1/auth/redeem', 'http://192.168.1.94:3001/m/v1/infer',
     'http://192.168.1.94:3001/m/v1/auth/refresh', 'http://192.168.1.94:3001/m/v1/infer',
   ]);
-  assert.equal(JSON.parse(calls[0].options.body).clientBuildId, 'mob-v0.6.0+44');
-  assert.deepEqual(JSON.parse(calls[2].options.body), { refreshToken: 'r1', deviceBinding: '44444444-4444-4444-8444-444444444444', clientBuildId: 'mob-v0.6.0+44' });
+  assert.equal(JSON.parse(calls[0].options.body).clientBuildId, 'mob-v0.6.5+45');
+  assert.deepEqual(JSON.parse(calls[2].options.body), { refreshToken: 'r1', deviceBinding: '44444444-4444-4444-8444-444444444444', clientBuildId: 'mob-v0.6.5+45' });
   assert.equal(calls[1].options.headers['X-Device-Binding'], '44444444-4444-4444-8444-444444444444');
   assert.equal(calls[3].options.headers.Authorization, 'Bearer a2', 'rotated access token protects retry');
   assert.equal(calls[3].options.headers['X-Request-ID'], request.requestId);

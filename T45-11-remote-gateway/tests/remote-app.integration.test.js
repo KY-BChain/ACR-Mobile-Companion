@@ -64,7 +64,9 @@ test('persistent Build 45 auth composes with the six-route gateway contract', as
     const completed = await sendInference(requestBody);
     assert.equal(completed.status, 200);
     assert.equal(completed.body.resultMode, 'LIVE_REASONER');
+    // Superseded Build 44 client identity must be rejected by the Build 45 gateway.
     const mismatchedBody = mobileRequest();
+    mismatchedBody.client.buildId = 'mob-v0.6.0+44';
     const mismatch = await sendInference(mismatchedBody);
     assert.equal(mismatch.status, 403);
     assert.equal(mismatch.body.error.code, 'CLIENT_BUILD_MISMATCH');

@@ -118,7 +118,7 @@ function parseTimeout(value) {
 }
 
 function parseClientBuildId(value) {
-  const buildId = value || 'mob-v0.6.0+44';
+  const buildId = value || 'mob-v0.6.5+45';
   if (!/^mob-v\d+\.\d+\.\d+\+\d+$/.test(buildId)) {
     throw new Error('ACR_EXPECTED_CLIENT_BUILD_ID must use mob-v<semver>+<build> format');
   }
