@@ -137,7 +137,7 @@ Index: `sessions(invitation_id)`.
 |---|---|---|
 | `token_hash` | TEXT PK — HMAC-SHA256(token, pepper) | same |
 | `session_id` | NOT NULL REFERENCES sessions(id) | same |
-| `issued_at` / `expires_at` | INTEGER NOT NULL (15 min) | INTEGER NOT NULL (30 days) |
+| `issued_at` / `expires_at` | INTEGER NOT NULL (15 min from issue) | INTEGER NOT NULL — **always `sessions.expires_at`**, never `issued_at + 30d` (see §4.6) |
 | `consumed_at` | — | INTEGER NULL — single-use marker |
 | `superseded_by` | — | TEXT NULL — successor hash, for chain audit |
 
@@ -341,8 +341,9 @@ removes an entire attack surface, and AT-16 ("revocation endpoint rejects
 non-admin requests") is then satisfied vacuously — which I want your explicit agreement
 on rather than quietly declaring the test inapplicable.
 
-**Q4 — Session lifetime vs review window.** 30 days per AUTH-02/AUTH-14. If the review
-window is shorter, sessions should expire with it rather than outliving it.
+**Q4 — WITHDRAWN.** Superseded by your instruction 4: no shared review-window cutoff
+exists. Expiry is a flat 30 days anchored at each evaluator's own redemption. See §4.6
+and §10.4.
 
 ---
 
@@ -353,6 +354,165 @@ GO/NO-GO on this design specifically**, separate from the backlog/Loop approval 
 given. Answers to Q1–Q4 (or "your recommendation" on each) are enough to proceed.
 
 **STOP condition honoured:** §10.2 has not been entered.
+
+---
+
+## 10. G10-0 addendum — answers to the five pre-GO points
+
+### 10.1 Scope: shared basis for the companion app and any future WeChat surface
+
+Confirmed. The re-derived design — selector/verifier invitations, SQLite WAL, persisted
+rate limiting, HMAC token digests — is the shared basis for both surfaces. The original
+proposal's code is not reverted to on either.
+
+Three constraints follow, and the design already meets them:
+
+1. **The auth layer stays transport- and platform-agnostic.** Nothing under
+   `gateway/src/auth/` may import a React Native, Expo or WeChat API. The surface
+   differences live entirely in the client.
+2. **Install proof is an opaque string, not a platform artefact.** The gateway accepts
+   `X-Device-Binding` as 8–256 opaque characters and stores only its keyed digest. It
+   never asserts *how* the proof was produced. On the companion app that is a
+   Keychain/Keystore-backed value; a WeChat surface would supply its own stable
+   per-install value through the same header. No gateway change is needed to add a
+   surface.
+3. **The wire contract is already surface-neutral** — `/m/v1/auth/redeem`,
+   `/m/v1/auth/refresh`, `X-Client-Build-ID`, `X-Device-Binding`, `X-ACR-Contract`,
+   `acr.error.v1`. A second surface registers a different `clientBuildId`; it does not
+   need a second protocol.
+
+**Flagged, not solved here (WeChat is out of scope per Loop v1.1 §0.2):** a WeChat
+Mini-Program has no Keychain/Keystore equivalent, so refresh-token storage there is
+weaker than on the companion app. That is a real difference in achievable assurance and
+should be assessed in the separate WeChat backlog before that surface is authorised —
+it is not resolved by this design and must not be assumed equivalent.
+
+### 10.2 Where refresh-token expiry is set, for the record
+
+Once implemented, refresh-token expiry will be set in exactly one place:
+
+| Item | Value |
+|---|---|
+| **File** | `gateway/src/auth/session-store.js` |
+| **Function** | `issueTokenPair(db, sessionId, now)` |
+| **Statement** | the `INSERT INTO refresh_tokens (...) VALUES (...)` binding for `expires_at` |
+| **Value bound** | `session.expires_at` — read from the `sessions` row, never recomputed |
+| **Constants** | `gateway/src/auth/lifetimes.js` — `ACCESS_TOKEN_MS = 15 * 60 * 1000`, `SESSION_MS = 30 * 24 * 60 * 60 * 1000`, `INVITE_ACTIVATION_MS = 7 * 24 * 60 * 60 * 1000` |
+
+`SESSION_MS` is consumed in exactly one other place — `createSession(db, invitationId, …)`
+in the same file, which sets `sessions.expires_at = now + SESSION_MS` at redemption.
+`issueTokenPair` never reads `SESSION_MS`; it only copies the session's stored value. That
+is what makes sliding expiry structurally impossible rather than merely intended.
+
+Access-token expiry is set in the same `issueTokenPair`, as `now + ACCESS_TOKEN_MS`.
+
+### 10.3 Lost-invitation-code procedure (T45-08)
+
+Not previously specified. Proposed:
+
+1. **Report.** The evaluator notifies the named issuer through the approved private
+   channel. No code material is ever quoted in the report.
+2. **Revoke immediately, before anything else.** `acr-invite revoke --label <label>
+   --reason LOST`. This sets `invitations.revoked_at` and cascades: every session
+   created from that invitation is revoked in the same transaction, so any already-issued
+   access and refresh tokens stop working on the next request. Revocation precedes
+   re-issue so a found-and-abused code cannot run in parallel with its replacement.
+3. **Re-issue as a new invitation, never a re-send.** A new `id`, new `selector`, new
+   `salt`, new secret, fresh 7-day activation window. The old row is retained
+   (revoked) for audit; it is never reactivated or edited.
+4. **Deliver** the new plaintext once, through the approved private channel, and do not
+   record it anywhere — not in the store, a report, a document, or shell history.
+5. **Audit.** Two rows: `SESSION_REVOKED` with reason `LOST` and `INVITE_ISSUED` with the
+   evaluator label and named issuer. Non-clinical metadata only.
+6. **Device change is the same procedure.** Because a session binds one app install,
+   a reinstall or new device requires a new invitation, not a re-bind. There is
+   deliberately no "move my session" path — that would be an unauthenticated rebinding
+   primitive.
+
+Suspected compromise, as opposed to loss, follows the same steps plus revocation of the
+evaluator's *other* live sessions, if any, and an explicit note in the evidence package.
+
+### 10.4 Session expiry — confirmed as already per-user, with one correction
+
+**Confirmed for the anchor:** the design already does what you describe. There is no
+shared review-window cutoff anywhere in it. `sessions.expires_at` is set at each
+evaluator's own redemption (§4.1, in the redemption transaction), so two evaluators who
+redeem a fortnight apart expire a fortnight apart. Q4, which had contemplated aligning
+sessions to a shorter shared review window, is **withdrawn**.
+
+**One correction to make it unambiguous.** §3.3 previously described
+`refresh_tokens.expires_at` only as "30 days", without stating what happens on rotation.
+Read naively that would mean each rotation issues a successor with a *fresh* 30 days —
+sliding expiry, under which an evaluator who refreshes regularly would never expire and
+AT-05 could never fire. That is not what you have specified, so the design now states it
+explicitly:
+
+> A refresh token's `expires_at` is **always the parent session's `expires_at`**, copied
+> from the `sessions` row. It is never `issued_at + 30 days`. Rotation issues a successor
+> that expires at the same fixed instant as its predecessor.
+
+So the lifetime is a flat 30 days from that individual's redemption, and rotation moves
+the token but not the deadline. §10.2 records the single code site where this is bound.
+
+### 10.5 The existing Build 44 SHA-based login key — origin, and replacement
+
+**Its origin is not unknown.** It entered in `119a2e5a`, the Build 44 delivery commit
+(2 September 2026, KrakenYu), and is documented in `gateway/README.md` and
+`docs/loop/ACR_PLATFORM_AND_MOBILE_GATEWAY_MANUAL_OPERATIONS_01SEPT26.md`, which shows
+the operator computing it as `printf '%s' "$ACR_INVITE_CODE" | shasum -a 256`.
+
+What it actually is — `InMemoryAuthService` in `gateway/src/auth.js`:
+
+| Property | Build 44 behaviour |
+|---|---|
+| Invite | **One shared code for all evaluators**, supplied as `ACR_INVITE_CODE_SHA256` at process start. No per-invitee concept exists. |
+| Hashing | Unsalted, single-round SHA-256 |
+| Comparison | `crypto.timingSafeEqual` — this part is sound |
+| Tokens | `crypto.randomUUID()`, held **in plaintext** as `Map` keys |
+| Sessions | Three in-memory `Map`s; everything is lost on restart |
+| Binding | Device binding and client build are bound, and family revocation on reuse exists |
+
+Measured against Build 45 it fails AUTH-01 (no per-invitee one-time code), AUTH-05 (not
+structured session records), AUTH-10 (no persistence), AUTH-12 (not a slow hash) and
+AUTH-13 (tokens not stored as digests). Backlog §10.4 names this defect directly:
+invite storage must use "a reviewed slow password hash or keyed verification design
+appropriate to human-entered codes rather than relying only on unsalted fast SHA-256".
+
+**Answer: Build 45 replaces it entirely. It must not keep functioning alongside.**
+
+- Two authentication paths mean the weaker one defines the security of the system. A
+  shared unsalted-SHA code retained "for continuity" would be exactly the direct bypass
+  §10.4 prohibits.
+- It cannot satisfy T45-08 even in principle: per-invitee issue, expiry, individual
+  revocation and a lost-code procedure are impossible against a single shared secret.
+- **No transition period is needed, because build binding already enforces the cut.**
+  Build 44 clients identify as `mob-v0.6.0+44`, which the Build 45 gateway rejects with
+  `CLIENT_BUILD_MISMATCH` — the negative tests added in the identity bump (`69bccf5a`)
+  assert exactly this. A Build 44 app already cannot reach the Build 45 gateway,
+  whatever its invite code.
+
+**Implementation consequence:** `InMemoryAuthService` and the `ACR_INVITE_CODE_SHA256`
+configuration are removed in §10.2's implementation, not left dormant, and
+`gateway/README.md` plus the manual-operations document are updated in the same commit
+so no operator procedure still points at the retired mechanism. Dormant-but-present auth
+code is itself a hazard.
+
+---
+
+## 11. Revised status
+
+| Point | Status |
+|---|---|
+| 1 — shared basis for both surfaces | Confirmed; three constraints recorded; WeChat storage-assurance gap flagged for its own backlog |
+| 2 — where refresh expiry is set | `gateway/src/auth/session-store.js` → `issueTokenPair()`, binding `session.expires_at`; constants in `lifetimes.js` |
+| 3 — lost-code procedure | Specified in §10.3 — **needs your confirmation before Gate 10 closes** |
+| 4 — flat per-user 30 days | Confirmed as already per-user; sliding-expiry ambiguity corrected in §3.3 and §10.4 |
+| 5 — Build 44 SHA key | Origin identified (`119a2e5a`); replaced entirely; no coexistence; already cut off by build binding |
+
+Outstanding for GO: **Q1** (SQLite driver), **Q2** (invite code length), **Q3**
+(no network admin endpoint, making AT-16 vacuous), and confirmation of **§10.3**.
+
+**STOP condition still honoured: §10.2 has not been entered.**
 
 ---
 
