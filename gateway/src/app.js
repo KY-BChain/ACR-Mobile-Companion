@@ -50,6 +50,21 @@ function createApp(options = {}) {
   app.disable('x-powered-by');
   app.use(helmet());
   app.use(cors({ origin: config.allowedOrigin, methods: ['GET', 'POST'], allowedHeaders: ['authorization', 'content-type', 'x-acr-contract', 'x-request-id', 'x-device-binding', 'x-client-build-id'] }));
+  // Build 45 / G3-02: when a dedicated public hostname is configured, only
+  // requests that arrived through it may reach the routes. This is enforced in
+  // addition to the edge ingress rules, not instead of them, so a request that
+  // reaches the loopback origin by any other path is refused. Unset by default,
+  // which preserves the supervised-LAN posture used by Gates 4-9.
+  if (config.publicHostname) {
+    app.use((req, res, next) => {
+      const host = String(req.headers.host || '').toLowerCase().split(':')[0];
+      if (host !== config.publicHostname) {
+        return next(new GatewayError('MISDIRECTED_REQUEST',
+          'Request did not arrive through the approved gateway hostname.', 421, false, 'NOT_SUBMITTED'));
+      }
+      next();
+    });
+  }
   app.use(express.json({ limit: '16kb' }));
   app.use((req, res, next) => {
     const started = Date.now();

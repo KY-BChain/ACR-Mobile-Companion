@@ -6,6 +6,7 @@ const os = require('os');
 const path = require('path');
 const request = require('supertest');
 const { loadConfig } = require('../src/config');
+const { createApp } = require('../src/app');
 const { loadFixtureBundle, FIXTURE_FILES } = require('../src/fixture-loader');
 const { startListener } = require('../src/listener');
 const { SyntheticFixtureAdapter, sha256 } = require('../src/synthetic-fixture-adapter');
@@ -223,6 +224,39 @@ describe('bounded capture candidate and revalidation tooling', () => {
       expect(() => revalidateCandidateDirectory({ directory, expectedEvidence: evidence, approvedCaptureRoute: ROUTE })).toThrow(/changed/);
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('Build 45 dedicated gateway hostname (G3-02)', () => {
+  const HOST = 'mobile-gateway-review.acragent.com';
+
+  test('unset ACR_PUBLIC_HOSTNAME keeps the supervised-LAN posture', async () => {
+    expect(loadConfig({}).publicHostname).toBeNull();
+    const app = createApp({ config: loadConfig({}) });
+    const any = await request(app).get('/m/v1/live').set('Host', 'anything.example');
+    expect(any.status).toBe(200);
+  });
+
+  test('configured hostname admits the approved host and refuses every other', async () => {
+    const config = loadConfig({ ACR_PUBLIC_HOSTNAME: HOST });
+    expect(config.publicHostname).toBe(HOST);
+    const app = createApp({ config });
+
+    const approved = await request(app).get('/m/v1/live').set('Host', HOST);
+    expect(approved.status).toBe(200);
+
+    for (const host of ['127.0.0.1:3001', 'mobile.acragent.com', 'api.acragent.com', 'evil.example']) {
+      const denied = await request(app).get('/m/v1/live').set('Host', host);
+      expect(denied.status).toBe(421);
+      expect(denied.body.error.code).toBe('MISDIRECTED_REQUEST');
+    }
+  });
+
+  test('hostname must be a bare DNS name', () => {
+    for (const bad of ['https://mobile-gateway-review.acragent.com', 'mobile-gateway-review.acragent.com:443',
+                       'mobile-gateway-review.acragent.com/m/v1', 'localhost', '-bad.example']) {
+      expect(() => loadConfig({ ACR_PUBLIC_HOSTNAME: bad })).toThrow(/bare DNS hostname/);
     }
   });
 });

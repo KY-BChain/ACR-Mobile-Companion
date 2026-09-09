@@ -125,6 +125,22 @@ function parseClientBuildId(value) {
   return buildId;
 }
 
+/**
+ * Optional dedicated public hostname the gateway is reached through (Build 45:
+ * mobile-gateway-review.acragent.com, served by the acr-mobile-review tunnel).
+ * Bare hostname only — no scheme, port, path or credentials. When unset the
+ * gateway accepts any Host, which is the supervised-LAN posture. When set, the
+ * gateway rejects requests that did not arrive via that hostname, so a
+ * misdirected or directly-addressed request cannot reach the routes.
+ */
+function parsePublicHostname(value) {
+  if (value == null || value === '') return null;
+  if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/i.test(value)) {
+    throw new Error('ACR_PUBLIC_HOSTNAME must be a bare DNS hostname without scheme, port or path');
+  }
+  return value.toLowerCase();
+}
+
 function loadConfig(env = process.env) {
   const host = env.ACR_GATEWAY_HOST || '127.0.0.1';
   if (host !== '127.0.0.1' && host !== '::1' && env.ACR_ALLOW_PRIVATE_LAN !== 'true') {
@@ -166,6 +182,7 @@ function loadConfig(env = process.env) {
     upstreamInferUrl,
     upstreamTimeoutMs: parseTimeout(env.ACR_UPSTREAM_TIMEOUT_MS),
     allowedOrigin: env.ACR_ALLOWED_ORIGIN || false,
+    publicHostname: parsePublicHostname(env.ACR_PUBLIC_HOSTNAME),
     inviteCodeSha256: parseSha256(env.ACR_INVITE_CODE_SHA256, 'ACR_INVITE_CODE_SHA256'),
     expectedClientBuildId: parseClientBuildId(env.ACR_EXPECTED_CLIENT_BUILD_ID),
     fixtureDirectory,
@@ -174,4 +191,4 @@ function loadConfig(env = process.env) {
   });
 }
 
-module.exports = { loadConfig, parseTimeout, parseUrl, parseInferUrl, parseEvidenceUrl, parseSha256, parseExpectedCount, parseExpectedMode, parseClientBuildId, loadPinnedExpectedEvidence, assertPinnedExpectedEvidence, PINNED_EXPECTED_EVIDENCE, isLoopbackHost, DEFAULT_TIMEOUT_MS };
+module.exports = { loadConfig, parseTimeout, parseUrl, parseInferUrl, parseEvidenceUrl, parseSha256, parseExpectedCount, parseExpectedMode, parseClientBuildId, parsePublicHostname, loadPinnedExpectedEvidence, assertPinnedExpectedEvidence, PINNED_EXPECTED_EVIDENCE, isLoopbackHost, DEFAULT_TIMEOUT_MS };
