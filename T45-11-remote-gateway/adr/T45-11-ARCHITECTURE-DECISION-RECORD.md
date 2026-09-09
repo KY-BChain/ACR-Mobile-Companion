@@ -34,7 +34,7 @@ Build 45 must enable a small named reviewer group to evaluate the app from off-L
 ### Option A — Hairpin through existing T2 (`api.acragent.com`)
 
 ```
-Phone → HTTPS mobile.acragent.com → T4 → T3@127.0.0.1:3001 → HTTPS api.acragent.com → T2 → T1@localhost:8080
+Phone → HTTPS mobile-gateway-review.acragent.com → T4 → T3@127.0.0.1:3001 → HTTPS api.acragent.com → T2 → T1@localhost:8080
 ```
 
 **Pros:**
@@ -52,7 +52,7 @@ Phone → HTTPS mobile.acragent.com → T4 → T3@127.0.0.1:3001 → HTTPS api.a
 ### Option B — Direct loopback to T1
 
 ```
-Phone → HTTPS mobile.acragent.com → T4 → T3@127.0.0.1:3001 → HTTP 127.0.0.1:8080 → T1
+Phone → HTTPS mobile-gateway-review.acragent.com → T4 → T3@127.0.0.1:3001 → HTTP 127.0.0.1:8080 → T1
 ```
 
 **Pros:**
@@ -70,7 +70,7 @@ Phone → HTTPS mobile.acragent.com → T4 → T3@127.0.0.1:3001 → HTTP 127.0.
 ### Option C — VPS jump host (future)
 
 ```
-Phone → HTTPS mobile.acragent.com → VPS → SSH/tunnel → Mac T3
+Phone → HTTPS mobile-gateway-review.acragent.com → VPS → SSH/tunnel → Mac T3
 ```
 
 **Pros:**

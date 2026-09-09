@@ -24,7 +24,7 @@
          global HTTPS domain allowlist; system-CA HTTPS remains possible for
          other app dependencies. -->
     <domain-config cleartextTrafficPermitted="false">
-        <domain includeSubdomains="false">mobile.acragent.com</domain>
+        <domain includeSubdomains="false">mobile-gateway-review.acragent.com</domain>
 
         <!-- Pin the certificate (optional — only if backup pin/rotation is reviewed) -->
         <!-- 

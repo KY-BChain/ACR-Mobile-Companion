@@ -9,7 +9,7 @@ export interface InstallationProofStore {
   set(value: string): Promise<void>;
 }
 export interface Build45ClientConfig {
-  baseUrl: 'https://mobile.acragent.com';
+  baseUrl: 'https://mobile-gateway-review.acragent.com';
   buildIdentity: `mob-v${string}+${number}`;
   proofStore: InstallationProofStore;
   fetchImpl?: FetchLike;
@@ -46,7 +46,7 @@ export class Build45APIClient {
   private refreshInFlight: Promise<void> | null = null;
 
   constructor(private readonly config: Build45ClientConfig) {
-    if (config.baseUrl !== 'https://mobile.acragent.com' || !/^mob-v\d+\.\d+\.\d+\+\d+$/.test(config.buildIdentity)) throw new Error('Invalid immutable Build 45 transport configuration');
+    if (config.baseUrl !== 'https://mobile-gateway-review.acragent.com' || !/^mob-v\d+\.\d+\.\d+\+\d+$/.test(config.buildIdentity)) throw new Error('Invalid immutable Build 45 transport configuration');
     this.fetchImpl = config.fetchImpl || fetch;
     this.timeoutMs = config.timeoutMs || 12000;
   }

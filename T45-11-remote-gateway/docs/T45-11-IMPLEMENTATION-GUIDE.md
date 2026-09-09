@@ -163,7 +163,7 @@ These commands are documentation, not present authority to run them:
 ```zsh
 cloudflared --version
 cloudflared tunnel list
-dig +short mobile.acragent.com
+dig +short mobile-gateway-review.acragent.com
 ls -la /Users/Kraken/.cloudflared
 ```
 
@@ -173,7 +173,7 @@ named tunnel:
 
 ```zsh
 cloudflared tunnel login
-cloudflared tunnel create acr-mobile-gateway-t4
+cloudflared tunnel create acr-mobile-review
 ```
 
 Copy the printed UUID exactly, validate its format, and render a protected
@@ -182,11 +182,11 @@ runtime config. `T45_TUNNEL_UUID` below is task-specific, not a secret:
 ```zsh
 export T45_TUNNEL_UUID=PASTE-EXACT-UUID
 printf '%s\n' "$T45_TUNNEL_UUID" | grep -Eq '^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$'
-cp /Users/Kraken/DAPP/acr-mobile-companion/T45-11-remote-gateway/t4-tunnel/cloudflared-config.yml /Users/Kraken/.cloudflared/acr-mobile-gateway-t4.yml
-sed -i.bak "s/<YOUR_TUNNEL_UUID>/$T45_TUNNEL_UUID/g" /Users/Kraken/.cloudflared/acr-mobile-gateway-t4.yml
-chmod 600 /Users/Kraken/.cloudflared/acr-mobile-gateway-t4.yml "/Users/Kraken/.cloudflared/$T45_TUNNEL_UUID.json"
-cloudflared tunnel --config /Users/Kraken/.cloudflared/acr-mobile-gateway-t4.yml ingress validate
-cloudflared tunnel --config /Users/Kraken/.cloudflared/acr-mobile-gateway-t4.yml ingress rule https://mobile.acragent.com/m/v1/liveevil
+cp /Users/Kraken/DAPP/acr-mobile-companion/T45-11-remote-gateway/t4-tunnel/cloudflared-config.yml /Users/Kraken/.cloudflared/acr-mobile-review.yml
+sed -i.bak "s/<YOUR_TUNNEL_UUID>/$T45_TUNNEL_UUID/g" /Users/Kraken/.cloudflared/acr-mobile-review.yml
+chmod 600 /Users/Kraken/.cloudflared/acr-mobile-review.yml "/Users/Kraken/.cloudflared/$T45_TUNNEL_UUID.json"
+cloudflared tunnel --config /Users/Kraken/.cloudflared/acr-mobile-review.yml ingress validate
+cloudflared tunnel --config /Users/Kraken/.cloudflared/acr-mobile-review.yml ingress rule https://mobile-gateway-review.acragent.com/m/v1/liveevil
 ```
 
 The negative rule command must select the 404 catch-all. Configure and record
@@ -194,13 +194,13 @@ Cloudflare zone controls for exact methods, 16-KiB body limit, reviewer-IP rate
 limits, WAF and minimum TLS before DNS. Then, only with the separate DNS GO:
 
 ```zsh
-cloudflared tunnel route dns "$T45_TUNNEL_UUID" mobile.acragent.com
+cloudflared tunnel route dns "$T45_TUNNEL_UUID" mobile-gateway-review.acragent.com
 ```
 
 Start T4 in its own visible Terminal for the first controlled window:
 
 ```zsh
-cloudflared tunnel --config /Users/Kraken/.cloudflared/acr-mobile-gateway-t4.yml run "$T45_TUNNEL_UUID"
+cloudflared tunnel --config /Users/Kraken/.cloudflared/acr-mobile-review.yml run "$T45_TUNNEL_UUID"
 ```
 
 Do not install auto-start until manual outage/rollback, sleep/wake and network
@@ -232,7 +232,7 @@ Terminal 4 — start the approved T4 command from section 7.1. Terminal 5 may ru
 read-only health evidence:
 
 ```zsh
-export ACR_MOBILE_HOSTNAME=mobile.acragent.com
+export ACR_MOBILE_HOSTNAME=mobile-gateway-review.acragent.com
 /Users/Kraken/DAPP/acr-mobile-companion/T45-11-remote-gateway/t4-tunnel/health-check.sh
 ```
 

@@ -19,7 +19,7 @@ check command -v curl
 check command -v openssl
 check cloudflared --version
 check cloudflared tunnel --config "$(dirname "$0")/cloudflared-config.yml" ingress validate
-check plutil -lint "$(dirname "$0")/com.cloudflare.cloudflared.acr-mobile-t4.plist"
+check plutil -lint "$(dirname "$0")/com.cloudflare.cloudflared.acr-mobile-review.plist"
 
 if [ "$failures" -ne 0 ]; then
   echo "Preflight failed: ${failures} check(s). No changes were made." >&2

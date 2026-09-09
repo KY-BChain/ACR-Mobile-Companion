@@ -5,16 +5,16 @@
      system service before independent security review and owner Phase-B GO. -->
 <dict>
     <key>Label</key>
-    <string>com.cloudflare.cloudflared.acr-mobile-t4</string>
+    <string>com.cloudflare.cloudflared.acr-mobile-review</string>
 
     <key>ProgramArguments</key>
     <array>
         <string>/usr/local/bin/cloudflared</string>
         <string>tunnel</string>
         <string>--config</string>
-        <string>/Users/Kraken/.cloudflared/acr-mobile-gateway-t4.yml</string>
+        <string>/Users/Kraken/.cloudflared/acr-mobile-review.yml</string>
         <string>run</string>
-        <string>acr-mobile-gateway-t4</string>
+        <string>acr-mobile-review</string>
     </array>
 
     <key>RunAtLoad</key>

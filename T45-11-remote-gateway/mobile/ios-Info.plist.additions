@@ -24,7 +24,7 @@
 
 <!-- Build-time API endpoint (no runtime editing) -->
 <key>ACR_API_BASE_URL</key>
-<string>https://mobile.acragent.com</string>
+<string>https://mobile-gateway-review.acragent.com</string>
 
 <!-- Build identity for gateway validation -->
 <key>ACR_BUILD_IDENTITY</key>

@@ -2,7 +2,7 @@
 # Read-only T4 runtime evidence for an already owner-approved deployment.
 set -u
 
-HOSTNAME="${ACR_MOBILE_HOSTNAME:-mobile.acragent.com}"
+HOSTNAME="${ACR_MOBILE_HOSTNAME:-mobile-gateway-review.acragent.com}"
 T3_URL="${ACR_T3_URL:-http://127.0.0.1:3001}"
 failures=0
 pass() { printf 'PASS  %s\n' "$1"; }
@@ -12,7 +12,7 @@ status() {
     --output /dev/null --write-out '%{http_code}' "$1" 2>/dev/null || printf '000'
 }
 
-if pgrep -f 'cloudflared.*acr-mobile-gateway-t4' >/dev/null; then pass 'T4 process'; else fail 'T4 process'; fi
+if pgrep -f 'cloudflared.*acr-mobile-review' >/dev/null; then pass 'T4 process'; else fail 'T4 process'; fi
 if [ "$(status "${T3_URL}/m/v1/live")" = 200 ]; then pass 'T3 loopback live'; else fail 'T3 loopback live'; fi
 if [ "$(status "https://${HOSTNAME}/m/v1/live")" = 200 ]; then pass 'remote HTTPS live'; else fail 'remote HTTPS live'; fi
 for path in /admin /x/m/v1/live /m/v1/liveevil /m/v1/live/ /m/v1/infer/extra; do

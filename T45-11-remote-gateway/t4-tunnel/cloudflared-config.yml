@@ -11,8 +11,8 @@
 #
 # Then authenticate:
 #   cloudflared tunnel login
-#   cloudflared tunnel create acr-mobile-gateway-t4
-#   cloudflared tunnel route dns acr-mobile-gateway-t4 mobile.acragent.com
+#   cloudflared tunnel create acr-mobile-review
+#   cloudflared tunnel route dns acr-mobile-review mobile-gateway-review.acragent.com
 
 # Tunnel identity (replace with your actual tunnel UUID)
 tunnel: <YOUR_TUNNEL_UUID>
@@ -28,32 +28,32 @@ metrics: 127.0.0.1:45678
 # Everything else is denied by the catch-all
 ingress:
   # T3 gateway health and API routes
-  - hostname: mobile.acragent.com
+  - hostname: mobile-gateway-review.acragent.com
     path: ^/m/v1/live$
     service: http://127.0.0.1:3001
 
-  - hostname: mobile.acragent.com
+  - hostname: mobile-gateway-review.acragent.com
     path: ^/m/v1/auth/redeem$
     service: http://127.0.0.1:3001
 
-  - hostname: mobile.acragent.com
+  - hostname: mobile-gateway-review.acragent.com
     path: ^/m/v1/auth/refresh$
     service: http://127.0.0.1:3001
 
-  - hostname: mobile.acragent.com
+  - hostname: mobile-gateway-review.acragent.com
     path: ^/m/v1/attestation$
     service: http://127.0.0.1:3001
 
-  - hostname: mobile.acragent.com
+  - hostname: mobile-gateway-review.acragent.com
     path: ^/m/v1/infer$
     service: http://127.0.0.1:3001
 
-  - hostname: mobile.acragent.com
+  - hostname: mobile-gateway-review.acragent.com
     path: ^/m/v1/demo/infer$
     service: http://127.0.0.1:3001
 
   # Deny all other paths explicitly
-  - hostname: mobile.acragent.com
+  - hostname: mobile-gateway-review.acragent.com
     service: http_status:404
 
   # Catch-all: deny everything else
