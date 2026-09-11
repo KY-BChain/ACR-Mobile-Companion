@@ -69,13 +69,23 @@ export class GatewayClient {
     await this.store.saveRefresh(this.refreshToken, this.refreshExpiresAt).catch(() => undefined);
   }
 
+  private refreshing: Promise<void> | null = null;
+  private restoring: Promise<boolean> | null = null;
+
   /**
    * Re-establish access after an app restart from the persisted refresh token,
-   * without a new invitation. Returns false — and clears everything — when there
-   * is nothing to restore or the gateway refuses the token. Never falls back to
-   * synthetic delivery (AUTH-15).
+   * without a new invitation. Returns false when there is nothing to restore or
+   * the gateway cannot be reached (the token is kept), and clears everything
+   * when the gateway refuses the token. Never falls back to synthetic delivery
+   * (AUTH-15). Single-flight: overlapping callers share one attempt, so a stored
+   * token is never loaded and presented twice.
    */
-  async restoreSession(): Promise<boolean> {
+  restoreSession(): Promise<boolean> {
+    if (!this.restoring) this.restoring = this.restoreFromStore().finally(() => { this.restoring = null; });
+    return this.restoring;
+  }
+
+  private async restoreFromStore(): Promise<boolean> {
     if (this.hasSession()) return true;
     const saved = await this.store.loadRefresh().catch(() => null);
     if (!saved) return false;
@@ -159,9 +169,20 @@ export class GatewayClient {
     this.refreshExpiresAt = refreshExpiry;
   }
 
-  private async refreshAccess(): Promise<void> {
+  /**
+   * One refresh at a time. Refresh tokens rotate on every use, so two
+   * overlapping refreshes would present the same token twice and the gateway
+   * would revoke the whole token family as a replay (AT-11).
+   */
+  private refreshAccess(): Promise<void> {
+    if (!this.refreshing) this.refreshing = this.rotateRefresh().finally(() => { this.refreshing = null; });
+    return this.refreshing;
+  }
+
+  private async rotateRefresh(): Promise<void> {
     if (!this.refreshToken || Date.now() >= this.refreshExpiresAt) { this.clearSession(); throw new GatewayError('AUTHENTICATION_REQUIRED', 'Evaluation access has expired.', false, 'NOT_SUBMITTED'); }
     const currentRefreshToken = this.refreshToken;
+    let rotated = false;
     try {
       const deviceBinding = await this.binding();
       const response = await this.send('/auth/refresh', {
@@ -169,10 +190,19 @@ export class GatewayClient {
         body: JSON.stringify({ refreshToken: currentRefreshToken, deviceBinding, clientBuildId: MOBILE_BUILD_ID }),
       });
       if (!response.ok) throw await this.errorFrom(response);
+      rotated = true;
       this.acceptTokens(await response.json() as AuthRedeemResponse);
       await this.persistRefresh();
     } catch (error) {
-      this.clearSession();
+      // The session ends when the gateway refused the token, or accepted and
+      // rotated it (a 200 whose body was unusable leaves the old token spent).
+      // A transport, server or rate-limit failure changes nothing, so the
+      // persisted refresh token survives and access returns once the gateway
+      // is reachable (Gate 12 device finding: an offline launch wiped the
+      // session). If a lost response had in fact rotated the token, the next
+      // presentation is refused as reuse and the gateway revokes the family —
+      // the same end state as clearing here, decided by the gateway's defence.
+      if (rotated || (error instanceof GatewayError && SESSION_INVALIDATING_CODES.has(error.code))) this.clearSession();
       throw error;
     }
   }

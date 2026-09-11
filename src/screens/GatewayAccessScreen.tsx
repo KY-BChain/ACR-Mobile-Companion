@@ -40,16 +40,21 @@ export const GatewayAccessScreen: React.FC = () => {
 
   // P3 / AUTH-03: after an app restart, restore access from the refresh token
   // held in the Keychain/Keystore, so an evaluator does not need a new
-  // single-use invitation. A failed restore simply leaves the invite form; it
-  // never switches delivery mode (AUTH-15).
+  // single-use invitation. It is attempted whenever the gateway is reachable, so
+  // a launch while offline recovers once connectivity returns. A failed restore
+  // simply leaves the invite form; it never switches delivery mode (AUTH-15).
   useEffect(() => {
     let active = true;
-    if (!accessReady && !walkthroughOnly) {
-      gatewayClient.restoreSession().then((restored) => { if (active && restored) setAccessReady(true); }).catch(() => undefined);
+    if (gatewayLive === 'UP' && !accessReady && !walkthroughOnly) {
+      gatewayClient.restoreSession().then(async (restored) => {
+        if (!active || !restored) return;
+        setAccessReady(true);
+        try { const evidence = await gatewayClient.checkAttestation(); if (active) setAttestation(evidence); }
+        catch (error) { if (active) { setAttestation(null); setFailure(toFailureState(error)); } }
+      }).catch(() => undefined);
     }
     return () => { active = false; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [gatewayLive, accessReady, walkthroughOnly, setAccessReady, setAttestation, setFailure]);
 
   const connect = async () => {
     if (walkthroughOnly) reset();
@@ -104,9 +109,12 @@ export const GatewayAccessScreen: React.FC = () => {
           }} />
         <Text style={[styles.hint, textStyle]}>{deliveryChoice === 'LIVE_PLATFORM' ? t('gatewayAccess:liveHint') : t('gatewayAccess:demoHint')}</Text>
       </ACRCard>
-      <ACRCard title={t('gatewayAccess:inviteTitle')}>
+      {/* Once access is active (redeemed, or restored after a restart) the
+          single-use invitation is spent; showing an empty invite field then
+          reads as "access lost" (Gate 12 device finding). */}
+      {!accessReady ? <ACRCard title={t('gatewayAccess:inviteTitle')}>
         <ACRInput value={inviteCode} onChangeText={setInviteCode} secureTextEntry autoCapitalize="none" placeholder={t('gatewayAccess:invitePlaceholder')} hint={t('gatewayAccess:inviteHint')} />
-      </ACRCard>
+      </ACRCard> : null}
       {accessReady ? <>
         <ACRButton title={t('common:next')} onPress={() => navigation.navigate('Step1')} />
         <ACRButton title={t('gatewayAccess:disconnect')} variant="secondary" onPress={disconnect} />

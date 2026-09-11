@@ -11,7 +11,6 @@ import { ACRButton } from '../components/ACRButton';
 import { WalkthroughNotice } from '../components/WalkthroughNotice';
 import { useAssessmentStore } from '../store/assessmentStore';
 import { generatePatientId } from '../utils/uuid';
-import { gatewayClient } from '../api/client';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { getLocaleDirection, getTextAlign } from '../utils/rtl';
@@ -31,8 +30,8 @@ export const Step1ReceptorsScreen: React.FC = () => {
   }, [sessionId, setSessionId]);
 
   const isValid = isKi67Valid(form.step1.ki67);
+  // Cancelling an assessment keeps evaluation access (see ResultScreen).
   const cancel = () => {
-    gatewayClient.clearSession();
     resetCycle();
     navigation.reset({ index: 0, routes: [{ name: 'GatewayAccess' }] });
   };

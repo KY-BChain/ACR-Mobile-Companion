@@ -9,7 +9,6 @@ import { ACRButton } from '../components/ACRButton';
 import { ACRBadge } from '../components/ACRBadge';
 import { ACRColors, ACRTypography } from '../theme/colors';
 import { useAssessmentStore } from '../store/assessmentStore';
-import { gatewayClient } from '../api/client';
 import { getLocaleDirection, getTextAlign } from '../utils/rtl';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { buildClinicalResultPresentation, formatReturnedProbability, TECHNICAL_DETAILS_DEFAULT_EXPANDED } from './resultPresentation';
@@ -23,8 +22,10 @@ export const ResultScreen: React.FC = () => {
   const [technicalDetailsExpanded, setTechnicalDetailsExpanded] = useState(TECHNICAL_DETAILS_DEFAULT_EXPANDED);
   const language = i18n.resolvedLanguage ?? i18n.language;
   const localText = { writingDirection: getLocaleDirection(language), textAlign: getTextAlign(language) };
+  // "New assessment" ends the assessment cycle only. Evaluation access ends
+  // solely through Disconnect or a gateway refusal, so an evaluator is not
+  // locked out after one assessment by a single-use invitation.
   const done = () => {
-    gatewayClient.clearSession();
     resetCycle();
     navigation.reset({ index: 0, routes: [{ name: 'GatewayAccess' }] });
   };

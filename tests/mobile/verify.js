@@ -197,7 +197,11 @@ const clientModule = compile('src/api/client.ts', (name) => {
   });
   await proactiveRefreshFailure.redeemInvite('valid');
   await assert.rejects(proactiveRefreshFailure.submit(request, 'LIVE_PLATFORM'), (error) => error.code === 'SERVICE_UNAVAILABLE');
-  assert.equal(proactiveRefreshFailure.hasSession(), false, 'proactive refresh transport failure clears the complete token family');
+  // Build 44 cleared the family here, when tokens were memory-only. With P3
+  // persistence that turned any offline moment into a permanent lock-out
+  // (Gate 12 device finding), so a transport failure now keeps the family for
+  // a later retry; a gateway refusal or a rotated-but-unusable 200 still clears.
+  assert.equal(proactiveRefreshFailure.hasSession(), true, 'a refresh transport failure keeps the token family for a later retry');
   assert.equal(proactiveRefreshCalls.filter((url) => url.endsWith('/infer')).length, 0, 'proactive refresh failure makes no inference attempt');
 
   const refreshParseCalls = [];
@@ -225,7 +229,7 @@ const clientModule = compile('src/api/client.ts', (name) => {
     });
     await failingClient.redeemInvite('valid');
     await assert.rejects(failingClient.submit(request, 'LIVE_PLATFORM'), (error) => error.code === refreshFailure.code);
-    assert.equal(failingClient.hasSession(), false, `${refreshFailure.name} refresh failure clears the complete token family`);
+    assert.equal(failingClient.hasSession(), true, `${refreshFailure.name} refresh failure keeps the token family for a later retry (Gate 12)`);
     assert.equal(failureCalls.filter((url) => url.endsWith('/infer')).length, 0, `${refreshFailure.name} refresh failure makes no inference attempt`);
   }
 
@@ -238,7 +242,7 @@ const clientModule = compile('src/api/client.ts', (name) => {
   });
   await post401RefreshFailure.redeemInvite('valid');
   await assert.rejects(post401RefreshFailure.submit(request, 'LIVE_PLATFORM'), (error) => error.code === 'SERVICE_UNAVAILABLE');
-  assert.equal(post401RefreshFailure.hasSession(), false, 'post-401 refresh transport failure clears the complete token family');
+  assert.equal(post401RefreshFailure.hasSession(), true, 'post-401 refresh transport failure keeps the token family: only the access token was refused (Gate 12)');
   assert.equal(post401RefreshCalls.filter((url) => url.endsWith('/infer')).length, 1, 'refresh failure never retries inference');
 
   const bindingCalls = [];
@@ -329,7 +333,45 @@ const clientModule = compile('src/api/client.ts', (name) => {
     const empty = new clientModule.GatewayClient(async () => { throw new Error('no network call expected'); },
       secureModule.createMemorySessionStore('77777777-7777-4777-8777-777777777777'));
     assert.equal(await empty.restoreSession(), false);
+
+    // Gate 12 device finding: launching while offline wiped the session. A
+    // network failure must keep the persisted token, and access must return
+    // once the gateway is reachable — with exactly one refresh even when two
+    // restores overlap, because a second presentation would read as a replay.
+    const offlineStore = secureModule.createMemorySessionStore('88888888-8888-4888-8888-888888888888');
+    await offlineStore.saveRefresh('kept-refresh', Date.now() + 60_000);
+    let online = false;
+    const presented = [];
+    const offline = new clientModule.GatewayClient(async (url, options) => {
+      if (!online) throw new TypeError('Network request failed');
+      presented.push(JSON.parse(options.body).refreshToken);
+      return new Response(JSON.stringify({ tokenType: 'Bearer', accessToken: 'pa9', expiresIn: 3600, refreshToken: 'pr9', refreshExpiresAt }), { status: 200 });
+    }, offlineStore);
+    assert.equal(await offline.restoreSession(), false, 'no access while the gateway is unreachable');
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.equal(offlineStore.snapshot().token, 'kept-refresh', 'a network failure never wipes the persisted refresh token');
+    online = true;
+    const restores = await Promise.all([offline.restoreSession(), offline.restoreSession()]);
+    assert.deepEqual(restores, [true, true], 'access is restored once the gateway is reachable again');
+    assert.deepEqual(presented, ['kept-refresh'], 'overlapping restores present the refresh token exactly once');
+    assert.equal(offlineStore.snapshot().token, 'pr9');
+
+    // A rate-limited (or other non-refusal) response also keeps the token.
+    const limitedStore = secureModule.createMemorySessionStore('99999999-9999-4999-8999-999999999999');
+    await limitedStore.saveRefresh('limited-refresh', Date.now() + 60_000);
+    const limited = new clientModule.GatewayClient(async () => new Response(JSON.stringify({
+      contract: 'acr.error.v1', requestId: request.requestId,
+      error: { code: 'RATE_LIMITED', message: 'slow down', retryable: true, outcome: 'NOT_SUBMITTED', fieldErrors: [] },
+    }), { status: 429 }), limitedStore);
+    assert.equal(await limited.restoreSession(), false);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.equal(limitedStore.snapshot().token, 'limited-refresh', 'only a gateway refusal of the token wipes it');
+
+    // Ending an assessment cycle must not end evaluation access.
+    for (const screen of ['src/screens/ResultScreen.tsx', 'src/screens/Step1ReceptorsScreen.tsx']) {
+      assert.doesNotMatch(read(screen), /clearSession\(/, `${screen} must not end evaluation access when an assessment cycle ends`);
+    }
   }
-  console.log('PASS P3 secure client session: refresh token in Keychain/Keystore with device-only accessibility, access token memory-only, one install binding per install, restore after app restart without a new invitation, refused tokens wiped');
+  console.log('PASS P3 secure client session: refresh token in Keychain/Keystore with device-only accessibility, access token memory-only, one install binding per install, restore after app restart without a new invitation, refused tokens wiped, network and rate-limit failures keep the token, one refresh at a time, a new assessment keeps access');
   console.log('PASS mobile gateway client/auth-only retry/no-network-retry, fixed route, exact attestation, three response modes, fail-closed guards and native endpoint policy');
 })().catch((error) => { console.error(error); process.exitCode = 1; });
