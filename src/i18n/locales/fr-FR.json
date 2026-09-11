@@ -325,7 +325,7 @@
     "notConnected": "Serveur non connecté",
     "checking": "Vérification…",
     "attestation": "Attestation de référence",
-    "privacy": "L'invitation, les jetons et la liaison de l'appareil ne sont jamais écrits dans le stockage.",
+    "privacy": "Le code d'invitation n'est jamais enregistré. Votre session d'évaluation et un identifiant d'installation aléatoire sont conservés uniquement dans le trousseau sécurisé de cet appareil, ne sont jamais synchronisés avec d'autres appareils, et la session est supprimée lorsque vous vous déconnectez.",
     "stateChecking": "Vérification de la connexion…",
     "stateGatewayOffline": "Passerelle injoignable — aucune transmission possible",
     "stateGatewayConnectedPlatformOffline": "Passerelle connectée — Plateforme en direct hors ligne",

@@ -325,7 +325,7 @@
     "notConnected": "Server not connected",
     "checking": "Checking…",
     "attestation": "Baseline attestation",
-    "privacy": "The invite, tokens and device binding are never written to device storage.",
+    "privacy": "The invite code is never stored. Your evaluation session and a random install identifier are kept only in this device's secure keystore, are never synced to other devices, and the session is removed when you disconnect.",
     "stateChecking": "Checking connection…",
     "stateGatewayOffline": "Gateway unreachable — no delivery available",
     "stateGatewayConnectedPlatformOffline": "Gateway connected — Live Platform offline",

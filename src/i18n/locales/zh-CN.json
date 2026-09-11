@@ -325,7 +325,7 @@
     "notConnected": "服务器未连接",
     "checking": "正在检查…",
     "attestation": "基线证明",
-    "privacy": "邀请码、令牌和设备绑定绝不会写入设备存储。",
+    "privacy": "邀请码绝不会被存储。您的评估会话和一个随机安装标识符仅保存在本设备的安全密钥库中，绝不会同步到其他设备；断开连接时会删除该会话。",
     "stateChecking": "正在检查连接…",
     "stateGatewayOffline": "网关不可达 — 无法提交",
     "stateGatewayConnectedPlatformOffline": "网关已连接 — 实时平台离线",

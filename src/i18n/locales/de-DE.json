@@ -325,7 +325,7 @@
     "notConnected": "Server nicht verbunden",
     "checking": "Prüfung…",
     "attestation": "Basis-Attestierung",
-    "privacy": "Einladung, Token und Gerätebindung werden nie im Gerätespeicher abgelegt.",
+    "privacy": "Der Einladungscode wird nie gespeichert. Ihre Evaluierungssitzung und eine zufällige Installationskennung werden ausschließlich im sicheren Schlüsselspeicher dieses Geräts abgelegt, nie mit anderen Geräten synchronisiert, und die Sitzung wird beim Trennen gelöscht.",
     "stateChecking": "Verbindung wird geprüft …",
     "stateGatewayOffline": "Gateway nicht erreichbar — keine Übermittlung möglich",
     "stateGatewayConnectedPlatformOffline": "Gateway verbunden — Live-Plattform offline",
