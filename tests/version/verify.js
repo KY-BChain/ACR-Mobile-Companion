@@ -46,8 +46,8 @@ assert.match(requestBuilder, /Build identity is not a valid gateway client ident
 assert.doesNotMatch(requestBuilder, /MOBILE_BUILD_ID !== ['"]mob-v/);
 
 assert.match(infoPlist, /<key>NSAllowsArbitraryLoads<\/key>\s*<false\/>/);
-assert.match(infoPlist, /<key>NSAllowsLocalNetworking<\/key>\s*<true\/>/);
-assert.match(infoPlist, /ACR Companion connects to the locally operated ACR evaluation gateway/);
+assert.doesNotMatch(infoPlist, /NSAllowsLocalNetworking/, 'Build 45 has no iOS local-network cleartext exception');
+assert.doesNotMatch(infoPlist, /NSLocalNetworkUsageDescription/, 'Build 45 does not request local-network access');
 const mainManifest = read('android/app/src/main/AndroidManifest.xml');
 assert.match(mainManifest, /android:usesCleartextTraffic="false"/);
 assert.match(mainManifest, /android:networkSecurityConfig="@xml\/network_security_config"/);
@@ -55,8 +55,8 @@ const debugManifest = read('android/app/src/debug/AndroidManifest.xml');
 assert.doesNotMatch(debugManifest, /usesCleartextTraffic="true"/);
 const networkConfig = read('android/app/src/main/res/xml/network_security_config.xml');
 assert.match(networkConfig, /base-config cleartextTrafficPermitted="false"/);
-assert.match(networkConfig, /domain-config cleartextTrafficPermitted="true"/);
-assert.match(networkConfig, />192\.168\.1\.94<\/domain>/);
+assert.doesNotMatch(networkConfig, /cleartextTrafficPermitted="true"/, 'Build 45 has no Android cleartext exception for any domain');
+assert.doesNotMatch(networkConfig, /192\.168\.1\.94/, 'the retired Build 44 LAN host is gone');
 
 const english = JSON.parse(read('src/i18n/locales/en-GB.json'));
 assert.equal(
@@ -64,4 +64,7 @@ assert.equal(
   'The app does not intentionally store clinical data. Entries are held in memory for the current assessment only.',
 );
 
-console.log('PASS version/native consistency: Expo, Android, iOS and derived gateway build ID are 0.6.5 / 45; local-network policy is narrow');
+const gatewayConfig = read('src/config/gateway.ts');
+assert.match(gatewayConfig, /ACTIVE_GATEWAY_ORIGIN: GovernedOrigin = BUILD45_REVIEW_ORIGIN/, 'the compiled origin is the Build 45 review hostname');
+assert.doesNotMatch(gatewayConfig, /http:\/\//, 'no cleartext origin is compiled into the app');
+console.log('PASS version/native consistency: Expo, Android, iOS and derived gateway build ID are 0.6.5 / 45; one compiled https origin and no cleartext exception on either platform');

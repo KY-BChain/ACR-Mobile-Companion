@@ -38,6 +38,19 @@ export const GatewayAccessScreen: React.FC = () => {
     return () => { active = false; };
   }, [setGatewayLive]);
 
+  // P3 / AUTH-03: after an app restart, restore access from the refresh token
+  // held in the Keychain/Keystore, so an evaluator does not need a new
+  // single-use invitation. A failed restore simply leaves the invite form; it
+  // never switches delivery mode (AUTH-15).
+  useEffect(() => {
+    let active = true;
+    if (!accessReady && !walkthroughOnly) {
+      gatewayClient.restoreSession().then((restored) => { if (active && restored) setAccessReady(true); }).catch(() => undefined);
+    }
+    return () => { active = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const connect = async () => {
     if (walkthroughOnly) reset();
     setConnecting(true); setFailure(null); setAttestation(null);

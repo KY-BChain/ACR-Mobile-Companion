@@ -1,11 +1,11 @@
 import { MOBILE_BUILD_ID } from '../config/appIdentity';
 import { GATEWAY_API_BASE } from '../config/gateway';
 import type { ACRError, AssessmentRequest, AssessmentResponse, AttestationResponse, AuthRedeemResponse, DeliveryChoice, ErrorCode, FailureState } from '../types/api';
-import { generateDeviceBinding, generateRequestId } from '../utils/uuid';
+import { generateRequestId } from '../utils/uuid';
 import { parseAssessmentResponse, parseAttestation } from './responseGuard';
+import { secureSessionStore, type SessionStore } from './secureSession';
 
 type FetchLike = typeof fetch;
-const deviceBinding = generateDeviceBinding();
 
 const ERROR_CODES = new Set<ErrorCode>([
   'SCHEMA_INVALID', 'REQUEST_ID_MISMATCH', 'AUTHENTICATION_REQUIRED', 'INVITE_CONFIGURATION_REQUIRED', 'INVITE_INVALID',
@@ -13,7 +13,7 @@ const ERROR_CODES = new Set<ErrorCode>([
   'PAYLOAD_TOO_LARGE', 'CLINICAL_INPUT_REJECTED', 'RATE_LIMITED', 'ATTESTATION_MISMATCH', 'ATTESTATION_UNAVAILABLE',
   'UPSTREAM_NOT_CONFIGURED', 'UPSTREAM_TIMEOUT', 'UPSTREAM_HTTP_ERROR', 'INVALID_UPSTREAM_RESPONSE',
   'BAYESIAN_ENHANCEMENT_UNAVAILABLE', 'DEMO_FIXTURE_NOT_AVAILABLE', 'SERVICE_UNAVAILABLE',
-  'INFERENCE_OUTCOME_INDETERMINATE', 'INFERENCE_FAILED',
+  'INFERENCE_OUTCOME_INDETERMINATE', 'INFERENCE_FAILED', 'TLS_REQUIRED', 'MISDIRECTED_REQUEST',
 ]);
 const SESSION_INVALIDATING_CODES = new Set<ErrorCode>([
   'AUTHENTICATION_REQUIRED', 'DEVICE_BINDING_MISMATCH', 'CLIENT_BUILD_MISMATCH', 'TOKEN_REUSE_DETECTED',
@@ -37,10 +37,57 @@ export class GatewayClient {
   private accessExpiresAt = 0;
   private refreshExpiresAt = 0;
 
-  constructor(private fetchImpl: FetchLike = fetch) {}
+  private installBinding: string | null = null;
+  private pendingClear: Promise<void> = Promise.resolve();
+
+  /**
+   * AUTH-03 / AUTH-04: the access token lives only in this object's memory; the
+   * refresh token and the per-install binding live in the Keychain/Keystore via
+   * the injected SessionStore.
+   */
+  constructor(private fetchImpl: FetchLike = fetch, private store: SessionStore = secureSessionStore) {}
 
   hasSession(): boolean { return this.accessToken !== null && this.refreshToken !== null && Date.now() < this.refreshExpiresAt; }
-  clearSession(): void { this.accessToken = null; this.refreshToken = null; this.accessExpiresAt = 0; this.refreshExpiresAt = 0; }
+  clearSession(): void {
+    this.accessToken = null; this.refreshToken = null; this.accessExpiresAt = 0; this.refreshExpiresAt = 0;
+    // Remove the persisted refresh token too. Any later save awaits this, so a
+    // slow delete can never wipe a token issued after it.
+    this.pendingClear = this.store.clearRefresh().catch(() => undefined);
+  }
+
+  /** The per-install binding, created once and then read from secure storage. */
+  private async binding(): Promise<string> {
+    if (!this.installBinding) this.installBinding = await this.store.getInstallBinding();
+    return this.installBinding;
+  }
+
+  private async persistRefresh(): Promise<void> {
+    await this.pendingClear;
+    if (!this.refreshToken) return;
+    // A secure-storage failure degrades to a memory-only session (the Build 44
+    // behaviour); it never fails an otherwise valid sign-in.
+    await this.store.saveRefresh(this.refreshToken, this.refreshExpiresAt).catch(() => undefined);
+  }
+
+  /**
+   * Re-establish access after an app restart from the persisted refresh token,
+   * without a new invitation. Returns false — and clears everything — when there
+   * is nothing to restore or the gateway refuses the token. Never falls back to
+   * synthetic delivery (AUTH-15).
+   */
+  async restoreSession(): Promise<boolean> {
+    if (this.hasSession()) return true;
+    const saved = await this.store.loadRefresh().catch(() => null);
+    if (!saved) return false;
+    this.refreshToken = saved.token;
+    this.refreshExpiresAt = saved.expiresAt;
+    try {
+      await this.refreshAccess();
+      return this.hasSession();
+    } catch {
+      return false;
+    }
+  }
 
   private async send(path: string, options: RequestInit): Promise<Response> {
     try {
@@ -69,11 +116,11 @@ export class GatewayClient {
     return { Accept: 'application/json', 'Content-Type': 'application/json', 'Cache-Control': 'no-store' };
   }
 
-  private protectedHeaders(extra: Record<string, string> = {}): Record<string, string> {
+  private protectedHeaders(binding: string, extra: Record<string, string> = {}): Record<string, string> {
     if (!this.accessToken) throw new GatewayError('AUTHENTICATION_REQUIRED', 'Evaluation access is required.', false, 'NOT_SUBMITTED');
     return {
       ...this.baseHeaders(), Authorization: `Bearer ${this.accessToken}`,
-      'X-Device-Binding': deviceBinding, 'X-Client-Build-ID': MOBILE_BUILD_ID, ...extra,
+      'X-Device-Binding': binding, 'X-Client-Build-ID': MOBILE_BUILD_ID, ...extra,
     };
   }
 
@@ -87,12 +134,14 @@ export class GatewayClient {
 
   async redeemInvite(inviteCode: string): Promise<void> {
     this.clearSession();
+    const deviceBinding = await this.binding();
     const response = await this.send('/auth/redeem', {
       method: 'POST', headers: this.baseHeaders(),
       body: JSON.stringify({ inviteCode, deviceBinding, clientBuildId: MOBILE_BUILD_ID }),
     });
     if (!response.ok) throw await this.errorFrom(response);
     this.acceptTokens(await response.json() as AuthRedeemResponse);
+    await this.persistRefresh();
   }
 
   private acceptTokens(tokens: AuthRedeemResponse): void {
@@ -114,12 +163,14 @@ export class GatewayClient {
     if (!this.refreshToken || Date.now() >= this.refreshExpiresAt) { this.clearSession(); throw new GatewayError('AUTHENTICATION_REQUIRED', 'Evaluation access has expired.', false, 'NOT_SUBMITTED'); }
     const currentRefreshToken = this.refreshToken;
     try {
+      const deviceBinding = await this.binding();
       const response = await this.send('/auth/refresh', {
         method: 'POST', headers: this.baseHeaders(),
         body: JSON.stringify({ refreshToken: currentRefreshToken, deviceBinding, clientBuildId: MOBILE_BUILD_ID }),
       });
       if (!response.ok) throw await this.errorFrom(response);
       this.acceptTokens(await response.json() as AuthRedeemResponse);
+      await this.persistRefresh();
     } catch (error) {
       this.clearSession();
       throw error;
@@ -129,12 +180,13 @@ export class GatewayClient {
   private async protectedResponse(path: string, options: RequestInit, extraHeaders: Record<string, string> = {}): Promise<Response> {
     if (!this.hasSession()) throw new GatewayError('AUTHENTICATION_REQUIRED', 'Evaluation access is required.', false, 'NOT_SUBMITTED');
     if (Date.now() >= this.accessExpiresAt - 30_000) await this.refreshAccess();
-    let response = await this.send(path, { ...options, headers: this.protectedHeaders(extraHeaders) });
+    const binding = await this.binding();
+    let response = await this.send(path, { ...options, headers: this.protectedHeaders(binding, extraHeaders) });
     if (response.status === 401) {
       const firstError = await this.errorFrom(response);
       if (firstError.code !== 'AUTHENTICATION_REQUIRED') throw firstError;
       await this.refreshAccess();
-      response = await this.send(path, { ...options, headers: this.protectedHeaders(extraHeaders) });
+      response = await this.send(path, { ...options, headers: this.protectedHeaders(binding, extraHeaders) });
       if (response.status === 401) {
         const retryError = await this.errorFrom(response);
         this.clearSession();

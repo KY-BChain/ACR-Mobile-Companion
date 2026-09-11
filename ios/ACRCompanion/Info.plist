@@ -47,15 +47,11 @@
     <dict>
       <key>NSAllowsArbitraryLoads</key>
       <false/>
-      <key>NSAllowsLocalNetworking</key>
-      <true/>
     </dict>
     <key>NSBonjourServices</key>
     <array>
       <string>_expo._tcp</string>
     </array>
-    <key>NSLocalNetworkUsageDescription</key>
-    <string>ACR Companion connects to the locally operated ACR evaluation gateway on this network.</string>
     <key>UILaunchStoryboardName</key>
     <string>SplashScreen</string>
     <key>UIRequiredDeviceCapabilities</key>

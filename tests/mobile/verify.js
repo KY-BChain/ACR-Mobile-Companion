@@ -109,11 +109,33 @@ const responses = [
   new Response(JSON.stringify({ tokenType: 'Bearer', accessToken: 'a2', expiresIn: 3600, refreshToken: 'r2', refreshExpiresAt }), { status: 200 }),
   new Response(JSON.stringify(live), { status: 200 }),
 ];
+// P3: the real secureSession.ts, compiled against a fake SecureStore so the
+// actual key names and accessibility option are exercised.
+const secureCalls = [];
+const fakeSecureStore = (() => {
+  const items = new Map();
+  return {
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'WHEN_UNLOCKED_THIS_DEVICE_ONLY',
+    async getItemAsync(key, options) { secureCalls.push(['get', key, options && options.keychainAccessible]); return items.has(key) ? items.get(key) : null; },
+    async setItemAsync(key, value, options) { secureCalls.push(['set', key, options && options.keychainAccessible]); items.set(key, value); },
+    async deleteItemAsync(key, options) { secureCalls.push(['delete', key, options && options.keychainAccessible]); items.delete(key); },
+    _items: items,
+  };
+})();
+let bindingsGenerated = 0;
+const secureModule = compile('src/api/secureSession.ts', (name) => {
+  if (name === 'expo-secure-store') return fakeSecureStore;
+  if (name === '../utils/uuid') return { generateDeviceBinding: () => { bindingsGenerated += 1; return '44444444-4444-4444-8444-444444444444'; } };
+  return require(name);
+});
+const sharedStore = secureModule.createMemorySessionStore('44444444-4444-4444-8444-444444444444');
+
 const clientModule = compile('src/api/client.ts', (name) => {
   if (name === '../config/appIdentity') return { MOBILE_BUILD_ID: 'mob-v0.6.5+45' };
-  if (name === '../config/gateway') return { GATEWAY_API_BASE: 'http://192.168.1.94:3001/m/v1' };
+  if (name === '../config/gateway') return { GATEWAY_API_BASE: 'https://mobile-gateway-review.acragent.com/m/v1' };
   if (name === '../utils/uuid') return { generateDeviceBinding: () => '44444444-4444-4444-8444-444444444444', generateRequestId: () => request.requestId };
   if (name === './responseGuard') return guard;
+  if (name === './secureSession') return { secureSessionStore: sharedStore };
   return require(name);
 });
 
@@ -124,8 +146,8 @@ const clientModule = compile('src/api/client.ts', (name) => {
   const response = await client.submit(request, 'LIVE_PLATFORM');
   assert.equal(response.resultMode, 'LIVE_REASONER');
   assert.deepEqual(calls.map((call) => call.url), [
-    'http://192.168.1.94:3001/m/v1/auth/redeem', 'http://192.168.1.94:3001/m/v1/infer',
-    'http://192.168.1.94:3001/m/v1/auth/refresh', 'http://192.168.1.94:3001/m/v1/infer',
+    'https://mobile-gateway-review.acragent.com/m/v1/auth/redeem', 'https://mobile-gateway-review.acragent.com/m/v1/infer',
+    'https://mobile-gateway-review.acragent.com/m/v1/auth/refresh', 'https://mobile-gateway-review.acragent.com/m/v1/infer',
   ]);
   assert.equal(JSON.parse(calls[0].options.body).clientBuildId, 'mob-v0.6.5+45');
   assert.deepEqual(JSON.parse(calls[2].options.body), { refreshToken: 'r1', deviceBinding: '44444444-4444-4444-8444-444444444444', clientBuildId: 'mob-v0.6.5+45' });
@@ -142,7 +164,7 @@ const clientModule = compile('src/api/client.ts', (name) => {
   });
   await demoClient.redeemInvite('demo-invite');
   await demoClient.submit(request, 'SYNTHETIC_DEMO');
-  assert.deepEqual(demoCalls, ['http://192.168.1.94:3001/m/v1/auth/redeem', 'http://192.168.1.94:3001/m/v1/demo/infer']);
+  assert.deepEqual(demoCalls, ['https://mobile-gateway-review.acragent.com/m/v1/auth/redeem', 'https://mobile-gateway-review.acragent.com/m/v1/demo/infer']);
 
   const nonAuth401Calls = [];
   const nonAuth401 = new clientModule.GatewayClient(async (url) => {
@@ -237,12 +259,77 @@ const clientModule = compile('src/api/client.ts', (name) => {
   assert.equal(offlineCalls.length, 1, 'network failure is not retried');
 
   const gateway = read('src/config/gateway.ts');
-  assert.match(gateway, /http:\/\/192\.168\.1\.94:3001/);
+  // Gate 10: one compiled https origin; the Build 44 cleartext LAN origin is retired.
+  assert.match(gateway, /https:\/\/mobile-gateway-review\.acragent\.com/);
+  assert.doesNotMatch(gateway, /http:\/\//);
   assert.doesNotMatch(gateway, /api\.acragent\.com|localhost|process\.env/);
   const clientSource = read('src/api/client.ts');
   assert.doesNotMatch(clientSource, /AsyncStorage|console\.|SecureStore/);
   assert.match(read('src/screens/GatewayAccessScreen.tsx'), /secureTextEntry/);
   assert.doesNotMatch(read('src/screens/ResultScreen.tsx'), /I18nManager|molecularSubtype\.code|recommendations/);
-  assert.match(read('android/app/src/main/res/xml/network_security_config.xml'), /192\.168\.1\.94/);
+  const androidNetwork = read('android/app/src/main/res/xml/network_security_config.xml');
+  assert.doesNotMatch(androidNetwork, /192\.168\.1\.94|cleartextTrafficPermitted="true"/);
+  // client.ts reaches secure storage only through the reviewed secureSession adapter.
+  assert.match(clientSource, /from '\.\/secureSession'/);
+  // ---- P3 / AUTH-03 / AUTH-04: secure client session storage ----------------
+  {
+    // The real secure store: one binding per install, device-only accessibility.
+    const installA = await secureModule.secureSessionStore.getInstallBinding();
+    const installB = await secureModule.secureSessionStore.getInstallBinding();
+    assert.equal(installA, installB, 'the install binding is created once and then reused');
+    assert.equal(bindingsGenerated, 1, 'a binding is generated only on first use, not per launch');
+    await secureModule.secureSessionStore.saveRefresh('persisted-refresh', Date.now() + 60_000);
+    assert.deepEqual((await secureModule.secureSessionStore.loadRefresh()).token, 'persisted-refresh');
+    await secureModule.secureSessionStore.saveRefresh('stale-refresh', Date.now() - 1);
+    assert.equal(await secureModule.secureSessionStore.loadRefresh(), null, 'an expired persisted refresh token is never offered');
+    await secureModule.secureSessionStore.clearRefresh();
+    assert.ok(secureCalls.length > 0 && secureCalls.every(([, , access]) => access === 'WHEN_UNLOCKED_THIS_DEVICE_ONLY'),
+      'every secure-store call uses device-only accessibility: no iCloud sync, no device migration');
+    assert.ok(![...fakeSecureStore._items.keys()].some((key) => /access/i.test(key)), 'the access token is never persisted');
+
+    // Client behaviour against an isolated store.
+    const store = secureModule.createMemorySessionStore('55555555-5555-4555-8555-555555555555');
+    const seen = [];
+    const persisting = new clientModule.GatewayClient(async (url, options) => {
+      seen.push({ url, body: options.body && JSON.parse(options.body) });
+      if (url.endsWith('/auth/redeem')) return new Response(JSON.stringify({ tokenType: 'Bearer', accessToken: 'pa1', expiresIn: 3600, refreshToken: 'pr1', refreshExpiresAt }), { status: 200 });
+      if (url.endsWith('/auth/refresh')) return new Response(JSON.stringify({ tokenType: 'Bearer', accessToken: 'pa2', expiresIn: 3600, refreshToken: 'pr2', refreshExpiresAt }), { status: 200 });
+      throw new Error('unexpected route');
+    }, store);
+    await persisting.redeemInvite('invite-once');
+    assert.equal(store.snapshot().token, 'pr1', 'the refresh token is persisted to secure storage at redemption');
+    assert.equal(seen[0].body.deviceBinding, '55555555-5555-4555-8555-555555555555', 'redemption binds to the install, not a per-launch value');
+
+    // Simulated app restart: a brand-new client, same secure store, no invite.
+    const restarted = new clientModule.GatewayClient(async (url, options) => {
+      seen.push({ url, body: options.body && JSON.parse(options.body) });
+      if (url.endsWith('/auth/refresh')) return new Response(JSON.stringify({ tokenType: 'Bearer', accessToken: 'pa3', expiresIn: 3600, refreshToken: 'pr3', refreshExpiresAt }), { status: 200 });
+      throw new Error('a restored session must not redeem again');
+    }, store);
+    assert.equal(restarted.hasSession(), false);
+    assert.equal(await restarted.restoreSession(), true, 'access is restored after an app restart without a new invitation');
+    const restoreCall = seen[seen.length - 1];
+    assert.ok(restoreCall.url.endsWith('/auth/refresh'));
+    assert.equal(restoreCall.body.refreshToken, 'pr1');
+    assert.equal(restoreCall.body.deviceBinding, '55555555-5555-4555-8555-555555555555', 'the restored session presents the same install binding');
+    assert.equal(store.snapshot().token, 'pr3', 'the rotated refresh token replaces the persisted one');
+
+    // A refused restore wipes the persisted token and never falls back to demo.
+    const refusedStore = secureModule.createMemorySessionStore('66666666-6666-4666-8666-666666666666');
+    await refusedStore.saveRefresh('revoked-refresh', Date.now() + 60_000);
+    const refused = new clientModule.GatewayClient(async () => new Response(JSON.stringify({
+      contract: 'acr.error.v1', requestId: request.requestId,
+      error: { code: 'TOKEN_REUSE_DETECTED', message: 'revoked', retryable: false, outcome: 'NOT_SUBMITTED', fieldErrors: [] },
+    }), { status: 409 }), refusedStore);
+    assert.equal(await refused.restoreSession(), false, 'a revoked persisted token does not restore access');
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assert.equal(refusedStore.snapshot(), null, 'a refused persisted token is wiped from secure storage');
+
+    // Nothing to restore.
+    const empty = new clientModule.GatewayClient(async () => { throw new Error('no network call expected'); },
+      secureModule.createMemorySessionStore('77777777-7777-4777-8777-777777777777'));
+    assert.equal(await empty.restoreSession(), false);
+  }
+  console.log('PASS P3 secure client session: refresh token in Keychain/Keystore with device-only accessibility, access token memory-only, one install binding per install, restore after app restart without a new invitation, refused tokens wiped');
   console.log('PASS mobile gateway client/auth-only retry/no-network-retry, fixed route, exact attestation, three response modes, fail-closed guards and native endpoint policy');
 })().catch((error) => { console.error(error); process.exitCode = 1; });

@@ -18,6 +18,7 @@
     "expo": "~51.0.0",
     "expo-dev-client": "~4.0.29",
     "expo-localization": "~15.0.3",
+    "expo-secure-store": "~13.0.2",
     "expo-status-bar": "~1.12.1",
     "expo-updates": "~0.25.28",
     "i18next": "^26.3.6",

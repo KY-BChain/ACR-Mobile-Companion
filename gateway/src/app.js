@@ -21,6 +21,12 @@ function safeRequestId(req) {
     ? candidate : crypto.randomUUID();
 }
 
+/** The client's original scheme as reported by the edge, or 'direct' when absent. */
+function forwardedScheme(req) {
+  const value = String(req.headers['x-forwarded-proto'] || '').toLowerCase().split(',')[0].trim();
+  return value === 'https' || value === 'http' ? value : 'direct';
+}
+
 function createApp(options = {}) {
   const config = options.config || loadConfig(options.env);
   const logger = options.logger || createMetadataLogger();
@@ -64,6 +70,15 @@ function createApp(options = {}) {
         return next(new GatewayError('MISDIRECTED_REQUEST',
           'Request did not arrive through the approved gateway hostname.', 421, false, 'NOT_SUBMITTED'));
       }
+      // AT-14 defence in depth (P2). The Cloudflare WAF rule blocks cleartext at
+      // the edge; this refuses to PROCESS anything the edge did not forward as
+      // https, so the origin stays TLS-only even if the edge rule regresses.
+      // Observed live: cloudflared forwards X-Forwarded-Proto: https. A request
+      // without it did not come through the edge and is refused too.
+      if (forwardedScheme(req) !== 'https') {
+        return next(new GatewayError('TLS_REQUIRED',
+          'Only TLS requests forwarded by the approved edge are accepted.', 403, false, 'NOT_SUBMITTED'));
+      }
       next();
     });
   }
@@ -77,6 +92,7 @@ function createApp(options = {}) {
     res.on('finish', () => logger.emit('request.complete', {
       requestId: safeRequestId(req), route: req.route ? req.route.path : req.path,
       method: req.method, status: res.statusCode, durationMs: Date.now() - started,
+      scheme: forwardedScheme(req),
     }));
     next();
   });
@@ -179,4 +195,4 @@ function createApp(options = {}) {
   return app;
 }
 
-module.exports = { createApp, safeRequestId };
+module.exports = { createApp, safeRequestId, forwardedScheme };

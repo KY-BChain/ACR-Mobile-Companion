@@ -247,7 +247,7 @@ describe('Build 45 dedicated gateway hostname (G3-02)', () => {
     const auth = createAuthFixture();
     const app = createApp({ config, authService: auth.service });
 
-    const approved = await request(app).get('/m/v1/live').set('Host', HOST);
+    const approved = await request(app).get('/m/v1/live').set('Host', HOST).set('X-Forwarded-Proto', 'https');
     expect(approved.status).toBe(200);
 
     for (const host of ['127.0.0.1:3001', 'mobile.acragent.com', 'api.acragent.com', 'evil.example']) {
@@ -255,6 +255,22 @@ describe('Build 45 dedicated gateway hostname (G3-02)', () => {
       expect(denied.status).toBe(421);
       expect(denied.body.error.code).toBe('MISDIRECTED_REQUEST');
     }
+  });
+
+  test('P2: with a public hostname, only edge-forwarded https requests are processed', async () => {
+    const auth = createAuthFixture();
+    const app = createApp({ config: loadConfig({ ACR_PUBLIC_HOSTNAME: HOST }), authService: auth.service });
+    expect((await request(app).get('/m/v1/live').set('Host', HOST).set('X-Forwarded-Proto', 'https')).status).toBe(200);
+    for (const proto of ['http', null, 'ftp', 'HTTP']) {
+      const req = request(app).post('/m/v1/auth/redeem').set('Host', HOST)
+        .send({ inviteCode: 'ACR45-AAAAAAAA-BBBBBBBBBBBB', deviceBinding: 'p2-probe-device', clientBuildId: 'mob-v0.6.5+45' });
+      if (proto) req.set('X-Forwarded-Proto', proto);
+      const refused = await req;
+      expect(refused.status).toBe(403);
+      expect(refused.body.error.code).toBe('TLS_REQUIRED');
+      expect(refused.body.error.outcome).toBe('NOT_SUBMITTED');
+    }
+    auth.cleanup();
   });
 
   test('hostname must be a bare DNS name', () => {

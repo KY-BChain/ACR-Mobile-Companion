@@ -103,6 +103,9 @@ assert.match(gatewayConfig, /BUILD45_REVIEW_ORIGIN = 'https:\/\/mobile-gateway-r
   'the Build 45 review origin must be the authorised acr-mobile-review hostname over TLS');
 assert.doesNotMatch(gatewayConfig, /process\.env|AsyncStorage|localStorage|setOrigin|useState/,
   'the gateway origin must not be runtime-configurable');
+assert.doesNotMatch(gatewayConfig, /http:\/\//, 'no cleartext origin may be compiled into the app (Gate 10)');
+assert.match(gatewayConfig, /ACTIVE_GATEWAY_ORIGIN: GovernedOrigin = BUILD45_REVIEW_ORIGIN/,
+  'the compiled origin must be the authorised Build 45 review hostname');
 
 for (const file of ['src/config/gateway.ts', 'src/api/client.ts', 'gateway/src/config.js', 'gateway/src/app.js']) {
   assert.doesNotMatch(read(file), /acr-mobile-gateway-t4|(^|[^-])mobile\.acragent\.com/,
