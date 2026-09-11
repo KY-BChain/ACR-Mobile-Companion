@@ -37,5 +37,15 @@
     "patch-package": "8.0.1",
     "typescript": "~5.3.3"
   },
-  "private": true
+  "private": true,
+  "expo": {
+    "autolinking": {
+      "exclude": [
+        "expo-dev-client",
+        "expo-dev-launcher",
+        "expo-dev-menu",
+        "expo-dev-menu-interface"
+      ]
+    }
+  }
 }
