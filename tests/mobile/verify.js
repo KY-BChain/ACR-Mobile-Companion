@@ -371,6 +371,18 @@ const clientModule = compile('src/api/client.ts', (name) => {
     for (const screen of ['src/screens/ResultScreen.tsx', 'src/screens/Step1ReceptorsScreen.tsx']) {
       assert.doesNotMatch(read(screen), /clearSession\(/, `${screen} must not end evaluation access when an assessment cycle ends`);
     }
+
+    // Gate 12: the restore effect must not own the attestation fetch — its own
+    // re-run cancelled it, so a verified platform read "Live Platform offline"
+    // after every restore and every new assessment.
+    const accessSource = read('src/screens/GatewayAccessScreen.tsx');
+    const restoreAt = accessSource.indexOf('gatewayClient.restoreSession()');
+    assert.ok(restoreAt >= 0);
+    // The restore call is one statement on one line; bound the check to it.
+    assert.doesNotMatch(accessSource.slice(restoreAt, accessSource.indexOf('\n', restoreAt)), /checkAttestation/,
+      'the restore effect must not fetch attestation');
+    assert.match(accessSource, /accessReady && !walkthroughOnly && attestation === null\) \{\s*gatewayClient\.checkAttestation\(\)/,
+      'an active session with no baseline evidence on screen re-attests');
   }
   console.log('PASS P3 secure client session: refresh token in Keychain/Keystore with device-only accessibility, access token memory-only, one install binding per install, restore after app restart without a new invitation, refused tokens wiped, network and rate-limit failures keep the token, one refresh at a time, a new assessment keeps access');
   console.log('PASS mobile gateway client/auth-only retry/no-network-retry, fixed route, exact attestation, three response modes, fail-closed guards and native endpoint policy');

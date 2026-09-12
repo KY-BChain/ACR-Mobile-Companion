@@ -46,15 +46,26 @@ export const GatewayAccessScreen: React.FC = () => {
   useEffect(() => {
     let active = true;
     if (gatewayLive === 'UP' && !accessReady && !walkthroughOnly) {
-      gatewayClient.restoreSession().then(async (restored) => {
-        if (!active || !restored) return;
-        setAccessReady(true);
-        try { const evidence = await gatewayClient.checkAttestation(); if (active) setAttestation(evidence); }
-        catch (error) { if (active) { setAttestation(null); setFailure(toFailureState(error)); } }
-      }).catch(() => undefined);
+      gatewayClient.restoreSession().then((restored) => { if (active && restored) setAccessReady(true); }).catch(() => undefined);
     }
     return () => { active = false; };
-  }, [gatewayLive, accessReady, walkthroughOnly, setAccessReady, setAttestation, setFailure]);
+  }, [gatewayLive, accessReady, walkthroughOnly, setAccessReady]);
+
+  // Baseline evidence for an active session that has none on screen: after a
+  // restore, and after "New assessment" (resetCycle clears it). Kept apart from
+  // the restore effect, whose own re-run (accessReady flipping) cancelled this
+  // fetch and left a verified platform reading "Live Platform offline" (Gate 12
+  // device finding). Display only: ReviewScreen re-attests before every live
+  // submission.
+  useEffect(() => {
+    let active = true;
+    if (gatewayLive === 'UP' && accessReady && !walkthroughOnly && attestation === null) {
+      gatewayClient.checkAttestation()
+        .then((evidence) => { if (active) setAttestation(evidence); })
+        .catch((error) => { if (active) setFailure(toFailureState(error)); });
+    }
+    return () => { active = false; };
+  }, [gatewayLive, accessReady, walkthroughOnly, attestation, setAttestation, setFailure]);
 
   const connect = async () => {
     if (walkthroughOnly) reset();
