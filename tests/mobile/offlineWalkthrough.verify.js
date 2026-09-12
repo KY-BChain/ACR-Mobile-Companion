@@ -8,7 +8,11 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
 const app = read('App.tsx');
 assert.match(app, /useEffect\(\(\) => \{/);
-assert.match(app, /gatewayClient\.clearSession\(\)/);
+// Build 44 H-SIM also ended the token family on every launch. Since P3 (G10-0,
+// AUTH-03) evaluation access deliberately survives a restart via the
+// Keychain/Keystore refresh token, so a launch resets the assessment cycle only
+// (Gate 12 device finding: the launch-time clear locked evaluators out).
+assert.doesNotMatch(app, /clearSession\(/, 'a process launch must not end evaluation access');
 assert.match(app, /useAssessmentStore\.getState\(\)\.resetCycle\(\)/);
 
 const navigator = read('src/navigation/AppNavigator.tsx');
