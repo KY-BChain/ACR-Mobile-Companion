@@ -340,7 +340,9 @@
     "pairedTitle": "Einladungscode akzeptiert",
     "pairedMessage": "Einladungscode akzeptiert und ausschließlich mit diesem Mobilgerät gekoppelt. Für {{days}} Tage.",
     "pairedDetail": "Gekoppelt: {{pairedAt}} UTC · Gültig bis: {{expiresAt}} UTC",
-    "pairedContinue": "Weiter"
+    "pairedContinue": "Weiter",
+    "disconnectConfirmMessage": "Sie müssen den Einladungscode erneut eingeben.",
+    "disconnectConfirmAction": "Trennen"
   },
   "build44": {
     "validationError": "Prüfen Sie die ungültigen Bewertungsfelder.",

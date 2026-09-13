@@ -340,7 +340,9 @@
     "pairedTitle": "Code d'invitation accepté",
     "pairedMessage": "Code d'invitation accepté et associé à cet appareil mobile, et à lui seul. Pour {{days}} jours.",
     "pairedDetail": "Associé : {{pairedAt}} UTC · Valable jusqu'au : {{expiresAt}} UTC",
-    "pairedContinue": "Continuer"
+    "pairedContinue": "Continuer",
+    "disconnectConfirmMessage": "Vous devrez saisir à nouveau le code d'invitation.",
+    "disconnectConfirmAction": "Déconnecter"
   },
   "build44": {
     "validationError": "Vérifiez les champs d'évaluation invalides.",

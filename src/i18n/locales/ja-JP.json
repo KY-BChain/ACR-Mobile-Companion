@@ -340,7 +340,9 @@
     "pairedTitle": "招待コードを受け付けました",
     "pairedMessage": "招待コードを受け付け、このモバイル端末のみとペアリングしました。有効期間は{{days}}日間です。",
     "pairedDetail": "ペアリング: {{pairedAt}} UTC · 有効期限: {{expiresAt}} UTC",
-    "pairedContinue": "続行"
+    "pairedContinue": "続行",
+    "disconnectConfirmMessage": "招待コードを再度入力する必要があります。",
+    "disconnectConfirmAction": "切断"
   },
   "build44": {
     "validationError": "無効な評価フィールドを確認してください。",

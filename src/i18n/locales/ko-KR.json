@@ -340,7 +340,9 @@
     "pairedTitle": "초대 코드가 승인되었습니다",
     "pairedMessage": "초대 코드가 승인되어 이 모바일 기기에만 페어링되었습니다. {{days}}일 동안 유효합니다.",
     "pairedDetail": "페어링: {{pairedAt}} UTC · 유효 기한: {{expiresAt}} UTC",
-    "pairedContinue": "계속"
+    "pairedContinue": "계속",
+    "disconnectConfirmMessage": "초대 코드를 다시 입력해야 합니다.",
+    "disconnectConfirmAction": "연결 해제"
   },
   "build44": {
     "validationError": "유효하지 않은 평가 필드를 확인하십시오.",

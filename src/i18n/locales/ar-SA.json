@@ -340,7 +340,9 @@
     "pairedTitle": "تم قبول رمز الدعوة",
     "pairedMessage": "تم قبول رمز الدعوة وإقرانه بهذا الجهاز المحمول وحده فقط. لمدة {{days}} يومًا.",
     "pairedDetail": "الإقران: {{pairedAt}} UTC · صالح حتى: {{expiresAt}} UTC",
-    "pairedContinue": "متابعة"
+    "pairedContinue": "متابعة",
+    "disconnectConfirmMessage": "ستحتاج إلى إدخال رمز الدعوة مرة أخرى.",
+    "disconnectConfirmAction": "قطع الاتصال"
   },
   "build44": {
     "validationError": "راجع حقول التقييم غير الصالحة.",

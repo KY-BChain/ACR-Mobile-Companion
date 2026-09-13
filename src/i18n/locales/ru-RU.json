@@ -340,7 +340,9 @@
     "pairedTitle": "Код приглашения принят",
     "pairedMessage": "Код приглашения принят и привязан к этому мобильному устройству, и только к нему. На {{days}} дней.",
     "pairedDetail": "Привязано: {{pairedAt}} UTC · Действует до: {{expiresAt}} UTC",
-    "pairedContinue": "Продолжить"
+    "pairedContinue": "Продолжить",
+    "disconnectConfirmMessage": "Вам потребуется снова ввести код приглашения.",
+    "disconnectConfirmAction": "Отключить"
   },
   "build44": {
     "validationError": "Проверьте недопустимые поля оценки.",

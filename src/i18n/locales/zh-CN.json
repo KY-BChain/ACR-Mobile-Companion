@@ -340,7 +340,9 @@
     "pairedTitle": "邀请码已接受",
     "pairedMessage": "邀请码已接受，并已与本移动设备配对，仅限本设备使用。有效期 {{days}} 天。",
     "pairedDetail": "配对时间：{{pairedAt}} UTC · 有效期至：{{expiresAt}} UTC",
-    "pairedContinue": "继续"
+    "pairedContinue": "继续",
+    "disconnectConfirmMessage": "您需要重新输入邀请码。",
+    "disconnectConfirmAction": "断开"
   },
   "build44": {
     "validationError": "请检查无效的评估字段。",

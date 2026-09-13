@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Alert, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -108,6 +108,14 @@ export const GatewayAccessScreen: React.FC = () => {
     setFailure(null);
   };
 
+  // Build 46 (Kraken, 13 Sept 2026): say before disconnecting that the invite
+  // code will be needed again. The paired device can re-enter its own code;
+  // the expiry does not move.
+  const confirmDisconnect = () => Alert.alert(t('gatewayAccess:disconnect'), t('gatewayAccess:disconnectConfirmMessage'), [
+    { text: t('common:cancel'), style: 'cancel' },
+    { text: t('gatewayAccess:disconnectConfirmAction'), style: 'destructive', onPress: disconnect },
+  ]);
+
   // Build 46: only a device with a saved, unexpired session may walk through,
   // online or offline, and doing so keeps that session (Kraken, 13 Sept 2026).
   const startWalkthrough = () => {
@@ -150,7 +158,7 @@ export const GatewayAccessScreen: React.FC = () => {
       </ACRCard> : null}
       {accessReady ? <>
         <ACRButton title={t('common:next')} onPress={() => navigation.navigate('Step1')} />
-        <ACRButton title={t('gatewayAccess:disconnect')} variant="secondary" onPress={disconnect} />
+        <ACRButton title={t('gatewayAccess:disconnect')} variant="secondary" onPress={confirmDisconnect} />
       </> : null}
       <ACRCard title={t('gatewayAccess:statusTitle')}>
         {/* T45-10: gateway reachability and live-platform availability are one

@@ -415,6 +415,10 @@ const clientModule = compile('src/api/client.ts', (name) => {
     assert.match(access, /code === 'INVITE_EXPIRED' \? t\('gatewayAccess:inviteExpired'\)/);
     assert.match(access, /code === 'DEVICE_NOT_AUTHORISED' \? t\('gatewayAccess:incorrectDevice'\)/);
     assert.match(access, /savedAccess === 'EXPIRED'/);
+    // Disconnect first says the invite code will be needed again (Xiaomi field note).
+    assert.match(access, /title=\{t\('gatewayAccess:disconnect'\)\} variant="secondary" onPress=\{confirmDisconnect\}/);
+    assert.match(access, /Alert\.alert\(t\('gatewayAccess:disconnect'\), t\('gatewayAccess:disconnectConfirmMessage'\)/);
+    assert.match(access, /style: 'destructive', onPress: disconnect/);
 
     const welcome = read('src/screens/WelcomeScreen.tsx');
     assert.match(welcome, /visible=\{pairingNotice !== null\}/);
