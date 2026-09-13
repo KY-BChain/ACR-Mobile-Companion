@@ -34,6 +34,7 @@ function createApp(options = {}) {
     storePath: config.authStorePath,
     pepperPath: config.authPepperPath,
     expectedClientBuildId: config.expectedClientBuildId,
+    previousClientBuildIds: config.previousClientBuildIds || [],
   });
   const evidenceProbe = options.evidenceProbe || createPlatformEvidenceProbe({
     ...(config.evidence || {}),
@@ -116,7 +117,11 @@ function createApp(options = {}) {
       throw new GatewayError('SCHEMA_INVALID', 'X-ACR-Contract must be acr.cds.v1.', 400);
     }
     const body = validateAssessmentRequest(req.body);
-    if (body.client.buildId !== config.expectedClientBuildId) {
+    // The header build was already checked against the session by
+    // authenticate(); during a Build 46 changeover the body must name that same
+    // build, which is the current one or a listed previous one.
+    const acceptedBuilds = [config.expectedClientBuildId, ...(config.previousClientBuildIds || [])];
+    if (!acceptedBuilds.includes(body.client.buildId) || body.client.buildId !== req.headers['x-client-build-id']) {
       throw new GatewayError('CLIENT_BUILD_MISMATCH', 'Request body is not authorised for this client build.', 403);
     }
     if (req.headers['x-request-id'] !== body.requestId) {

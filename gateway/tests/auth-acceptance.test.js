@@ -85,7 +85,11 @@ describe('AT-03 expired invitation code', () => {
   test('exchange returns 401 and issues no tokens', () => {
     const code = fixture.issueInvite();
     advance(L.INVITE_ACTIVATION_MS + 1);
-    expect(codeOf(caught(() => redeem(code)))).toBe('INVITE_INVALID');
+    // Build 46: a complete, correct but unused code past its 7-day window is
+    // told it has expired (Kraken, 13 Sept 2026); still 401, still no tokens.
+    const error = caught(() => redeem(code));
+    expect(codeOf(error)).toBe('INVITE_EXPIRED');
+    expect(error.status).toBe(401);
   });
 });
 
@@ -335,14 +339,20 @@ describe('AT-15 invitation code reuse', () => {
   test('an already redeemed invitation code cannot be reused', () => {
     const code = fixture.issueInvite();
     expect(redeem(code).accessToken).toBeTruthy();
-    expect(codeOf(caught(() => redeem(code, 'second-device-binding')))).toBe('INVITE_INVALID');
+    // Build 46: the code is paired to the first device; another device is told
+    // so and gets nothing (Kraken, 13 Sept 2026).
+    expect(codeOf(caught(() => redeem(code, 'second-device-binding')))).toBe('DEVICE_NOT_AUTHORISED');
   });
 
   test('a multi-redemption invitation stops at its configured limit', () => {
     const code = fixture.issueInvite({ label: 'reviewer-multi', maxRedemptions: 2 });
     expect(redeem(code, 'device-one-binding').accessToken).toBeTruthy();
     expect(redeem(code, 'device-two-binding').accessToken).toBeTruthy();
-    expect(codeOf(caught(() => redeem(code, 'device-three-binding')))).toBe('INVITE_INVALID');
+    expect(codeOf(caught(() => redeem(code, 'device-three-binding')))).toBe('DEVICE_NOT_AUTHORISED');
+    const ctx = openAuthDatabase({ storePath: fixture.storePath, pepperPath: fixture.pepperPath });
+    const count = ctx.db.prepare('SELECT COUNT(*) AS n FROM sessions').get().n;
+    ctx.db.close();
+    expect(count).toBe(2);
   });
 });
 

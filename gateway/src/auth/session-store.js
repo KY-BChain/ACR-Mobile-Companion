@@ -9,6 +9,15 @@ const {
 } = require('./crypto');
 const { assertNotBlocked, recordAuthFailure, clearAuthFailures } = require('./rate-limit');
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const inviteExpired = () => new GatewayError('INVITE_EXPIRED', 'Invite Code Expired. Request a refreshed one.', 401);
+
+/** Shown to the evaluator on pairing: when it happened and the fixed term. */
+function pairingDetails(pairing, pairedAt) {
+  return { pairing, pairedAt: new Date(pairedAt).toISOString(), sessionDays: Math.round(L.SESSION_MS / DAY_MS) };
+}
+
 /**
  * Build 45 authentication service (G10-0 §2, §4).
  *
@@ -22,12 +31,13 @@ const { assertNotBlocked, recordAuthFailure, clearAuthFailures } = require('./ra
  * not read from disk, and never resurrects a session it cannot re-validate.
  */
 class SqliteAuthService {
-  constructor({ storePath, pepperPath, expectedClientBuildId, now = () => Date.now() }) {
+  constructor({ storePath, pepperPath, expectedClientBuildId, previousClientBuildIds = [], now = () => Date.now() }) {
     if (!expectedClientBuildId) throw new Error('expectedClientBuildId is required');
     const { db, pepper } = openAuthDatabase({ storePath, pepperPath });
     this.db = db;
     this.pepper = pepper;
     this.expectedClientBuildId = expectedClientBuildId;
+    this.previousClientBuildIds = Object.freeze(previousClientBuildIds.filter((id) => id !== expectedClientBuildId));
     this.now = now;
   }
 
@@ -41,10 +51,21 @@ class SqliteAuthService {
     this.db.prepare('DELETE FROM refresh_tokens WHERE expires_at <= ?').run(now);
   }
 
-  /** Uniform binding failure — never reveals which dimension mismatched. */
+  /**
+   * Uniform binding failure — never reveals which dimension mismatched.
+   *
+   * Build 46 changeover: the current build may use a session recorded under a
+   * listed previous build (refresh then moves it forward); a previous build may
+   * use only a session still recorded under its own build, so a session never
+   * moves backwards.
+   */
   assertBinding(session, deviceBinding, clientBuildId) {
-    if (typeof clientBuildId !== 'string' || clientBuildId !== this.expectedClientBuildId
-        || session.client_build_id !== this.expectedClientBuildId) {
+    const currentBuild = clientBuildId === this.expectedClientBuildId
+      && (session.client_build_id === this.expectedClientBuildId
+        || this.previousClientBuildIds.includes(session.client_build_id));
+    const previousBuild = this.previousClientBuildIds.includes(clientBuildId)
+      && session.client_build_id === clientBuildId;
+    if (typeof clientBuildId !== 'string' || !(currentBuild || previousBuild)) {
       throw new GatewayError('CLIENT_BUILD_MISMATCH', 'Client build is not authorised for this gateway.', 403);
     }
     if (typeof deviceBinding !== 'string' || deviceBinding.length < 8 || deviceBinding.length > 256
@@ -142,15 +163,35 @@ class SqliteAuthService {
 
     if (!invitation || !matches) throw fail();
     if (invitation.revoked_at !== null) throw fail();
-    if (invitation.expires_at <= now) throw fail();
-    if (invitation.redemptions >= invitation.max_redemptions) throw fail();
 
+    // Pairing and re-entry need the current build; a previous build keeps its
+    // existing session during a changeover but can never pair a device.
     if (typeof clientBuildId !== 'string' || clientBuildId !== this.expectedClientBuildId) {
       throw new GatewayError('CLIENT_BUILD_MISMATCH', 'Client build is not authorised for this gateway.', 403);
     }
     if (typeof deviceBinding !== 'string' || deviceBinding.length < 8 || deviceBinding.length > 256) {
       throw new GatewayError('DEVICE_BINDING_MISMATCH', 'Device binding is invalid.', 403);
     }
+
+    // Build 46 device pairing. The caller now holds the complete, correct
+    // code, so the specific answers below give a guesser nothing: AT-12 keeps
+    // unknown and wrong codes indistinguishable, and that is unchanged.
+    const bindingHash = keyedDigest(deviceBinding, this.pepper);
+    const sessions = this.db.prepare('SELECT * FROM sessions WHERE invitation_id = ? ORDER BY created_at DESC')
+      .all(invitation.id);
+    const paired = sessions.find((session) => safeEqualHex(bindingHash, session.device_binding_hash));
+    if (paired) return this.reenter(invitation, paired, parsed.selector, clientBuildId, now);
+
+    if (invitation.redemptions >= invitation.max_redemptions) {
+      if (sessions.some((session) => session.revoked_at === null && session.expires_at > now)) {
+        throw new GatewayError('DEVICE_NOT_AUTHORISED', 'Incorrect device used. This device is not authorised for this invite code.', 403);
+      }
+      if (sessions.some((session) => session.revoked_at === null)) throw inviteExpired();
+      throw invalid();
+    }
+    // The 7-day activation window applies to an unused code only; a paired
+    // device keeps its 30 days (AUTH-01).
+    if (invitation.expires_at <= now) throw inviteExpired();
 
     this.db.exec('BEGIN IMMEDIATE');
     try {
@@ -176,7 +217,36 @@ class SqliteAuthService {
       audit(this.db, { at: now, event: 'INVITE_REDEEMED', sessionId, label: invitation.label });
       this.db.exec('COMMIT');
       clearAuthFailures(this.db, parsed.selector);
-      return issued;
+      return { ...issued, ...pairingDetails('NEW', now) };
+    } catch (error) {
+      try { this.db.exec('ROLLBACK'); } catch { /* already rolled back */ }
+      throw error;
+    }
+  }
+
+  /**
+   * The paired device entered its own code again — for example after its saved
+   * session was lost. It gets fresh tokens on the SAME session, so the expiry
+   * never moves; any tokens still outstanding for that session are destroyed.
+   */
+  reenter(invitation, session, selector, clientBuildId, now) {
+    if (session.revoked_at !== null) {
+      throw new GatewayError('INVITE_INVALID', 'Invite credential is invalid.', 401);
+    }
+    if (session.expires_at <= now) throw inviteExpired();
+
+    this.db.exec('BEGIN IMMEDIATE');
+    try {
+      this.db.prepare('DELETE FROM access_tokens WHERE session_id = ?').run(session.id);
+      this.db.prepare('DELETE FROM refresh_tokens WHERE session_id = ?').run(session.id);
+      if (session.client_build_id !== clientBuildId) {
+        this.db.prepare('UPDATE sessions SET client_build_id = ? WHERE id = ?').run(clientBuildId, session.id);
+      }
+      const issued = this.issueTokenPair(session.id, now);
+      audit(this.db, { at: now, event: 'INVITE_REENTERED', sessionId: session.id, label: invitation.label });
+      this.db.exec('COMMIT');
+      clearAuthFailures(this.db, selector);
+      return { ...issued, ...pairingDetails('EXISTING', session.created_at) };
     } catch (error) {
       try { this.db.exec('ROLLBACK'); } catch { /* already rolled back */ }
       throw error;
@@ -218,6 +288,12 @@ class SqliteAuthService {
       if (claimed.changes !== 1) {
         this.db.exec('ROLLBACK');
         throw new GatewayError('TOKEN_REUSE_DETECTED', 'Refresh token reuse revoked this token family.', 409);
+      }
+      // Build 46 changeover: the first refresh from an updated app moves the
+      // session to the current build. assertBinding() never lets it move back.
+      if (session.client_build_id !== clientBuildId) {
+        this.db.prepare('UPDATE sessions SET client_build_id = ? WHERE id = ?').run(clientBuildId, row.session_id);
+        audit(this.db, { at: now, event: 'CLIENT_BUILD_UPGRADED', sessionId: row.session_id });
       }
       const issued = this.issueTokenPair(row.session_id, now);
       this.db.prepare('UPDATE refresh_tokens SET superseded_by = ? WHERE token_hash = ?')

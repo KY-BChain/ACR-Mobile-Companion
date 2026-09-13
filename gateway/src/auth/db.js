@@ -85,6 +85,7 @@ const AUDIT_EVENTS = Object.freeze([
   'INVITE_ISSUED', 'INVITE_REDEEMED', 'INVITE_REVOKED',
   'REFRESH_ROTATED', 'REUSE_DETECTED',
   'SESSION_REVOKED', 'RATE_LIMIT_BLOCK',
+  'INVITE_REENTERED', 'CLIENT_BUILD_UPGRADED',
 ]);
 
 /** Constrained vocabulary for audit.detail — never free text (AUTH-09). */

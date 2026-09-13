@@ -117,12 +117,32 @@ function parseTimeout(value) {
   return timeout;
 }
 
+const CLIENT_BUILD_ID_PATTERN = /^mob-v\d+\.\d+\.\d+\+\d+$/;
+
 function parseClientBuildId(value) {
-  const buildId = value || 'mob-v0.6.5+45';
-  if (!/^mob-v\d+\.\d+\.\d+\+\d+$/.test(buildId)) {
+  const buildId = value || 'mob-v0.6.5+46';
+  if (!CLIENT_BUILD_ID_PATTERN.test(buildId)) {
     throw new Error('ACR_EXPECTED_CLIENT_BUILD_ID must use mob-v<semver>+<build> format');
   }
   return buildId;
+}
+
+/**
+ * Build 46 changeover: earlier client builds whose EXISTING sessions stay
+ * valid. They can never redeem a new invitation; a session moves to the
+ * current build the first time an updated app refreshes it, and cannot move
+ * back. Empty (the default) accepts the current build only.
+ */
+function parsePreviousClientBuildIds(value, expected) {
+  if (value == null || value.trim() === '') return [];
+  const ids = [...new Set(value.split(',').map((item) => item.trim()).filter(Boolean))];
+  for (const id of ids) {
+    if (!CLIENT_BUILD_ID_PATTERN.test(id)) {
+      throw new Error('ACR_PREVIOUS_CLIENT_BUILD_IDS must be a comma-separated list of mob-v<semver>+<build> identities');
+    }
+    if (id === expected) throw new Error('ACR_PREVIOUS_CLIENT_BUILD_IDS must not repeat the current build');
+  }
+  return ids;
 }
 
 /**
@@ -176,6 +196,7 @@ function loadConfig(env = process.env) {
       throw new Error('ACR_EVIDENCE_ONTOLOGY_PATH must be an absolute canonical ontology path');
     }
   }
+  const expectedClientBuildId = parseClientBuildId(env.ACR_EXPECTED_CLIENT_BUILD_ID);
   return Object.freeze({
     host,
     port,
@@ -185,11 +206,12 @@ function loadConfig(env = process.env) {
     publicHostname: parsePublicHostname(env.ACR_PUBLIC_HOSTNAME),
     authStorePath: env.ACR_AUTH_STORE_PATH || null,
     authPepperPath: env.ACR_AUTH_PEPPER_PATH || null,
-    expectedClientBuildId: parseClientBuildId(env.ACR_EXPECTED_CLIENT_BUILD_ID),
+    expectedClientBuildId,
+    previousClientBuildIds: Object.freeze(parsePreviousClientBuildIds(env.ACR_PREVIOUS_CLIENT_BUILD_IDS, expectedClientBuildId)),
     fixtureDirectory,
     evidence: Object.freeze(evidence),
     expectedEvidence: loadPinnedExpectedEvidence(env),
   });
 }
 
-module.exports = { loadConfig, parseTimeout, parseUrl, parseInferUrl, parseEvidenceUrl, parseSha256, parseExpectedCount, parseExpectedMode, parseClientBuildId, parsePublicHostname, loadPinnedExpectedEvidence, assertPinnedExpectedEvidence, PINNED_EXPECTED_EVIDENCE, isLoopbackHost, DEFAULT_TIMEOUT_MS };
+module.exports = { loadConfig, parseTimeout, parseUrl, parseInferUrl, parseEvidenceUrl, parseSha256, parseExpectedCount, parseExpectedMode, parseClientBuildId, parsePreviousClientBuildIds, parsePublicHostname, loadPinnedExpectedEvidence, assertPinnedExpectedEvidence, PINNED_EXPECTED_EVIDENCE, isLoopbackHost, DEFAULT_TIMEOUT_MS };

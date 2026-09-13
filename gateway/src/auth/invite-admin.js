@@ -111,13 +111,28 @@ function list({ db }, { now = Date.now() } = {}) {
       FROM invitations i ORDER BY i.issued_at DESC`).all(now);
 }
 
+/** DDMMYY-HHMMSS in UTC — the Build 46 pairing-record format. */
+function pairingStamp(ms) {
+  const d = new Date(ms);
+  const two = (n) => String(n).padStart(2, '0');
+  return `${two(d.getUTCDate())}${two(d.getUTCMonth() + 1)}${two(d.getUTCFullYear() % 100)}-`
+    + `${two(d.getUTCHours())}${two(d.getUTCMinutes())}${two(d.getUTCSeconds())}`;
+}
+
+/**
+ * One row per paired device: the invite (by label — the code itself is never
+ * stored), the device (by its hashed install identifier, never shown), and
+ * when they were paired. The 30-day term runs from the pairing time.
+ */
 function sessions({ db }, { now = Date.now() } = {}) {
   return db.prepare(`
-    SELECT s.id, i.label, s.created_at, s.expires_at, s.revoked_at, s.revoked_reason
+    SELECT s.id, i.label, s.client_build_id, s.created_at, s.expires_at, s.revoked_at, s.revoked_reason
       FROM sessions s JOIN invitations i ON i.id = s.invitation_id
      ORDER BY s.created_at DESC`).all().map((row) => ({
     session: redactSessionId(row.id),
     label: row.label,
+    pairedUtc: pairingStamp(row.created_at),
+    build: row.client_build_id,
     createdAt: new Date(row.created_at).toISOString(),
     expiresAt: new Date(row.expires_at).toISOString(),
     live: row.revoked_at === null && row.expires_at > now,

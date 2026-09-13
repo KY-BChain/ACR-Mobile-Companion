@@ -19,8 +19,8 @@ const { mobileRequest, platformResponse, evidence } = require('./helpers');
 const ROUTE = 'https://api.acragent.com/api/infer';
 
 describe('client build identity configuration', () => {
-  test('preserves Build 44 default and accepts an explicit valid Build 45 identity', () => {
-    expect(loadConfig({}).expectedClientBuildId).toBe('mob-v0.6.5+45');
+  test('defaults to the Build 46 identity and accepts an explicit valid identity', () => {
+    expect(loadConfig({}).expectedClientBuildId).toBe('mob-v0.6.5+46');
     expect(loadConfig({ ACR_EXPECTED_CLIENT_BUILD_ID: 'mob-v0.6.5+45' }).expectedClientBuildId).toBe('mob-v0.6.5+45');
   });
 
