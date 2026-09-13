@@ -87,10 +87,9 @@ Each refusal appears twice in the file: an error line and a completion line.
 
 **The three wrong-code attempts** (21:24:24, 21:50:32, 21:53:14 UTC) got the generic answer
 and had no effect.
-- The first matches a slip while re-entering the Xiaomi's code.
-- The other two are not attributed. **Kraken to confirm** whether they were manual entries.
-  An attempt with a correct code on the wrong phone would have shown "Incorrect device used"
-  instead.
+All three were typing slips while entering the Xiaomi's code by hand (Kraken, 14 September).
+An attempt with a correct code on the wrong phone would have shown "Incorrect device used"
+instead.
 
 **Privacy scan (G12-04 / AT-10 standard):** zero invite-shaped strings, tokens, device
 identifiers, clinical field names, email addresses or full request IDs. The log records time,
@@ -125,10 +124,9 @@ When no Build 45 phone remains (none does now), end the changeover as described 
    covered by the field translation review (Kraken: 30–60 days).
 2. **F7:** the first-inference timeout after the platform has been idle did not recur today
    (first assessment 576 ms). It stays open.
-3. **Unattributed wrong-code attempts** at 21:50 and 21:53 UTC (§4): Kraken to confirm.
-4. **Carried from Gate 11 / T45-11:**
+3. **Carried from Gate 11 / T45-11:**
    - independent security review;
    - regional reachability;
    - DNS/certificate rotation;
    - classification of the platform database.
-5. **iOS profile renewal** before 18 September (§5).
+4. **iOS profile renewal** before 18 September (§5).

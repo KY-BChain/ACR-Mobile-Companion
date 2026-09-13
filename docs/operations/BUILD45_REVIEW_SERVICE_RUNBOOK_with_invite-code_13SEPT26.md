@@ -1,5 +1,10 @@
 # Build 45 — Review Service and Device Build Runbook
 
+> **Superseded by [BUILD46_REVIEW_SERVICE_RUNBOOK.md](BUILD46_REVIEW_SERVICE_RUNBOOK.md)**
+> (14 September 2026). Kraken's Build 45 revision, kept as written. The invite-code
+> and database notes at the end are carried into the Build 46 runbook §6, which adds
+> device pairing. The script is now `scripts/build46-review-service.sh`.
+
 **Scope:** starting and stopping the Build 45 remote-review service, and rebuilding the
 apps for the named test devices. Written at the close of Gate 12 (12 September 2026);
 see `docs/build45-evidence/gate12/GATE12_DEVICE_EVIDENCE_20260912.md`.
