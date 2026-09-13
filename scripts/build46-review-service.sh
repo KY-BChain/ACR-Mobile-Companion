@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
-# Build 45 remote-review service: T3 (gateway, 127.0.0.1:3001) + T4 (acr-mobile-review tunnel).
+# Build 46 remote-review service: T3 (gateway, 127.0.0.1:3001) + T4 (acr-mobile-review tunnel).
 #
-#   scripts/build45-review-service.sh start    checked start: T1/T2 checks, then T3, then T4
-#   scripts/build45-review-service.sh status   read-only health of T1-T4
-#   scripts/build45-review-service.sh stop     stop T4, then T3
+#   scripts/build46-review-service.sh start    checked start: T1/T2 checks, then T3, then T4
+#   scripts/build46-review-service.sh status   read-only health of T1-T4
+#   scripts/build46-review-service.sh stop     stop T4, then T3
 #
 # T1 (Spring Boot, :8080) and T2 (acr-api tunnel) are only ever CHECKED. This
 # script never starts, stops or restarts them.
 #
-# Runbook: docs/operations/BUILD45_REVIEW_SERVICE_RUNBOOK.md
+# Runbook: docs/operations/BUILD46_REVIEW_SERVICE_RUNBOOK.md
 set -uo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 GATEWAY_DIR="$REPO_DIR/gateway"
 STATE_DIR="$HOME/.acr-gateway"
-AUTH_DIR="${ACR45_AUTH_DIR:-$STATE_DIR/gate10}"
+AUTH_DIR="${ACR_AUTH_DIR:-${ACR45_AUTH_DIR:-$STATE_DIR/gate10}}"
 RUN_DIR="$STATE_DIR/run"
 LOG_DIR="$STATE_DIR/logs"
 PUBLIC_HOST="mobile-gateway-review.acragent.com"
@@ -23,7 +23,11 @@ TUNNEL_CONFIG="$HOME/.cloudflared/acr-mobile-review.yml"
 PLATFORM_ORIGIN="https://api.acragent.com"
 ONTOLOGY_PATH="${ACR45_ONTOLOGY_PATH:-/Users/Kraken/DAPP/ACR-platform/ontology/breast-cancer/ACR_Ontology_Full_v2_2.owl}"
 PORT=3001
-CLIENT_BUILD_ID="mob-v0.6.5+45"
+CLIENT_BUILD_ID="mob-v0.6.5+46"
+# Build 46 changeover (option a): existing Build 45 sessions keep working and
+# move to Build 46 at the next refresh from the updated app. Set to "" once no
+# Build 45 phone remains.
+PREVIOUS_CLIENT_BUILD_IDS="${ACR_PREVIOUS_CLIENT_BUILD_IDS-mob-v0.6.5+45}"
 
 ok()   { printf '  \033[32mPASS\033[0m  %s\n' "$*"; }
 bad()  { printf '  \033[31mFAIL\033[0m  %s\n' "$*"; }
@@ -91,7 +95,7 @@ stop_services() {
 
 start() {
   local c gp tp i stamp glog tlog
-  step "Build 45 review service — checked start ($(date -u +%FT%TZ))"
+  step "Build 46 review service — checked start ($(date -u +%FT%TZ))"
 
   step "1. Prerequisites"
   check_files
@@ -115,6 +119,7 @@ start() {
   ( cd "$GATEWAY_DIR" && exec env \
       ACR_GATEWAY_HOST=127.0.0.1 ACR_GATEWAY_PORT="$PORT" \
       ACR_EXPECTED_CLIENT_BUILD_ID="$CLIENT_BUILD_ID" \
+      ACR_PREVIOUS_CLIENT_BUILD_IDS="$PREVIOUS_CLIENT_BUILD_IDS" \
       ACR_PUBLIC_HOSTNAME="$PUBLIC_HOST" \
       ACR_UPSTREAM_INFER_URL="$PLATFORM_ORIGIN/api/infer" \
       ACR_EVIDENCE_HEALTH_URL="$PLATFORM_ORIGIN/api/infer/health" \
@@ -172,11 +177,11 @@ start() {
   step "Service is up."
   note "Phones: open ACR Companion — it reconnects by itself (no invite code) and shows VERIFIED."
   note "The first assessment after the platform has been idle may time out once; retry."
-  note "Stop with: scripts/build45-review-service.sh stop"
+  note "Stop with: scripts/build46-review-service.sh stop"
 }
 
 stop() {
-  step "Build 45 review service — stop ($(date -u +%FT%TZ))"
+  step "Build 46 review service — stop ($(date -u +%FT%TZ))"
   stop_services
   sleep 2
   [ -z "$(gateway_pid)" ] && ok "port $PORT free" || bad "port $PORT still in use"
@@ -186,7 +191,7 @@ stop() {
 
 status() {
   local gp tp
-  step "Build 45 review service — status ($(date -u +%FT%TZ))"
+  step "Build 46 review service — status ($(date -u +%FT%TZ))"
   step "T1 / T2 (read-only)"
   check_platform || true
   step "T3 / T4"
