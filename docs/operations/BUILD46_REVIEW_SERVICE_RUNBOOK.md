@@ -107,7 +107,7 @@ It never contains an invite code, token, device identifier or clinical value.
 | **public HTTP not 403** | cleartext reaches the service (AT-14) | the script has already stopped T3/T4; restore the WAF rule "Block HTTP - mobile gateway" |
 | Phone shows **"Incorrect device used"** | this code is paired with another device | issue this device its own code (§6) |
 | Phone shows **"Invite Code Expired. Request a refreshed one."** | 30 days have passed since pairing, or an unused code was not entered within 7 days | issue a new code (§6) |
-| Phone asks for a code with no message | access was disconnected, revoked, or the app was deleted and reinstalled | issue a new code (§6) |
+| Phone asks for a code with no message | this phone was disconnected (Disconnect access), or its access was revoked, or the app was deleted and reinstalled | after Disconnect: re-enter **this phone's own code** (same expiry); otherwise issue a new code (§6) |
 | "Live Platform offline" while the gateway is connected | T1/T2 down, or the first request after idle timed out (finding F7) | check T1/T2; retry |
 
 ## 5. Manual fallback (the same steps by hand)
@@ -158,6 +158,11 @@ Stop: Ctrl-C in window B first, then window A.
      not authorised for this invite code."* That phone gets no access.
 4. **After 30 days:** *"Invite Code Expired. Request a refreshed one."* Issue a
    new code.
+
+**Disconnect access** asks first: *"You'll need to re-enter the invite code again."*
+(Cancel / Disconnect). Disconnecting deletes the saved session on the phone; the
+same phone can re-enter **its own code** to sign back in, and its expiry does not
+change. The offline walkthrough and Build 46 app updates keep the session.
 
 **Offline:** a phone that is offline judges its access from the expiry date saved
 on the phone. If you revoke a code, the phone learns this only the next time it
