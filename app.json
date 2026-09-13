@@ -16,7 +16,7 @@
     ],
     "ios": {
       "bundleIdentifier": "com.anonymous.acr-mobile-companion",
-      "buildNumber": "45",
+      "buildNumber": "46",
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -24,7 +24,7 @@
     },
     "android": {
       "package": "com.anonymous.acr_mobile_companion",
-      "versionCode": 45
+      "versionCode": 46
     }
   }
 }

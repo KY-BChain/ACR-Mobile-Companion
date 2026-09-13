@@ -104,7 +104,7 @@ assert.doesNotMatch(about, /0\.6\.\d|Build \d+/,
 
 const appConfig = JSON.parse(read('app.json'));
 assert.equal(appConfig.expo.version, '0.6.5');
-assert.equal(appConfig.expo.ios.buildNumber, '45');
+assert.equal(appConfig.expo.ios.buildNumber, '46');
 
 // ---------------------------------------------------------------------------
 // 4. Eight languages, key-identical, with RTL registered for Arabic only.
@@ -136,4 +136,4 @@ for (const file of screens) {
     `src/screens/${file} must not contain placeholder or debug output`);
 }
 
-console.log(`PASS Gates 8-9: Dynamic Type never disabled across ${screens.length} screens and ${components.length} components; accessibility affordances on every screen with announced alerts; About renders the derived v0.6.5 (Build 45) identity with no hardcoded version; ${locales.length} locales key-identical (${base.length} keys) with Arabic RTL; no placeholder or debug text in shipped screens`);
+console.log(`PASS Gates 8-9: Dynamic Type never disabled across ${screens.length} screens and ${components.length} components; accessibility affordances on every screen with announced alerts; About renders the derived v0.6.5 (Build 46) identity with no hardcoded version; ${locales.length} locales key-identical (${base.length} keys) with Arabic RTL; no placeholder or debug text in shipped screens`);
