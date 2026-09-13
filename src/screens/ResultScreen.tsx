@@ -11,7 +11,7 @@ import { ACRColors, ACRTypography } from '../theme/colors';
 import { useAssessmentStore } from '../store/assessmentStore';
 import { getLocaleDirection, getTextAlign } from '../utils/rtl';
 import type { RootStackParamList } from '../navigation/AppNavigator';
-import { buildClinicalResultPresentation, formatReturnedProbability, TECHNICAL_DETAILS_DEFAULT_EXPANDED } from './resultPresentation';
+import { buildClinicalResultPresentation, formatReturnedProbability, resultValueTone, TECHNICAL_DETAILS_DEFAULT_EXPANDED } from './resultPresentation';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -52,8 +52,8 @@ export const ResultScreen: React.FC = () => {
 
       <View style={styles.subtypeBox}>
         <Text style={[styles.subtypeLabel, localText]}>{t('result:molecularSubtype')}</Text>
-        <Text selectable style={[styles.subtypeValue, localText]}>{data.molecularSubtype}</Text>
-        <Text selectable style={[styles.subtypeText, localText]}>{t('build44:risk')}: {data.riskLevel ?? t('common:emDash')}</Text>
+        <Text selectable style={[styles.subtypeValue, toneStyle(data.molecularSubtype), localText]}>{data.molecularSubtype}</Text>
+        <Text selectable style={[styles.subtypeText, localText]}>{t('build44:risk')}: <Text style={[styles.riskValue, toneStyle(data.riskLevel)]}>{data.riskLevel ?? t('common:emDash')}</Text></Text>
       </View>
 
       {presentation.warnings.length ? <View style={styles.warningBox}>
@@ -172,11 +172,17 @@ export const ResultScreen: React.FC = () => {
   );
 };
 
+// Build 46: every returned value is colour-coded — red HIGH/positive, green
+// LOW/negative, blue otherwise (see resultValueTone). The text itself still
+// carries the value, so colour is never the only signal.
+const TONE_COLOUR = { high: ACRColors.resultHigh, low: ACRColors.resultLow, other: ACRColors.resultOther } as const;
+const toneStyle = (value: string | null | undefined) => ({ color: TONE_COLOUR[resultValueTone(value)] });
+
 const Row: React.FC<{ label: string; value: string }> = ({ label, value }) => {
   const { i18n } = useTranslation();
   const language = i18n.resolvedLanguage ?? i18n.language;
   const localText = { writingDirection: getLocaleDirection(language), textAlign: getTextAlign(language) };
-  return <View style={styles.row}><Text style={[styles.rowLabel, localText]}>{label}</Text><Text selectable style={[styles.rowValue, localText]}>{value}</Text></View>;
+  return <View style={styles.row}><Text style={[styles.rowLabel, localText]}>{label}</Text><Text selectable style={[styles.rowValue, toneStyle(value), localText]}>{value}</Text></View>;
 };
 
 const styles = StyleSheet.create({
@@ -189,6 +195,7 @@ const styles = StyleSheet.create({
   subtypeLabel: { ...ACRTypography.subtypeLabel, color: ACRColors.muted },
   subtypeValue: { ...ACRTypography.subtypeValue, color: ACRColors.primary, marginVertical: 5 },
   subtypeText: { fontSize: 11, color: ACRColors.ink },
+  riskValue: { fontWeight: '700' },
   warningBox: { backgroundColor: ACRColors.warningBg, borderWidth: 1.5, borderColor: ACRColors.warningBorder, borderRadius: 12, padding: 12, marginBottom: 10 },
   warningTitle: { ...ACRTypography.cardTitle, color: ACRColors.warningText, marginBottom: 7 },
   technicalToggle: { backgroundColor: ACRColors.primary, borderRadius: 12, padding: 12, marginTop: 2, marginBottom: 10 },

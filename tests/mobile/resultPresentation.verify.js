@@ -66,7 +66,7 @@ assert.ok(warningIndex > summaryIndex && warningIndex < completenessIndex, 'retu
 assert.ok(completenessIndex > warningIndex && completenessIndex < treatmentIndex, 'completeness context precedes treatment');
 assert.ok(treatmentIndex < biomarkerIndex && biomarkerIndex < confidenceIndex && confidenceIndex < toggleIndex, 'clinical hierarchy precedes technical toggle');
 assert.ok(toggleIndex < rulesIndex, 'reasoning rules are inside the later technical section');
-assert.match(screen, /subtypeValue, localText\]\}>\{data\.molecularSubtype\}/, 'hero uses guarded top-level subtype');
+assert.match(screen, /subtypeValue, toneStyle\(data\.molecularSubtype\), localText\]\}>\{data\.molecularSubtype\}/, 'hero uses guarded top-level subtype');
 assert.match(screen, /data\.riskLevel \?\? t\('common:emDash'\)/, 'hero uses nullable top-level safety risk');
 assert.match(screen, /accessibilityRole="button"/);
 assert.match(screen, /setTechnicalDetailsExpanded\(\(expanded\) => !expanded\)/);
@@ -113,4 +113,25 @@ assert.match(screen, /getLocaleDirection\(language\)/);
 assert.match(screen, /getTextAlign\(language\)/);
 console.log('STATIC PASS eight-locale clinical-result key parity and reactive Arabic RTL wiring');
 
+// Build 46 colour code, mirroring the ACR Platform website (positive red,
+// negative green): red HIGH/positive, green LOW/negative, blue otherwise.
+// Words only — a number is never judged high or low on the device.
+for (const [value, tone] of [
+  ['HIGH', 'high'], ['high', 'high'], [' Positive ', 'high'],
+  ['LOW', 'low'], ['Negative', 'low'],
+  ['INTERMEDIATE', 'other'], ['LuminalB_HER2Negative', 'other'], ['25%', 'other'], ['0.9', 'other'],
+  ['highly', 'other'], ['', 'other'], [null, 'other'], [undefined, 'other'],
+]) {
+  assert.equal(presentation.resultValueTone(value), tone, `tone of ${JSON.stringify(value)}`);
+}
+const colourScreen = read('src/screens/ResultScreen.tsx');
+assert.match(colourScreen, /high: ACRColors\.resultHigh, low: ACRColors\.resultLow, other: ACRColors\.resultOther/);
+assert.match(colourScreen, /style=\{\[styles\.rowValue, toneStyle\(value\), localText\]\}/, 'every result row value is colour-coded');
+assert.match(colourScreen, /toneStyle\(data\.riskLevel\)/, 'the summary risk value is colour-coded');
+assert.match(colourScreen, /toneStyle\(data\.molecularSubtype\)/);
+const colourTokens = read('src/theme/colors.ts');
+assert.match(colourTokens, /resultHigh: '#c53030'/);
+assert.match(colourTokens, /resultLow: '#276749'/);
+assert.match(colourTokens, /resultOther: '#2b6cb0'/);
+console.log('PASS Build 46 result colour code: HIGH/positive red, LOW/negative green, everything else blue; returned words only, never numbers');
 console.log('PASS Build 44 clinical-first Result presentation verifier');

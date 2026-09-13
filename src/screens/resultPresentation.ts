@@ -50,3 +50,19 @@ export function buildClinicalResultPresentation(result: AssessmentResponse): Cli
     showBayesianSummary: result.data.bayesian.enabled,
   };
 }
+
+/**
+ * Build 46 colour code for values the platform returns, mirroring the ACR
+ * Platform website (acr_pathway.html colours positive red and negative
+ * green): red for HIGH (and positive), green for LOW (and negative), blue for
+ * everything else. Display only — it reads the returned word and never judges
+ * a number, so no value is reinterpreted on the device.
+ */
+export type ResultValueTone = 'high' | 'low' | 'other';
+
+export function resultValueTone(value: string | null | undefined): ResultValueTone {
+  const word = String(value ?? '').trim().toLowerCase();
+  if (word === 'high' || word === 'positive') return 'high';
+  if (word === 'low' || word === 'negative') return 'low';
+  return 'other';
+}

@@ -38,6 +38,13 @@ export const ACRColors = {
   verifiedState: '#148f77',
   unavailableState: '#c0392b',
 
+  // Result values (Build 46) — the ACR Platform website's red/green hues
+  // (#e53e3e / #48bb78), darkened to meet WCAG AA (4.5:1) on the white result
+  // cards; a deep blue, not sky blue, for everything else.
+  resultHigh: '#c53030',
+  resultLow: '#276749',
+  resultOther: '#2b6cb0',
+
   // iOS
   iosBlue: '#007AFF',
 } as const;
