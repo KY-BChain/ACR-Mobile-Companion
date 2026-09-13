@@ -333,7 +333,14 @@
     "stateGatewayConnectedPlatformVerified": "Gateway verbunden — Live-Plattform verifiziert",
     "stateNoLocalInference": "Dieses Gerät führt niemals klinische Inferenz durch. Die gesamte Schlussfolgerung erfolgt auf der ACR-Plattform.",
     "stateLiveBlocked": "Live-Übermittlung ist in diesem Zustand nicht verfügbar.",
-    "stateReplayAvailable": "Die ausdrückliche verifizierte synthetische Wiedergabe bleibt über das Gateway verfügbar."
+    "stateReplayAvailable": "Die ausdrückliche verifizierte synthetische Wiedergabe bleibt über das Gateway verfügbar.",
+    "inviteExpired": "Einladungscode abgelaufen. Fordern Sie einen neuen an.",
+    "incorrectDevice": "Falsches Gerät. Dieses Gerät ist für diesen Einladungscode nicht autorisiert.",
+    "walkthroughNeedsInvite": "Der Offline-Durchgang ist nur auf einem Gerät verfügbar, das bereits mit einem Einladungscode gekoppelt ist.",
+    "pairedTitle": "Einladungscode akzeptiert",
+    "pairedMessage": "Einladungscode akzeptiert und ausschließlich mit diesem Mobilgerät gekoppelt. Für {{days}} Tage.",
+    "pairedDetail": "Gekoppelt: {{pairedAt}} UTC · Gültig bis: {{expiresAt}} UTC",
+    "pairedContinue": "Weiter"
   },
   "build44": {
     "validationError": "Prüfen Sie die ungültigen Bewertungsfelder.",

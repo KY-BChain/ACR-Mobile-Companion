@@ -74,9 +74,16 @@ export interface AssessmentResponse {
   };
   warnings: string[];
 }
-export interface AuthRedeemResponse { tokenType: 'Bearer'; accessToken: string; expiresIn: number; refreshToken: string; refreshExpiresAt: string }
+export interface AuthRedeemResponse {
+  tokenType: 'Bearer'; accessToken: string; expiresIn: number; refreshToken: string; refreshExpiresAt: string;
+  /** Build 46 redeem only: a first pairing (NEW) or the paired device signing in again (EXISTING). */
+  pairing?: 'NEW' | 'EXISTING'; pairedAt?: string; sessionDays?: number;
+}
+/** What the app shows after a successful invite: the pairing and the fixed term the gateway set. */
+export interface PairingNotice { pairing: 'NEW' | 'EXISTING'; pairedAt: string; expiresAt: string; sessionDays: number }
 export type ErrorCode =
   | 'SCHEMA_INVALID' | 'REQUEST_ID_MISMATCH' | 'AUTHENTICATION_REQUIRED' | 'INVITE_CONFIGURATION_REQUIRED' | 'INVITE_INVALID'
+  | 'INVITE_EXPIRED' | 'DEVICE_NOT_AUTHORISED'
   | 'DEVICE_BINDING_MISMATCH' | 'CLIENT_BUILD_MISMATCH' | 'AUTHORISED_SCOPE_REQUIRED' | 'TOKEN_REUSE_DETECTED'
   | 'PAYLOAD_TOO_LARGE' | 'CLINICAL_INPUT_REJECTED' | 'RATE_LIMITED' | 'ATTESTATION_MISMATCH' | 'ATTESTATION_UNAVAILABLE'
   | 'TLS_REQUIRED' | 'MISDIRECTED_REQUEST'

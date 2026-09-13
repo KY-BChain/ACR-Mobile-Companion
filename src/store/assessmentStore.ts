@@ -1,6 +1,6 @@
 /** One-assessment, in-memory-only state. No persistence or clinical data at rest. */
 import { create } from 'zustand';
-import type { AssessmentFormState, AssessmentResponse, AttestationResponse, DeliveryChoice, FailureState, P1State, P2State } from '../types/api';
+import type { AssessmentFormState, AssessmentResponse, AttestationResponse, DeliveryChoice, FailureState, P1State, P2State, PairingNotice } from '../types/api';
 export type { ProvisionalGender, ProvisionalHer2Low, ProvisionalStatus, TreatmentIntent } from '../types/api';
 
 interface AssessmentStore {
@@ -18,6 +18,8 @@ interface AssessmentStore {
   accessReady: boolean; setAccessReady: (ready: boolean) => void;
   walkthroughOnly: boolean; setWalkthroughOnly: (enabled: boolean) => void;
   sessionId: string; setSessionId: (id: string) => void;
+  /** Build 46: shown once as the Welcome pop-up after a first pairing; not clinical data. */
+  pairingNotice: PairingNotice | null; setPairingNotice: (notice: PairingNotice | null) => void;
   reset: () => void;
   resetCycle: () => void;
 }
@@ -45,6 +47,7 @@ export const useAssessmentStore = create<AssessmentStore>((set) => ({
   accessReady: false, setAccessReady: (accessReady) => set({ accessReady }),
   walkthroughOnly: false, setWalkthroughOnly: (walkthroughOnly) => set({ walkthroughOnly }),
   sessionId: '', setSessionId: (sessionId) => set({ sessionId }),
+  pairingNotice: null, setPairingNotice: (pairingNotice) => set({ pairingNotice }),
   reset: () => set({ form: initialForm, p1: initialP1, p2: initialP2, result: null, failure: null, walkthroughOnly: false, sessionId: '' }),
   resetCycle: () => set({
     form: initialForm,

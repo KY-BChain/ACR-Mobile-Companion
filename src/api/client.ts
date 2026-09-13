@@ -1,6 +1,6 @@
 import { MOBILE_BUILD_ID } from '../config/appIdentity';
 import { GATEWAY_API_BASE } from '../config/gateway';
-import type { ACRError, AssessmentRequest, AssessmentResponse, AttestationResponse, AuthRedeemResponse, DeliveryChoice, ErrorCode, FailureState } from '../types/api';
+import type { ACRError, AssessmentRequest, AssessmentResponse, AttestationResponse, AuthRedeemResponse, DeliveryChoice, ErrorCode, FailureState, PairingNotice } from '../types/api';
 import { generateRequestId } from '../utils/uuid';
 import { parseAssessmentResponse, parseAttestation } from './responseGuard';
 import { secureSessionStore, type SessionStore } from './secureSession';
@@ -9,7 +9,7 @@ type FetchLike = typeof fetch;
 
 const ERROR_CODES = new Set<ErrorCode>([
   'SCHEMA_INVALID', 'REQUEST_ID_MISMATCH', 'AUTHENTICATION_REQUIRED', 'INVITE_CONFIGURATION_REQUIRED', 'INVITE_INVALID',
-  'DEVICE_BINDING_MISMATCH', 'CLIENT_BUILD_MISMATCH', 'AUTHORISED_SCOPE_REQUIRED', 'TOKEN_REUSE_DETECTED',
+  'INVITE_EXPIRED', 'DEVICE_NOT_AUTHORISED', 'DEVICE_BINDING_MISMATCH', 'CLIENT_BUILD_MISMATCH', 'AUTHORISED_SCOPE_REQUIRED', 'TOKEN_REUSE_DETECTED',
   'PAYLOAD_TOO_LARGE', 'CLINICAL_INPUT_REJECTED', 'RATE_LIMITED', 'ATTESTATION_MISMATCH', 'ATTESTATION_UNAVAILABLE',
   'UPSTREAM_NOT_CONFIGURED', 'UPSTREAM_TIMEOUT', 'UPSTREAM_HTTP_ERROR', 'INVALID_UPSTREAM_RESPONSE',
   'BAYESIAN_ENHANCEMENT_UNAVAILABLE', 'DEMO_FIXTURE_NOT_AVAILABLE', 'SERVICE_UNAVAILABLE',
@@ -142,7 +142,22 @@ export class GatewayClient {
     return 'UP';
   }
 
-  async redeemInvite(inviteCode: string): Promise<void> {
+  /**
+   * Build 46: whether this device holds a saved evaluation session, judged from
+   * the expiry saved with it — no network needed, so it also answers offline.
+   * ACTIVE allows the offline walkthrough; EXPIRED shows the expired-invite
+   * message; NONE means no code is paired here (or access was disconnected).
+   * An offline phone cannot learn of a revocation until it is next online.
+   */
+  async savedAccessStatus(): Promise<'NONE' | 'ACTIVE' | 'EXPIRED'> {
+    if (this.hasSession()) return 'ACTIVE';
+    await this.pendingClear;
+    const expiresAt = await this.store.loadRefreshExpiry().catch(() => null);
+    if (expiresAt === null) return 'NONE';
+    return Date.now() < expiresAt ? 'ACTIVE' : 'EXPIRED';
+  }
+
+  async redeemInvite(inviteCode: string): Promise<PairingNotice> {
     this.clearSession();
     const deviceBinding = await this.binding();
     const response = await this.send('/auth/redeem', {
@@ -150,8 +165,18 @@ export class GatewayClient {
       body: JSON.stringify({ inviteCode, deviceBinding, clientBuildId: MOBILE_BUILD_ID }),
     });
     if (!response.ok) throw await this.errorFrom(response);
-    this.acceptTokens(await response.json() as AuthRedeemResponse);
+    const tokens = await response.json() as AuthRedeemResponse;
+    this.acceptTokens(tokens);
     await this.persistRefresh();
+    // The term shown to the evaluator is the one the gateway set, so changing
+    // SESSION_MS there needs no app rebuild.
+    const days = tokens.sessionDays;
+    return {
+      pairing: tokens.pairing === 'EXISTING' ? 'EXISTING' : 'NEW',
+      pairedAt: typeof tokens.pairedAt === 'string' && Number.isFinite(Date.parse(tokens.pairedAt)) ? tokens.pairedAt : new Date().toISOString(),
+      expiresAt: tokens.refreshExpiresAt,
+      sessionDays: typeof days === 'number' && Number.isInteger(days) && days > 0 ? days : Math.round((this.refreshExpiresAt - Date.now()) / 86_400_000),
+    };
   }
 
   private acceptTokens(tokens: AuthRedeemResponse): void {

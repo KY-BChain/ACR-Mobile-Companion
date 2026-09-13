@@ -61,7 +61,8 @@ console.log('STATIC PASS fresh-launch Gateway boundary while the inspected poste
 const welcome = read('src/screens/WelcomeScreen.tsx');
 assert.match(welcome, /useFocusEffect/);
 assert.match(welcome, /Platform\.OS === 'android' \|\| Platform\.OS === 'ios'/);
-assert.match(welcome, /if \(!supportsPoster \|\| langModalVisible\)/);
+// Build 46: the poster also waits while the pairing confirmation is open.
+assert.match(welcome, /if \(!supportsPoster \|\| langModalVisible \|\| pairingNotice\)/);
 assert.match(welcome, /setTimeout\(\(\) => \{/);
 assert.match(welcome, /navigation\.isFocused\(\)/);
 assert.match(welcome, /navigation\.replace\('Poster'\)/);

@@ -333,7 +333,14 @@
     "stateGatewayConnectedPlatformVerified": "Gateway connected — Live Platform verified",
     "stateNoLocalInference": "This device never performs clinical inference. All reasoning happens on the ACR Platform.",
     "stateLiveBlocked": "Live submission is unavailable in this state.",
-    "stateReplayAvailable": "Explicit verified synthetic replay remains available through the gateway."
+    "stateReplayAvailable": "Explicit verified synthetic replay remains available through the gateway.",
+    "inviteExpired": "Invite Code Expired. Request a refreshed one.",
+    "incorrectDevice": "Incorrect device used. This device is not authorised for this invite code.",
+    "walkthroughNeedsInvite": "The offline walkthrough is available only on a device already paired with an invite code.",
+    "pairedTitle": "Invite code accepted",
+    "pairedMessage": "Invite Code accepted and paired with this mobile device and this mobile device only. For {{days}} days.",
+    "pairedDetail": "Paired: {{pairedAt}} UTC · Valid until: {{expiresAt}} UTC",
+    "pairedContinue": "Continue"
   },
   "build44": {
     "validationError": "Review the invalid assessment fields.",

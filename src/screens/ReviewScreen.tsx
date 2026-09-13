@@ -6,7 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ScreenLayout } from '../components/ScreenLayout';
 import { ACRCard } from '../components/ACRCard';
 import { ACRButton } from '../components/ACRButton';
-import { ACRStateBadge } from '../components/ACRStateBadge';
+import { ACRStateBadge, spokenState } from '../components/ACRStateBadge';
 import { WalkthroughNotice } from '../components/WalkthroughNotice';
 import { ACRColors, ACRTypography } from '../theme/colors';
 import { useAssessmentStore } from '../store/assessmentStore';
@@ -44,7 +44,7 @@ export const ReviewScreen: React.FC = () => {
 
   const handleSubmit = async () => {
     if (store.walkthroughOnly) {
-      gatewayClient.clearSession();
+      // Build 46: finishing the walkthrough keeps the saved session.
       store.resetCycle();
       store.setFailure({
         code: 'DEMO_FIXTURE_NOT_AVAILABLE',
@@ -140,7 +140,8 @@ export const ReviewScreen: React.FC = () => {
       </ACRCard>
 
       <ACRCard title={t('review:baseline')}>
-        <Row label={t('review:attestation')} valueComponent={store.attestation ? <ACRStateBadge state={store.attestation.verificationState} /> : <Text style={[styles.muted, localText]}>{t('common:unavailable')}</Text>} />
+        {/* value is what the screen reader speaks; the badge is what is seen. */}
+        <Row label={t('review:attestation')} value={store.attestation ? spokenState(store.attestation.verificationState) : t('common:unavailable')} valueComponent={store.attestation ? <ACRStateBadge state={store.attestation.verificationState} /> : <Text style={[styles.muted, localText]}>{t('common:unavailable')}</Text>} />
         <Text style={[styles.hint, localText]}>{t('review:baselineHint')}</Text>
       </ACRCard>
     </ScreenLayout>

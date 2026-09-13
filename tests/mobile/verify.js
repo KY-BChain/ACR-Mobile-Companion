@@ -384,6 +384,52 @@ const clientModule = compile('src/api/client.ts', (name) => {
     assert.match(accessSource, /accessReady && !walkthroughOnly && attestation === null\) \{\s*gatewayClient\.checkAttestation\(\)/,
       'an active session with no baseline evidence on screen re-attests');
   }
+
+  // Build 46 — device pairing, offline saved-access status, accessibility.
+  {
+    const pairStore = secureModule.createMemorySessionStore('55555555-5555-4555-8555-555555555555');
+    const expiresAt = new Date(Date.now() + 30 * 86_400_000).toISOString();
+    const pairClient = new clientModule.GatewayClient(async () => new Response(JSON.stringify({
+      tokenType: 'Bearer', accessToken: 'pair-access', expiresIn: 900, refreshToken: 'pair-refresh', refreshExpiresAt: expiresAt,
+      pairing: 'NEW', pairedAt: '2026-09-13T10:20:30.000Z', sessionDays: 30,
+    }), { status: 200 }), pairStore);
+    assert.equal(await pairClient.savedAccessStatus(), 'NONE', 'a device never paired has no saved access');
+    assert.deepEqual(await pairClient.redeemInvite('secret-once'),
+      { pairing: 'NEW', pairedAt: '2026-09-13T10:20:30.000Z', expiresAt, sessionDays: 30 },
+      'the pop-up shows the pairing time and the term the gateway set');
+
+    // A fresh process that cannot reach the network still knows it is paired.
+    const offline = new clientModule.GatewayClient(async () => { throw new TypeError('offline'); }, pairStore);
+    assert.equal(await offline.savedAccessStatus(), 'ACTIVE', 'judged offline, from the saved expiry');
+    await pairStore.saveRefresh('pair-refresh', Date.now() - 1000);
+    assert.equal(await offline.savedAccessStatus(), 'EXPIRED', 'after 30 days the device is told the code expired');
+    offline.clearSession();
+    assert.equal(await offline.savedAccessStatus(), 'NONE', 'disconnecting removes the saved access');
+
+    const access = read('src/screens/GatewayAccessScreen.tsx');
+    const connectBody = access.slice(access.indexOf('const connect = async'), access.indexOf('const disconnect'));
+    assert.ok(connectBody.length > 0);
+    assert.doesNotMatch(connectBody, /checkAttestation/, 'Connect no longer fetches attestation itself — the evidence effect does, once');
+    assert.match(connectBody, /notice\.pairing === 'NEW'\) \{ setPairingNotice\(notice\); navigation\.navigate\('Welcome'\)/,
+      'a first pairing is confirmed by the Welcome pop-up');
+    assert.match(access, /code === 'INVITE_EXPIRED' \? t\('gatewayAccess:inviteExpired'\)/);
+    assert.match(access, /code === 'DEVICE_NOT_AUTHORISED' \? t\('gatewayAccess:incorrectDevice'\)/);
+    assert.match(access, /savedAccess === 'EXPIRED'/);
+
+    const welcome = read('src/screens/WelcomeScreen.tsx');
+    assert.match(welcome, /visible=\{pairingNotice !== null\}/);
+    assert.match(welcome, /t\('gatewayAccess:pairedMessage', \{ days: pairingNotice\.sessionDays \}\)/);
+
+    // A badge inside an accessible row is not announced; the row's label is.
+    for (const screen of ['src/screens/GatewayAccessScreen.tsx', 'src/screens/ReviewScreen.tsx', 'src/screens/FailClosedScreen.tsx']) {
+      const source = read(screen);
+      for (const line of source.split('\n').filter((l) => /<Row [^\n]*valueComponent=\{[^\n]*ACRStateBadge/.test(l))) {
+        assert.match(line, /value=\{[^\n]*spokenState\(/, `${screen}: a badge row must give the screen reader the state`);
+      }
+      assert.match(source, /accessibilityLabel=\{`\$\{label\}: \$\{value \?\? ''\}`\}/, `${screen}: the row speaks label and value`);
+    }
+  }
+  console.log('PASS Build 46: redeem returns the pairing notice; saved access judged offline as ACTIVE, EXPIRED or NONE; Connect attests once; expired and wrong-device answers localised; badge rows announce their state');
   console.log('PASS P3 secure client session: refresh token in Keychain/Keystore with device-only accessibility, access token memory-only, one install binding per install, restore after app restart without a new invitation, refused tokens wiped, network and rate-limit failures keep the token, one refresh at a time, a new assessment keeps access');
   console.log('PASS mobile gateway client/auth-only retry/no-network-retry, fixed route, exact attestation, three response modes, fail-closed guards and native endpoint policy');
 })().catch((error) => { console.error(error); process.exitCode = 1; });

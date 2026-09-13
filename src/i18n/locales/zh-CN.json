@@ -333,7 +333,14 @@
     "stateGatewayConnectedPlatformVerified": "网关已连接 — 实时平台已验证",
     "stateNoLocalInference": "本设备不会执行任何临床推理。所有推理均在 ACR 平台上进行。",
     "stateLiveBlocked": "在此状态下无法进行实时提交。",
-    "stateReplayAvailable": "通过网关仍可使用明确验证过的合成回放。"
+    "stateReplayAvailable": "通过网关仍可使用明确验证过的合成回放。",
+    "inviteExpired": "邀请码已过期。请申请新的邀请码。",
+    "incorrectDevice": "设备不正确。此设备未获此邀请码授权。",
+    "walkthroughNeedsInvite": "离线演示仅适用于已与邀请码配对的设备。",
+    "pairedTitle": "邀请码已接受",
+    "pairedMessage": "邀请码已接受，并已与本移动设备配对，仅限本设备使用。有效期 {{days}} 天。",
+    "pairedDetail": "配对时间：{{pairedAt}} UTC · 有效期至：{{expiresAt}} UTC",
+    "pairedContinue": "继续"
   },
   "build44": {
     "validationError": "请检查无效的评估字段。",

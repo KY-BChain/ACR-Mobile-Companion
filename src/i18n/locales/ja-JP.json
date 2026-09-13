@@ -333,7 +333,14 @@
     "stateGatewayConnectedPlatformVerified": "ゲートウェイ接続済み — ライブプラットフォーム検証済み",
     "stateNoLocalInference": "この端末が臨床推論を行うことはありません。すべての推論は ACR プラットフォーム上で実行されます。",
     "stateLiveBlocked": "この状態ではライブ送信を利用できません。",
-    "stateReplayAvailable": "明示的に検証された合成リプレイはゲートウェイ経由で引き続き利用できます。"
+    "stateReplayAvailable": "明示的に検証された合成リプレイはゲートウェイ経由で引き続き利用できます。",
+    "inviteExpired": "招待コードの有効期限が切れています。新しいコードを依頼してください。",
+    "incorrectDevice": "端末が正しくありません。この端末はこの招待コードで認証されていません。",
+    "walkthroughNeedsInvite": "オフラインのウォークスルーは、招待コードとペアリング済みの端末でのみ利用できます。",
+    "pairedTitle": "招待コードを受け付けました",
+    "pairedMessage": "招待コードを受け付け、このモバイル端末のみとペアリングしました。有効期間は{{days}}日間です。",
+    "pairedDetail": "ペアリング: {{pairedAt}} UTC · 有効期限: {{expiresAt}} UTC",
+    "pairedContinue": "続行"
   },
   "build44": {
     "validationError": "無効な評価フィールドを確認してください。",

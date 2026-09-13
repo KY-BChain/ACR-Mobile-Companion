@@ -9,7 +9,7 @@ import { ACRButton } from '../components/ACRButton';
 import { ACRCard } from '../components/ACRCard';
 import { ACRInput } from '../components/ACRInput';
 import { ACRSegmentedControl } from '../components/ACRSegmentedControl';
-import { ACRStateBadge } from '../components/ACRStateBadge';
+import { ACRStateBadge, spokenState } from '../components/ACRStateBadge';
 import { ACRStopBox } from '../components/ACRStopBox';
 import { ScreenLayout } from '../components/ScreenLayout';
 import { useAssessmentStore } from '../store/assessmentStore';
@@ -24,10 +24,11 @@ export const GatewayAccessScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const [inviteCode, setInviteCode] = useState('');
   const [connecting, setConnecting] = useState(false);
+  const [savedAccess, setSavedAccess] = useState<'UNKNOWN' | 'NONE' | 'ACTIVE' | 'EXPIRED'>('UNKNOWN');
   const {
     deliveryChoice, setDeliveryChoice, gatewayLive, setGatewayLive,
     accessReady, setAccessReady, attestation, setAttestation,
-    failure, setFailure, walkthroughOnly, setWalkthroughOnly, reset,
+    failure, setFailure, walkthroughOnly, setWalkthroughOnly, reset, setPairingNotice,
   } = useAssessmentStore();
   const language = i18n.resolvedLanguage ?? i18n.language;
   const textStyle = { writingDirection: getLocaleDirection(language), textAlign: getTextAlign(language) };
@@ -37,6 +38,15 @@ export const GatewayAccessScreen: React.FC = () => {
     gatewayClient.checkLive().then(() => { if (active) setGatewayLive('UP'); }).catch(() => { if (active) setGatewayLive('DOWN'); });
     return () => { active = false; };
   }, [setGatewayLive]);
+
+  // Build 46: whether this device holds a saved session — read from the
+  // secure keystore, so it answers offline too. It gates the offline
+  // walkthrough and shows the expired-invite message after 30 days.
+  useEffect(() => {
+    let active = true;
+    gatewayClient.savedAccessStatus().then((status) => { if (active) setSavedAccess(status); }).catch(() => undefined);
+    return () => { active = false; };
+  }, [accessReady]);
 
   // P3 / AUTH-03: after an app restart, restore access from the refresh token
   // held in the Keychain/Keystore, so an evaluator does not need a new
@@ -74,10 +84,14 @@ export const GatewayAccessScreen: React.FC = () => {
     setInviteCode('');
     try {
       await gatewayClient.checkLive(); setGatewayLive('UP');
-      await gatewayClient.redeemInvite(submittedInvite.trim()); setAccessReady(true);
-      try { setAttestation(await gatewayClient.checkAttestation()); }
-      catch (error) { setAttestation(null); setFailure(toFailureState(error)); }
-      navigation.navigate('Step1');
+      const notice = await gatewayClient.redeemInvite(submittedInvite.trim());
+      setAccessReady(true); setSavedAccess('ACTIVE');
+      // Baseline evidence is fetched once, by the evidence effect above, which
+      // runs as soon as access is ready (Build 45 also fetched it here — twice).
+      // A first pairing is confirmed by the Welcome pop-up; the paired device
+      // signing in again goes straight on.
+      if (notice.pairing === 'NEW') { setPairingNotice(notice); navigation.navigate('Welcome'); }
+      else navigation.navigate('Step1');
     } catch (error) {
       const nextFailure = toFailureState(error);
       setAccessReady(false);
@@ -88,13 +102,15 @@ export const GatewayAccessScreen: React.FC = () => {
 
   const disconnect = () => {
     gatewayClient.clearSession();
+    setSavedAccess('NONE');
     setAccessReady(false);
     setAttestation(null);
     setFailure(null);
   };
 
+  // Build 46: only a device with a saved, unexpired session may walk through,
+  // online or offline, and doing so keeps that session (Kraken, 13 Sept 2026).
   const startWalkthrough = () => {
-    gatewayClient.clearSession();
     reset();
     setDeliveryChoice('SYNTHETIC_DEMO');
     setAccessReady(false);
@@ -103,6 +119,12 @@ export const GatewayAccessScreen: React.FC = () => {
     setWalkthroughOnly(true);
     navigation.navigate('Step1');
   };
+
+  // Build 46 pairing answers are shown in the evaluator's language.
+  const failureText = (code: string, message: string) => code === 'SERVICE_UNAVAILABLE' ? t('gatewayAccess:notConnected')
+    : code === 'INVITE_EXPIRED' ? t('gatewayAccess:inviteExpired')
+      : code === 'DEVICE_NOT_AUTHORISED' ? t('gatewayAccess:incorrectDevice')
+        : message;
 
   // T45-10 composite connection state, fail-closed by construction.
   const connectionState = deriveConnectionState(gatewayLive, attestation ? attestation.verificationState : null);
@@ -144,16 +166,22 @@ export const GatewayAccessScreen: React.FC = () => {
           ? <Text style={[styles.connectionDetail, textStyle]}>{t('gatewayAccess:stateReplayAvailable')}</Text>
           : null}
         <Row label={t('gatewayAccess:gateway')} value={gatewayLive === 'UP' ? t('gatewayAccess:connected') : gatewayLive === 'DOWN' ? t('gatewayAccess:notConnected') : t('gatewayAccess:checking')} />
-        <Row label={t('gatewayAccess:attestation')} valueComponent={attestation ? <ACRStateBadge state={attestation.verificationState} /> : undefined} value={attestation ? undefined : t('common:emDash')} />
+        {/* value is what the screen reader speaks; the badge is what is seen. */}
+        <Row label={t('gatewayAccess:attestation')} valueComponent={attestation ? <ACRStateBadge state={attestation.verificationState} /> : undefined} value={attestation ? spokenState(attestation.verificationState) : t('common:emDash')} />
         {attestation ? <Text style={[styles.evidence, textStyle]}>{`${attestation.expected.logicalRuleCount}/${attestation.expected.physicalRuleCount}/${attestation.expected.activeRuleCount}/${attestation.expected.loadedRuleCount}/${attestation.expected.queryCount}`}</Text> : null}
         <Text style={[styles.connectionDetail, textStyle]}>{t('gatewayAccess:stateNoLocalInference')}</Text>
       </ACRCard>
       {gatewayLive === 'DOWN' ? <ACRStopBox title={t('gatewayAccess:notConnected')} message={t('gatewayAccess:serverAlert')} /> : null}
       {!accessReady && deliveryChoice === 'SYNTHETIC_DEMO' ? <>
         <ACRStopBox title={t('build44:fixtureUnavailable')} message={t('gatewayAccess:walkthroughNotice')} />
-        <ACRButton title={t('gatewayAccess:continueOffline')} variant="secondary" onPress={startWalkthrough} />
+        {savedAccess === 'ACTIVE'
+          ? <ACRButton title={t('gatewayAccess:continueOffline')} variant="secondary" onPress={startWalkthrough} />
+          : <Text style={[styles.connectionDetail, textStyle]}>{t('gatewayAccess:walkthroughNeedsInvite')}</Text>}
       </> : null}
-      {failure ? <View style={styles.error}><Text accessibilityRole="alert" style={[styles.errorText, textStyle]}>{failure.code === 'SERVICE_UNAVAILABLE' ? t('gatewayAccess:notConnected') : failure.message}</Text></View> : null}
+      {failure ? <View style={styles.error}><Text accessibilityRole="alert" style={[styles.errorText, textStyle]}>{failureText(failure.code, failure.message)}</Text></View> : null}
+      {!failure && !accessReady && savedAccess === 'EXPIRED'
+        ? <View style={styles.error}><Text accessibilityRole="alert" style={[styles.errorText, textStyle]}>{t('gatewayAccess:inviteExpired')}</Text></View>
+        : null}
       <Text style={[styles.privacy, textStyle]}>{t('gatewayAccess:privacy')}</Text>
     </ScreenLayout>
   );

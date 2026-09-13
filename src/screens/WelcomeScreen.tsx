@@ -24,6 +24,8 @@ import {
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { getLocaleDirection, getTextAlign, isRTL } from '../utils/rtl';
+import { useAssessmentStore } from '../store/assessmentStore';
+import { pairingStamp } from '../utils/pairingStamp';
 
 const LOGO_CORNERSTONE = require('../assets/logos/logo-cornerstone.png');
 const LOGO_BLOCKENERGY = require('../assets/logos/logo-blockenergy.png');
@@ -37,6 +39,9 @@ export const WelcomeScreen: React.FC = () => {
   const { width } = useWindowDimensions();
   const [langModalVisible, setLangModalVisible] = useState(false);
   const languageChangeInProgress = useRef(false);
+  // Build 46: the one-time confirmation after a first pairing.
+  const pairingNotice = useAssessmentStore((state) => state.pairingNotice);
+  const setPairingNotice = useAssessmentStore((state) => state.setPairingNotice);
 
   const currentLang = i18n.language as LanguageCode;
   const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
@@ -49,7 +54,7 @@ export const WelcomeScreen: React.FC = () => {
   useFocusEffect(
     useCallback(() => {
       const supportsPoster = Platform.OS === 'android' || Platform.OS === 'ios';
-      if (!supportsPoster || langModalVisible) {
+      if (!supportsPoster || langModalVisible || pairingNotice) {
         return undefined;
       }
 
@@ -60,7 +65,7 @@ export const WelcomeScreen: React.FC = () => {
       }, 3000);
 
       return () => clearTimeout(posterTimer);
-    }, [langModalVisible, navigation]),
+    }, [langModalVisible, navigation, pairingNotice]),
   );
 
   const handleSelectLanguage = async (code: LanguageCode) => {
@@ -160,6 +165,37 @@ export const WelcomeScreen: React.FC = () => {
         resizeMode="contain"
         accessibilityLabel="Block Energy"
       />
+
+      {/* ─── Build 46 pairing confirmation (first pairing only) ─── */}
+      <Modal
+        visible={pairingNotice !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setPairingNotice(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View accessibilityViewIsModal style={[styles.modalContent, { width: Math.min(width * 0.85, 360) }]}>
+            <Text accessibilityRole="header" style={[styles.modalTitle, localeTextStyle]}>{t('gatewayAccess:pairedTitle')}</Text>
+            <Text accessibilityRole="alert" style={[styles.pairMessage, localeTextStyle]}>
+              {pairingNotice ? t('gatewayAccess:pairedMessage', { days: pairingNotice.sessionDays }) : ''}
+            </Text>
+            <Text style={[styles.pairDetail, localeTextStyle]}>
+              {pairingNotice ? t('gatewayAccess:pairedDetail', {
+                pairedAt: pairingStamp(pairingNotice.pairedAt),
+                expiresAt: pairingStamp(pairingNotice.expiresAt),
+              }) : ''}
+            </Text>
+            <TouchableOpacity
+              style={styles.modalCloseBtn}
+              accessibilityRole="button"
+              onPress={() => { setPairingNotice(null); navigation.navigate('GatewayAccess'); }}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.pairContinue, localeTextStyle]}>{t('gatewayAccess:pairedContinue')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       {/* ─── Language Selection Modal ─── */}
       <Modal
@@ -421,5 +457,23 @@ const styles = StyleSheet.create({
     ...ACRTypography.body,
     color: ACRColors.muted,
     fontSize: 14,
+  },
+  pairMessage: {
+    ...ACRTypography.body,
+    color: ACRColors.ink,
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 10,
+  },
+  pairDetail: {
+    ...ACRTypography.hint,
+    color: ACRColors.muted,
+    marginBottom: 4,
+  },
+  pairContinue: {
+    ...ACRTypography.body,
+    color: ACRColors.primary,
+    fontWeight: '700',
+    fontSize: 15,
   },
 });

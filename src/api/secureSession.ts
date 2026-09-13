@@ -22,6 +22,8 @@ import { generateDeviceBinding } from '../utils/uuid';
 export interface SessionStore {
   getInstallBinding(): Promise<string>;
   loadRefresh(): Promise<{ token: string; expiresAt: number } | null>;
+  /** The saved session's expiry even when it has passed, or null when none is saved (Build 46). */
+  loadRefreshExpiry(): Promise<number | null>;
   saveRefresh(token: string, expiresAt: number): Promise<void>;
   clearRefresh(): Promise<void>;
 }
@@ -52,6 +54,15 @@ export const secureSessionStore: SessionStore = {
     return { token, expiresAt };
   },
 
+  async loadRefreshExpiry() {
+    const [token, expiry] = await Promise.all([
+      SecureStore.getItemAsync(REFRESH_KEY, OPTIONS),
+      SecureStore.getItemAsync(REFRESH_EXPIRY_KEY, OPTIONS),
+    ]);
+    const expiresAt = Number(expiry);
+    return token && Number.isFinite(expiresAt) ? expiresAt : null;
+  },
+
   async saveRefresh(token, expiresAt) {
     await SecureStore.setItemAsync(REFRESH_KEY, token, OPTIONS);
     await SecureStore.setItemAsync(REFRESH_EXPIRY_KEY, String(expiresAt), OPTIONS);
@@ -71,6 +82,7 @@ export function createMemorySessionStore(binding: string): SessionStore & {
   return {
     async getInstallBinding() { return binding; },
     async loadRefresh() { return refresh && Date.now() < refresh.expiresAt ? { ...refresh } : null; },
+    async loadRefreshExpiry() { return refresh ? refresh.expiresAt : null; },
     async saveRefresh(token, expiresAt) { refresh = { token, expiresAt }; },
     async clearRefresh() { refresh = null; },
     snapshot() { return refresh ? { ...refresh } : null; },

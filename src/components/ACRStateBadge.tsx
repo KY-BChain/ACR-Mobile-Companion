@@ -7,6 +7,13 @@ interface Props {
   state: VerificationState;
 }
 
+/**
+ * The words a screen reader speaks for a state. A badge inside an accessible
+ * row is not announced on its own — the row's label is — so every row that
+ * shows a badge passes this as its spoken value (Build 46 accessibility fix).
+ */
+export const spokenState = (state: VerificationState): string => state.replace(/_/g, ' ').toLowerCase();
+
 export const ACRStateBadge: React.FC<Props> = ({ state }) => {
   const isVerified = state === 'VERIFIED';
   return (

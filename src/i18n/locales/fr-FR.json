@@ -333,7 +333,14 @@
     "stateGatewayConnectedPlatformVerified": "Passerelle connectée — Plateforme en direct vérifiée",
     "stateNoLocalInference": "Cet appareil n'effectue jamais d'inférence clinique. Tout le raisonnement a lieu sur la plateforme ACR.",
     "stateLiveBlocked": "La transmission en direct est indisponible dans cet état.",
-    "stateReplayAvailable": "La relecture synthétique vérifiée explicite reste disponible via la passerelle."
+    "stateReplayAvailable": "La relecture synthétique vérifiée explicite reste disponible via la passerelle.",
+    "inviteExpired": "Code d'invitation expiré. Demandez-en un nouveau.",
+    "incorrectDevice": "Appareil incorrect. Cet appareil n'est pas autorisé pour ce code d'invitation.",
+    "walkthroughNeedsInvite": "La visite hors ligne n'est disponible que sur un appareil déjà associé à un code d'invitation.",
+    "pairedTitle": "Code d'invitation accepté",
+    "pairedMessage": "Code d'invitation accepté et associé à cet appareil mobile, et à lui seul. Pour {{days}} jours.",
+    "pairedDetail": "Associé : {{pairedAt}} UTC · Valable jusqu'au : {{expiresAt}} UTC",
+    "pairedContinue": "Continuer"
   },
   "build44": {
     "validationError": "Vérifiez les champs d'évaluation invalides.",

@@ -333,7 +333,14 @@
     "stateGatewayConnectedPlatformVerified": "게이트웨이 연결됨 — 라이브 플랫폼 검증됨",
     "stateNoLocalInference": "이 기기는 임상 추론을 수행하지 않습니다. 모든 추론은 ACR 플랫폼에서 실행됩니다.",
     "stateLiveBlocked": "이 상태에서는 라이브 전송을 사용할 수 없습니다.",
-    "stateReplayAvailable": "명시적으로 검증된 합성 재생은 게이트웨이를 통해 계속 사용할 수 있습니다."
+    "stateReplayAvailable": "명시적으로 검증된 합성 재생은 게이트웨이를 통해 계속 사용할 수 있습니다.",
+    "inviteExpired": "초대 코드가 만료되었습니다. 새 코드를 요청하세요.",
+    "incorrectDevice": "잘못된 기기입니다. 이 기기는 이 초대 코드에 대해 인증되지 않았습니다.",
+    "walkthroughNeedsInvite": "오프라인 둘러보기는 초대 코드와 이미 페어링된 기기에서만 사용할 수 있습니다.",
+    "pairedTitle": "초대 코드가 승인되었습니다",
+    "pairedMessage": "초대 코드가 승인되어 이 모바일 기기에만 페어링되었습니다. {{days}}일 동안 유효합니다.",
+    "pairedDetail": "페어링: {{pairedAt}} UTC · 유효 기한: {{expiresAt}} UTC",
+    "pairedContinue": "계속"
   },
   "build44": {
     "validationError": "유효하지 않은 평가 필드를 확인하십시오.",

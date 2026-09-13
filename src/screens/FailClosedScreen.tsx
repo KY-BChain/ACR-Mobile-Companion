@@ -7,7 +7,7 @@ import { ScreenLayout } from '../components/ScreenLayout';
 import { ACRCard } from '../components/ACRCard';
 import { ACRButton } from '../components/ACRButton';
 import { ACRStopBox } from '../components/ACRStopBox';
-import { ACRStateBadge } from '../components/ACRStateBadge';
+import { ACRStateBadge, spokenState } from '../components/ACRStateBadge';
 import { ACRColors, ACRTypography } from '../theme/colors';
 import { useAssessmentStore } from '../store/assessmentStore';
 import { gatewayClient, toFailureState } from '../api/client';
@@ -58,7 +58,8 @@ export const FailClosedScreen: React.FC = () => {
           carries accessibilityRole="alert"), so it is not conveyed by colour alone. */}
       <ACRStopBox title={code} message={visibleMessage} />
       <ACRCard title={t('failClosed:verificationDetail')}>
-        <Row label={t('failClosed:state')} valueComponent={<ACRStateBadge state={state} />} />
+        {/* value is what the screen reader speaks; the badge is what is seen. */}
+        <Row label={t('failClosed:state')} value={spokenState(state)} valueComponent={<ACRStateBadge state={state} />} />
         <Row label={t('failClosed:expectedReasoner')} value="v2.2" />
         <Row label={t('failClosed:observedReasoner')} value={attestation?.observed.reasonerVersion ?? t('common:emDash')} />
         <Row label={t('failClosed:ontologyHash')} value={attestation?.observed.ontologySha256 ?? t('common:emDash')} />

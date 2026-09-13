@@ -44,7 +44,15 @@ const walkthroughStart = review.indexOf('if (store.walkthroughOnly)');
 const authenticatedStart = review.indexOf('if (!store.accessReady', walkthroughStart);
 assert.ok(walkthroughStart >= 0 && authenticatedStart > walkthroughStart, 'walkthrough is handled before authentication/submission');
 const walkthroughBranch = review.slice(walkthroughStart, authenticatedStart);
-assert.match(walkthroughBranch, /gatewayClient\.clearSession\(\)/);
+// Build 46 (Kraken, 13 Sept 2026): the walkthrough is for a device already
+// paired with an invite code, and it keeps that saved session — Build 44/45
+// ended it here and when the walkthrough started.
+assert.doesNotMatch(walkthroughBranch, /clearSession\(/, 'finishing the walkthrough must keep the saved session');
+const startWalkthrough = access.slice(access.indexOf('const startWalkthrough'), access.indexOf('navigation.navigate(\'Step1\');', access.indexOf('const startWalkthrough')));
+assert.ok(startWalkthrough.length > 0, 'startWalkthrough exists');
+assert.doesNotMatch(startWalkthrough, /clearSession\(/, 'starting the walkthrough must keep the saved session');
+assert.match(access, /savedAccess === 'ACTIVE'\s*\?\s*<ACRButton title=\{t\('gatewayAccess:continueOffline'\)\}/, 'the walkthrough button needs a saved, unexpired session');
+assert.match(access, /t\('gatewayAccess:walkthroughNeedsInvite'\)/, 'a device without a paired code is told why');
 assert.match(walkthroughBranch, /store\.resetCycle\(\)/);
 assert.match(walkthroughBranch, /DEMO_FIXTURE_NOT_AVAILABLE/);
 assert.match(walkthroughBranch, /outcome: 'NOT_SUBMITTED'/);
