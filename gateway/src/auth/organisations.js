@@ -10,7 +10,7 @@
  * organisation to the operator and in the admin listings. The gateway stores
  * the tag and a label only — never a name or an email address.
  */
-const ORGANISATIONS = Object.freeze(['ZZU', 'UCD', 'HKU', 'TEST']);
+const ORGANISATIONS = Object.freeze(['ZZU', 'UCD', 'HKU', 'CRIL','TEST']);
 
 const ORG_PATTERN = /^[A-Z]{2,6}$/;
 
