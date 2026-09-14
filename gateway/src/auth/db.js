@@ -28,7 +28,8 @@ CREATE TABLE IF NOT EXISTS invitations (
   max_redemptions INTEGER NOT NULL DEFAULT 1,
   redemptions     INTEGER NOT NULL DEFAULT 0,
   revoked_at      INTEGER,
-  revoked_reason  TEXT
+  revoked_reason  TEXT,
+  org             TEXT
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
@@ -133,6 +134,10 @@ function openAuthDatabase({ storePath, pepperPath }) {
   db.exec('PRAGMA synchronous = FULL');
   db.exec('PRAGMA foreign_keys = ON');
   db.exec(SCHEMA);
+  // Build 46 Part A: stores created before organisation tags gain the column.
+  // Existing invitations keep org NULL, so their ACR45 codes still verify.
+  const invitationColumns = db.prepare('PRAGMA table_info(invitations)').all().map((column) => column.name);
+  if (!invitationColumns.includes('org')) db.exec('ALTER TABLE invitations ADD COLUMN org TEXT');
   return { db, pepper };
 }
 

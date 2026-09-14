@@ -36,7 +36,7 @@ Step by step (Build 46 runbook §0–1). Give each service its own terminal and 
 lsof -nP -iTCP:8080 -sTCP:LISTEN || true
 cd /Users/Kraken/DAPP/ACR-platform/ACR-Ontology-Interface
 mvn spring-boot:run -Dspring-boot.run.profiles=hybrid
-# once Spring has started, from another terminal:
+# once Spring has started, from another terminal for verifiction:
 curl -fsS http://localhost:8080/api/infer/health | jq .
 ```
 
@@ -45,6 +45,7 @@ curl -fsS http://localhost:8080/api/infer/health | jq .
 ```zsh
 pgrep -lf 'cloudflared.*acr-api' || true
 cloudflared tunnel run --url http://localhost:8080 acr-api
+# once tunnel has started, from another terminal for verifiction:
 curl -fsS https://api.acragent.com/api/infer/health | jq .
 ```
 
@@ -64,6 +65,7 @@ The script:
 **Other commands**
 
 ```zsh
+cd /Users/Kraken/DAPP/acr-mobile-companion
 scripts/build46-review-service.sh status   # read-only check of T1–T4
 scripts/build46-review-service.sh stop     # stops T4, then T3 — do this before closing T1/T2
 ```
@@ -212,7 +214,7 @@ to be running to issue.
 ```sh
 cd /Users/Kraken/DAPP/acr-mobile-companion/gateway
 ACR_AUTH_STORE_PATH=$HOME/.acr-gateway/gate10/auth.db ACR_AUTH_PEPPER_PATH=$HOME/.acr-gateway/gate10/pepper.bin \
-  node src/auth/invite-admin.js issue --label reviewer-01 --issued-by Kraken
+  node src/auth/invite-admin.js issue --org ZZU --label zzu-001 --issued-by Kraken
 ```
 
 The code is printed once and never stored in plaintext. What happens next:
@@ -352,7 +354,7 @@ Run it from `gateway/` (§6):
 ```sh
 cd /Users/Kraken/DAPP/acr-mobile-companion/gateway
 ACR_AUTH_STORE_PATH=$HOME/.acr-gateway/gate10/auth.db ACR_AUTH_PEPPER_PATH=$HOME/.acr-gateway/gate10/pepper.bin \
-  node src/auth/invite-admin.js issue --label reviewer-01 --issued-by Kraken
+  node src/auth/invite-admin.js issue --org ZZU --label zzu-001 --issued-by Kraken
 ```
 
 The same tool also has `list`, `sessions`, `revoke --label X --reason LOST` and `init`.
@@ -371,7 +373,14 @@ The full path is `/Users/Kraken/.acr-gateway/gate10/`. It sits in your home fold
 than the repo, so it survives restarts and is never committed.
 
 **What's stored for an invite.** The plaintext code is printed once, when issued, and
-never written anywhere. A code such as `ACR45-XXXXXXXX-YYYYYYYYYYYY` has two parts:
+never written anywhere. **Code format.** A new code names the invitee's organisation, for example
+`ACR-ZZU-XXXXXXXX-YYYYYYYYYYYY`.
+- The allowed tags are a fixed list in `gateway/src/auth/organisations.js`: ZZU, UCD,
+  HKU, and TEST for internal test phones. `issue` requires `--org`.
+- Older codes read `ACR45-XXXXXXXX-YYYYYYYYYYYY` and still work.
+- Capitals don't matter, and O, I and L are read as 0, 1 and 1.
+
+After the prefix and tag, a code has two parts:
 - **The middle part is a selector,** stored as-is so the gateway can find the right row.
 - **The last part is the secret verifier.** Only a scrypt hash of it is stored, salted and
   combined with `pepper.bin`.

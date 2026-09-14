@@ -181,7 +181,7 @@ cd /Users/Kraken/DAPP/acr-mobile-companion/gateway
 export ACR_AUTH_STORE_PATH=$HOME/.acr-gateway/gate10/auth.db
 export ACR_AUTH_PEPPER_PATH=$HOME/.acr-gateway/gate10/pepper.bin
 
-node src/auth/invite-admin.js issue --label reviewer-01 --issued-by Kraken
+node src/auth/invite-admin.js issue --org ZZU --label zzu-001 --issued-by Kraken
 node src/auth/invite-admin.js list                   # every code: issued, uses, live devices
 node src/auth/invite-admin.js sessions               # every paired device: label, build, paired (DDMMYY-HHMMSS UTC), expiry, live
 node src/auth/invite-admin.js revoke --label reviewer-01 --reason LOST
@@ -202,7 +202,16 @@ Yes, it is a small SQLite database, but **the invite code itself is never kept i
 ~/.acr-gateway/gate10/pepper.bin     32-byte secret key used in hashing (0600)
 ```
 
-A code `ACR45-XXXXXXXX-YYYYYYYYYYYY` has two parts:
+**Code format.** A new code names the invitee's organisation, for example
+`ACR-ZZU-XXXXXXXX-YYYYYYYYYYYY`.
+- The allowed tags are a fixed list in `gateway/src/auth/organisations.js`: ZZU, UCD,
+  HKU, and TEST for internal test phones. To add a partner, add its tag there, then
+  restart the gateway. `issue` requires `--org`.
+- Older codes read `ACR45-XXXXXXXX-YYYYYYYYYYYY` and still work.
+- Capitals don't matter, and O, I and L are read as 0, 1 and 1.
+- A tag can't be swapped: a code with the wrong tag is refused like a wrong code.
+
+After the prefix and tag, a code has two parts:
 - The middle part is a **selector**, stored as-is so the gateway can find the row.
 - The last part is the secret. Only its scrypt hash is stored, salted and keyed
   with `pepper.bin`.

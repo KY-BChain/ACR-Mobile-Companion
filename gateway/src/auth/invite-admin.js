@@ -7,6 +7,7 @@ const path = require('path');
 const { openAuthDatabase, audit } = require('./db');
 const L = require('./lifetimes');
 const { generateInviteCode, newSalt, inviteVerifier, redactSessionId } = require('./crypto');
+const { ORGANISATIONS, isKnownOrganisation } = require('./organisations');
 
 /**
  * T45-08 invitation administration (G10-0 §10.3, Q3).
@@ -41,24 +42,31 @@ function init({ pepperPath }) {
   return { created: true, pepperPath };
 }
 
-function issue({ db, pepper }, { label, issuedBy, maxRedemptions = 1, now = Date.now() }) {
+function issue({ db, pepper }, { label, issuedBy, org = null, maxRedemptions = 1, now = Date.now() }) {
   if (!label || !issuedBy) throw new Error('--label and --issued-by are required');
   if (!/^[A-Za-z0-9_-]{1,64}$/.test(label)) {
     throw new Error('--label must be a short non-clinical identifier, e.g. reviewer-03');
   }
-  const { selector, secret, code } = generateInviteCode();
+  // Build 46 Part A: the organisation tag must be on the fixed list. Callers
+  // that pass none get a legacy ACR45 code (tests, existing tooling); the CLI
+  // always requires --org.
+  if (org !== null && !isKnownOrganisation(org)) {
+    throw new Error(`--org must be a known organisation: ${ORGANISATIONS.join(', ')}`);
+  }
+  const { selector, secret, code } = generateInviteCode(org);
   const salt = newSalt();
   const id = crypto.randomUUID();
   db.prepare(`
     INSERT INTO invitations
-      (id, selector, verifier_hash, salt, label, issued_by, issued_at, expires_at, max_redemptions, redemptions)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`).run(
+      (id, selector, verifier_hash, salt, label, issued_by, issued_at, expires_at, max_redemptions, redemptions, org)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)`).run(
     id, selector, inviteVerifier(secret, salt, pepper), salt, label, issuedBy,
-    now, now + L.INVITE_ACTIVATION_MS, maxRedemptions,
+    now, now + L.INVITE_ACTIVATION_MS, maxRedemptions, org,
   );
   audit(db, { at: now, event: 'INVITE_ISSUED', label });
   return {
     code,
+    org,
     label,
     issuedBy,
     activationExpiresAt: new Date(now + L.INVITE_ACTIVATION_MS).toISOString(),
@@ -104,7 +112,7 @@ function revoke({ db }, { label, reason = 'ADMIN', now = Date.now() }) {
 /** Non-clinical status listing. Never prints codes, tokens or hashes. */
 function list({ db }, { now = Date.now() } = {}) {
   return db.prepare(`
-    SELECT i.label, i.issued_by, i.issued_at, i.expires_at, i.redemptions, i.max_redemptions,
+    SELECT i.org, i.label, i.issued_by, i.issued_at, i.expires_at, i.redemptions, i.max_redemptions,
            i.revoked_at, i.revoked_reason,
            (SELECT COUNT(*) FROM sessions s WHERE s.invitation_id = i.id AND s.revoked_at IS NULL
               AND s.expires_at > ?) AS live_sessions
@@ -126,10 +134,11 @@ function pairingStamp(ms) {
  */
 function sessions({ db }, { now = Date.now() } = {}) {
   return db.prepare(`
-    SELECT s.id, i.label, s.client_build_id, s.created_at, s.expires_at, s.revoked_at, s.revoked_reason
+    SELECT s.id, i.org, i.label, s.client_build_id, s.created_at, s.expires_at, s.revoked_at, s.revoked_reason
       FROM sessions s JOIN invitations i ON i.id = s.invitation_id
      ORDER BY s.created_at DESC`).all().map((row) => ({
     session: redactSessionId(row.id),
+    org: row.org,
     label: row.label,
     pairedUtc: pairingStamp(row.created_at),
     build: row.client_build_id,
@@ -161,13 +170,17 @@ function main() {
   try {
     switch (command) {
       case 'issue': {
+        const org = arg('--org');
+        if (!org) throw new Error(`--org is required: one of ${ORGANISATIONS.join(', ')}`);
         const result = issue(ctx, {
+          org,
           label: arg('--label'),
           issuedBy: arg('--issued-by'),
           maxRedemptions: Number(arg('--max-redemptions') || 1),
         });
         console.log('Invitation issued. The code below is shown ONCE and is not stored anywhere.');
         console.log(`  code:              ${result.code}`);
+        console.log(`  organisation:      ${result.org}`);
         console.log(`  label:             ${result.label}`);
         console.log(`  issued by:         ${result.issuedBy}`);
         console.log(`  activation until:  ${result.activationExpiresAt}`);
@@ -187,7 +200,7 @@ function main() {
         console.table(sessions(ctx));
         break;
       default:
-        console.log('Usage: acr-invite <init|issue|revoke|list|sessions> [--label X] [--issued-by Y] [--reason LOST]');
+        console.log(`Usage: acr-invite <init|issue|revoke|list|sessions> [--org ${ORGANISATIONS.join('|')}] [--label X] [--issued-by Y] [--reason LOST]`);
         process.exitCode = 1;
     }
   } finally {

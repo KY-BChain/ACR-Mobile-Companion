@@ -161,7 +161,11 @@ class SqliteAuthService {
     const candidate = inviteVerifier(parsed.secret, salt, this.pepper);
     const matches = invitation ? safeEqualHex(candidate, invitation.verifier_hash) : false;
 
-    if (!invitation || !matches) throw fail();
+    // Build 46 Part A: the organisation tag in the code must be the one the
+    // code was issued with (legacy ACR45 codes carry none). Checked after the
+    // scrypt work, so a swapped tag costs the same as a wrong secret (AT-12)
+    // and counts towards the rate limit.
+    if (!invitation || !matches || (invitation.org ?? null) !== parsed.org) throw fail();
     if (invitation.revoked_at !== null) throw fail();
 
     // Pairing and re-entry need the current build; a previous build keeps its

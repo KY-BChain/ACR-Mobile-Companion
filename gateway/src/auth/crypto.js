@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('crypto');
+const { ORG_PATTERN } = require('./organisations');
 
 /**
  * Cryptographic primitives for Build 45 authentication (G10-0 §3, §4.1).
@@ -45,24 +46,55 @@ function randomCode(length) {
   return out.join('');
 }
 
-/** Generate a full invitation code: ACR45-<selector>-<secret>. */
-function generateInviteCode() {
+/**
+ * Generate a full invitation code. With an organisation tag (Build 46 Part A):
+ * ACR-<ORG>-<selector>-<secret>. Without one, the legacy ACR45-<selector>-<secret>.
+ */
+function generateInviteCode(org = null) {
   const selector = randomCode(SELECTOR_LENGTH);
   const secret = randomCode(SECRET_LENGTH);
-  return { selector, secret, code: `ACR45-${selector}-${secret}` };
+  const code = org ? `ACR-${org}-${selector}-${secret}` : `ACR45-${selector}-${secret}`;
+  return { selector, secret, code };
 }
 
 /**
- * Split a presented code into its selector and secret halves.
- * Returns null for anything that is not exactly the expected shape, so a
+ * Codes are typed by hand, so they are read case-insensitively, and the
+ * letters the alphabet never uses are read as the digits they resemble:
+ * O as 0, I and L as 1 (Crockford base32 decoding). Applied to the selector
+ * and secret only; the organisation tag is plain capitals.
+ */
+function normaliseCodePart(part) {
+  return part.toUpperCase().replace(/O/g, '0').replace(/[IL]/g, '1');
+}
+
+const SELECTOR_RE = new RegExp(`^[${ALPHABET}]{${SELECTOR_LENGTH}}$`);
+const SECRET_RE = new RegExp(`^[${ALPHABET}]{${SECRET_LENGTH}}$`);
+
+/**
+ * Split a presented code into { org, selector, secret }; org is null for a
+ * legacy ACR45 code. Accepts ACR-<ORG>-<8>-<12> and ACR45-<8>-<12>, in any
+ * case and with surrounding spaces. Returns null for anything else, so a
  * malformed code costs no cryptographic work (AT-18).
  */
 function parseInviteCode(value) {
-  if (typeof value !== 'string' || value.length !== 6 + SELECTOR_LENGTH + 1 + SECRET_LENGTH) return null;
-  const match = new RegExp(
-    `^ACR45-([${ALPHABET}]{${SELECTOR_LENGTH}})-([${ALPHABET}]{${SECRET_LENGTH}})$`,
-  ).exec(value);
-  return match ? { selector: match[1], secret: match[2] } : null;
+  if (typeof value !== 'string' || value.length > 64) return null;
+  const parts = value.trim().split('-');
+  let org = null;
+  let selectorPart;
+  let secretPart;
+  if (parts.length === 3 && parts[0].toUpperCase() === 'ACR45') {
+    [, selectorPart, secretPart] = parts;
+  } else if (parts.length === 4 && parts[0].toUpperCase() === 'ACR') {
+    org = parts[1].toUpperCase();
+    if (!ORG_PATTERN.test(org)) return null;
+    [, , selectorPart, secretPart] = parts;
+  } else {
+    return null;
+  }
+  const selector = normaliseCodePart(selectorPart);
+  const secret = normaliseCodePart(secretPart);
+  if (!SELECTOR_RE.test(selector) || !SECRET_RE.test(secret)) return null;
+  return { org, selector, secret };
 }
 
 function newSalt() {

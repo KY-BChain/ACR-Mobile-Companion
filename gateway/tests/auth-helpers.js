@@ -32,6 +32,7 @@ function createAuthFixture({ expectedClientBuildId = 'mob-v0.6.5+45', now = () =
       const ctx = openAuthDatabase({ storePath, pepperPath });
       try {
         return issue(ctx, {
+          org: options.org === undefined ? null : options.org,
           label: options.label || `reviewer-${crypto.randomBytes(3).toString('hex')}`,
           issuedBy: options.issuedBy || 'kraken',
           maxRedemptions: options.maxRedemptions || 1,
