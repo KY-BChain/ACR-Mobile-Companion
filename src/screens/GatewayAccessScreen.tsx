@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, AppState, StyleSheet, Text, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -33,6 +33,16 @@ export const GatewayAccessScreen: React.FC = () => {
   } = useAssessmentStore();
   const language = i18n.resolvedLanguage ?? i18n.language;
   const textStyle = { writingDirection: getLocaleDirection(language), textAlign: getTextAlign(language) };
+
+  // Build 47: check again whenever the app returns to the foreground — a phone
+  // that changed network (Wi-Fi, mobile data, cable) meanwhile would otherwise
+  // keep showing its last state.
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') { setGatewayLive('UNKNOWN'); setLiveCheck((count) => count + 1); }
+    });
+    return () => subscription.remove();
+  }, [setGatewayLive]);
 
   useEffect(() => {
     let active = true;
@@ -153,6 +163,7 @@ export const GatewayAccessScreen: React.FC = () => {
         <ACRButton title={t('gatewayAccess:connect')} onPress={() => { void connect(); }} disabled={connecting || inviteCode.trim() === ''} /></>}>
       <ACRCard title={t('gatewayAccess:modeTitle')}>
         <ACRSegmentedControl options={['LIVE_PLATFORM', 'SYNTHETIC_DEMO']} labels={[t('gatewayAccess:liveMode'), t('gatewayAccess:demoMode')]}
+          selectedColors={{ SYNTHETIC_DEMO: ACRColors.demo }}
           selected={deliveryChoice} onSelect={(value) => {
             setWalkthroughOnly(false);
             setDeliveryChoice(value as 'LIVE_PLATFORM' | 'SYNTHETIC_DEMO');
@@ -188,6 +199,7 @@ export const GatewayAccessScreen: React.FC = () => {
           ? <Text style={[styles.connectionDetail, textStyle]}>{t('gatewayAccess:stateReplayAvailable')}</Text>
           : null}
         <Row label={t('gatewayAccess:gateway')} value={gatewayLive === 'UP' ? t('gatewayAccess:connected') : gatewayLive === 'DOWN' ? t('gatewayAccess:notConnected') : t('gatewayAccess:checking')} />
+        {gatewayLive === 'DOWN' && !waitingForServer ? <ACRButton title={t('common:retryCheck')} variant="secondary" onPress={retryLive} /> : null}
         {/* value is what the screen reader speaks; the badge is what is seen. */}
         <Row label={t('gatewayAccess:attestation')} valueComponent={attestation ? <ACRStateBadge state={attestation.verificationState} /> : undefined} value={attestation ? spokenState(attestation.verificationState) : t('common:emDash')} />
         {attestation ? <Text style={[styles.evidence, textStyle]}>{`${attestation.expected.logicalRuleCount}/${attestation.expected.physicalRuleCount}/${attestation.expected.activeRuleCount}/${attestation.expected.loadedRuleCount}/${attestation.expected.queryCount}`}</Text> : null}

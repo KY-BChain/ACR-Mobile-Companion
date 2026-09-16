@@ -9,9 +9,11 @@ interface Props {
   labels?: string[];
   selected: string;
   onSelect: (value: string) => void;
+  /** Build 47: a selected background for particular options (e.g. demo mode in amber). */
+  selectedColors?: Partial<Record<string, string>>;
 }
 
-export const ACRSegmentedControl: React.FC<Props> = ({ options, labels, selected, onSelect }) => {
+export const ACRSegmentedControl: React.FC<Props> = ({ options, labels, selected, onSelect, selectedColors }) => {
   const { i18n } = useTranslation();
   const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
   const direction = getLocaleDirection(activeLanguage);
@@ -29,6 +31,7 @@ export const ACRSegmentedControl: React.FC<Props> = ({ options, labels, selected
           style={[
             styles.segment,
             selected === opt && styles.selected,
+            selected === opt && selectedColors?.[opt] ? { backgroundColor: selectedColors[opt] } : null,
             idx < options.length - 1 && (isRtl ? styles.borderLeft : styles.borderRight),
           ]}
           onPress={() => onSelect(opt)}

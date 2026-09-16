@@ -133,7 +133,21 @@ const access = read('src/screens/GatewayAccessScreen.tsx');
 assert.match(access, /const waitingForServer = !accessReady && !walkthroughOnly && savedAccess === 'ACTIVE';/);
 assert.match(access, /\{!accessReady && !waitingForServer && savedAccess !== 'UNKNOWN' \? <ACRCard title=\{t\('gatewayAccess:inviteTitle'\)\}>/);
 assert.match(access, /t\('build47:waitingForServer'\)/);
-console.log('STATIC PASS return path keeps values, notice before unchanged T1 text, fixed figure moved, muted deterministic risk, Review blanks/sample/demo, markers and signed-in-offline card');
+// Build 47 device finding (Samsung, 16 Sept): a live check in flight when the
+// phone changed network hung on "Checking…" with no way to retry.
+const client = read('src/api/client.ts');
+assert.match(client, /export const LIVE_CHECK_TIMEOUT_MS = 10_000;/);
+assert.match(client, /controller \? \{ \.\.\.options, signal: controller\.signal \} : options/);
+assert.match(client, /'\/live', \{[^\n]*\}, LIVE_CHECK_TIMEOUT_MS\);/, 'the reachability check has a time limit');
+assert.match(access, /AppState\.addEventListener\('change', \(state\) => \{\n\s+if \(state === 'active'\) \{ setGatewayLive\('UNKNOWN'\); setLiveCheck\(\(count\) => count \+ 1\); \}/, 're-check on returning to the foreground');
+assert.match(access, /\{gatewayLive === 'DOWN' && !waitingForServer \? <ACRButton title=\{t\('common:retryCheck'\)\}/, 'Retry whenever the gateway reads not connected');
+// Kraken, 16 Sept: Synthetic demonstration in amber, on the button and on Review.
+assert.match(read('src/theme/colors.ts'), /demo: '#b45309'/);
+assert.match(access, /selectedColors=\{\{ SYNTHETIC_DEMO: ACRColors\.demo \}\}/);
+assert.match(review, /valueColor=\{store\.deliveryChoice === 'SYNTHETIC_DEMO' \? ACRColors\.demo : undefined\}/);
+const luminance = (hex) => { const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+assert.ok((1.05) / (luminance('#b45309') + 0.05) >= 4.5, 'amber meets WCAG AA against white, both ways');
+console.log('STATIC PASS return path keeps values, notice before unchanged T1 text, fixed figure moved, muted deterministic risk, Review blanks/sample/demo, markers, signed-in-offline card, time-limited live check with foreground re-check, amber demo mode');
 
 // ── Locales: identical Build 47 keys and placeholders in all eight
 const localeDir = path.join(root, 'src/i18n/locales');

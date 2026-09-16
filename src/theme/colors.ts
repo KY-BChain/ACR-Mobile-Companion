@@ -44,6 +44,10 @@ export const ACRColors = {
   resultHigh: '#c53030',
   resultLow: '#276749',
   resultOther: '#2b6cb0',
+  // Build 47 (Kraken, 16 Sept 2026): Synthetic demonstration is marked in amber,
+  // so it is never mistaken for a live result. 5:1 against white both ways
+  // (white text on amber, amber text on white), meeting WCAG AA.
+  demo: '#b45309',
 
   // iOS
   iosBlue: '#007AFF',

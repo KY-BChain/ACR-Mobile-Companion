@@ -31,6 +31,9 @@ export class GatewayError extends Error implements FailureState {
   toFailure(): FailureState { return { code: this.code, message: this.message, retryable: this.retryable, outcome: this.outcome, fieldErrors: this.fieldErrors }; }
 }
 
+/** Build 47: the reachability check gives up after 10 seconds. */
+export const LIVE_CHECK_TIMEOUT_MS = 10_000;
+
 export class GatewayClient {
   private accessToken: string | null = null;
   private refreshToken: string | null = null;
@@ -99,11 +102,17 @@ export class GatewayClient {
     }
   }
 
-  private async send(path: string, options: RequestInit): Promise<Response> {
+  private async send(path: string, options: RequestInit, timeoutMs?: number): Promise<Response> {
+    // Build 47: a request can be given a time limit, so a phone that changes
+    // network mid-request reports "not connected" instead of checking forever.
+    const controller = timeoutMs ? new AbortController() : null;
+    const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
     try {
-      return await this.fetchImpl(`${GATEWAY_API_BASE}${path}`, options);
+      return await this.fetchImpl(`${GATEWAY_API_BASE}${path}`, controller ? { ...options, signal: controller.signal } : options);
     } catch {
       throw new GatewayError('SERVICE_UNAVAILABLE', 'Server not connected.', true, 'NOT_SUBMITTED');
+    } finally {
+      if (timer) clearTimeout(timer);
     }
   }
 
@@ -135,7 +144,7 @@ export class GatewayClient {
   }
 
   async checkLive(): Promise<'UP'> {
-    const response = await this.send('/live', { method: 'GET', headers: { Accept: 'application/json', 'Cache-Control': 'no-store' } });
+    const response = await this.send('/live', { method: 'GET', headers: { Accept: 'application/json', 'Cache-Control': 'no-store' } }, LIVE_CHECK_TIMEOUT_MS);
     if (!response.ok) throw await this.errorFrom(response);
     const body = await response.json() as { status?: unknown };
     if (body?.status !== 'UP') throw new GatewayError('SERVICE_UNAVAILABLE', 'Server not connected.', true, 'NOT_SUBMITTED');

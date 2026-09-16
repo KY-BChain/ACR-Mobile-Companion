@@ -114,7 +114,8 @@ export const ReviewScreen: React.FC = () => {
     </>}>
       <WalkthroughNotice />
       <ACRCard title={t('build44:deliveryMode')}>
-        <Row label={t('build44:deliveryMode')} value={store.deliveryChoice === 'LIVE_PLATFORM' ? t('gatewayAccess:liveMode') : t('gatewayAccess:demoMode')} />
+        {/* Build 47: demo mode is named in the same amber as its selection button. */}
+        <Row label={t('build44:deliveryMode')} value={store.deliveryChoice === 'LIVE_PLATFORM' ? t('gatewayAccess:liveMode') : t('gatewayAccess:demoMode')} valueColor={store.deliveryChoice === 'SYNTHETIC_DEMO' ? ACRColors.demo : undefined} />
         <Text style={[styles.hint, localText]}>{store.deliveryChoice === 'LIVE_PLATFORM' ? t('build44:liveReviewHint') : t('build44:demoReviewHint')}</Text>
       </ACRCard>
 
@@ -171,13 +172,13 @@ export const ReviewScreen: React.FC = () => {
   );
 };
 
-const Row: React.FC<{ label: string; value?: string; valueComponent?: React.ReactNode; note?: string }> = ({ label, value, valueComponent, note }) => {
+const Row: React.FC<{ label: string; value?: string; valueComponent?: React.ReactNode; note?: string; valueColor?: string }> = ({ label, value, valueComponent, note, valueColor }) => {
   const { i18n } = useTranslation();
   const language = i18n.resolvedLanguage ?? i18n.language;
   const localText = { writingDirection: getLocaleDirection(language), textAlign: getTextAlign(language) };
   // Gates 8-9: grouped so assistive technology announces the label and its
   // value as one item, rather than two unrelated text nodes.
-  return <View accessible accessibilityRole="text" accessibilityLabel={`${label}: ${value ?? ''}${note ? `, ${note}` : ''}`} style={styles.row}><Text style={[styles.rowLabel, localText]}>{label}</Text>{valueComponent ?? <View style={styles.rowValueBlock}><Text selectable style={[styles.rowValue, localText]}>{value}</Text>{note ? <Text style={[styles.sampleNote, localText]}>{note}</Text> : null}</View>}</View>;
+  return <View accessible accessibilityRole="text" accessibilityLabel={`${label}: ${value ?? ''}${note ? `, ${note}` : ''}`} style={styles.row}><Text style={[styles.rowLabel, localText]}>{label}</Text>{valueComponent ?? <View style={styles.rowValueBlock}><Text selectable style={[styles.rowValue, valueColor ? { color: valueColor } : null, localText]}>{value}</Text>{note ? <Text style={[styles.sampleNote, localText]}>{note}</Text> : null}</View>}</View>;
 };
 
 const styles = StyleSheet.create({
