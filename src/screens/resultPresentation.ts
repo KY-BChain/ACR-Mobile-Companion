@@ -60,6 +60,21 @@ export function buildClinicalResultPresentation(result: AssessmentResponse): Cli
  */
 export type ResultValueTone = 'high' | 'low' | 'other';
 
+/**
+ * Build 47 (Kraken, 16 Sept 2026): the summary risk word is shown in the
+ * reader's language. T1 returns HIGH, INTERMEDIATE or LOW; any other value is
+ * shown exactly as returned. Colour still follows the returned word.
+ */
+export type RiskLabelKey = 'build47:riskHigh' | 'build47:riskIntermediate' | 'build47:riskLow';
+
+export function riskLabelKey(value: string | null | undefined): RiskLabelKey | null {
+  const word = String(value ?? '').trim().toUpperCase();
+  if (word === 'HIGH') return 'build47:riskHigh';
+  if (word === 'INTERMEDIATE') return 'build47:riskIntermediate';
+  if (word === 'LOW') return 'build47:riskLow';
+  return null;
+}
+
 export function resultValueTone(value: string | null | undefined): ResultValueTone {
   const word = String(value ?? '').trim().toLowerCase();
   if (word === 'high' || word === 'positive') return 'high';

@@ -407,6 +407,9 @@
     "demoChanged": "合成演示只会重放未修改的演示病例。数值修改后将不会返回结果。",
     "signedInTitle": "已在本设备登录",
     "waitingForServer": "正在等待服务器。无需再次输入邀请码：服务器可访问后将自动恢复访问。",
-    "reconnecting": "正在重新连接服务器…"
+    "reconnecting": "正在重新连接服务器…",
+    "riskHigh": "高危",
+    "riskIntermediate": "中危",
+    "riskLow": "低危"
   }
 }

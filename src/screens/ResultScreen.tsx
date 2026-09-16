@@ -11,7 +11,7 @@ import { ACRColors, ACRTypography } from '../theme/colors';
 import { useAssessmentStore } from '../store/assessmentStore';
 import { getLocaleDirection, getTextAlign } from '../utils/rtl';
 import type { RootStackParamList } from '../navigation/AppNavigator';
-import { buildClinicalResultPresentation, formatReturnedProbability, resultValueTone, TECHNICAL_DETAILS_DEFAULT_EXPANDED } from './resultPresentation';
+import { buildClinicalResultPresentation, formatReturnedProbability, resultValueTone, riskLabelKey, TECHNICAL_DETAILS_DEFAULT_EXPANDED } from './resultPresentation';
 import { ENTRY_SCREEN_COUNT, firstEntryRoute, fullAssessmentField, isRiskWithheld } from './completeness';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
@@ -52,6 +52,8 @@ export const ResultScreen: React.FC = () => {
     return field ? t('build47:fieldOnScreen', { field: t(field.labelKey), screen: field.screen, total: ENTRY_SCREEN_COUNT }) : name;
   };
   const completeMissing = () => navigation.navigate(firstEntryRoute(completeness.missingFields));
+  const riskKey = riskLabelKey(data.riskLevel);
+  const riskText = data.riskLevel === null ? t('common:emDash') : riskKey ? t(riskKey) : data.riskLevel;
 
   return (
     <ScreenLayout title={t('result:title')} subtitle={modeLabel} bannerText={t('assessment:clinicalTransparencyBanner')} footer={<>
@@ -68,7 +70,7 @@ export const ResultScreen: React.FC = () => {
         <Text selectable style={[styles.subtypeValue, toneStyle(data.molecularSubtype), localText]}>{data.molecularSubtype}</Text>
         <Text selectable style={[styles.subtypeText, localText]}>{t('build44:risk')}: {riskWithheld
           ? <Text style={styles.riskWithheld}>{t('build47:riskWithheld', { fields: completeness.missingFields.map(fieldName).join(', ') })}</Text>
-          : <Text style={[styles.riskValue, toneStyle(data.riskLevel)]}>{data.riskLevel ?? t('common:emDash')}</Text>}</Text>
+          : <Text style={[styles.riskValue, toneStyle(data.riskLevel)]}>{riskText}</Text>}</Text>
       </View>
 
       {incomplete ? <View style={styles.noticeBox}>

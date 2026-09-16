@@ -407,6 +407,9 @@
     "demoChanged": "Synthetic demo replays only the unchanged demonstration case. With changed values it will not return a result.",
     "signedInTitle": "Signed in on this device",
     "waitingForServer": "Waiting for the server. You do not need your invite code again: access resumes when the server is reachable.",
-    "reconnecting": "Reconnecting to the server…"
+    "reconnecting": "Reconnecting to the server…",
+    "riskHigh": "HIGH",
+    "riskIntermediate": "INTERMEDIATE",
+    "riskLow": "LOW"
   }
 }

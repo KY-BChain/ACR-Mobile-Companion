@@ -407,6 +407,9 @@
     "demoChanged": "合成デモは変更されていないデモ症例のみを再生します。値を変更すると結果は返されません。",
     "signedInTitle": "この端末でサインイン済み",
     "waitingForServer": "サーバーを待っています。招待コードを再入力する必要はありません。サーバーに接続できるとアクセスが再開されます。",
-    "reconnecting": "サーバーに再接続しています…"
+    "reconnecting": "サーバーに再接続しています…",
+    "riskHigh": "高リスク",
+    "riskIntermediate": "中間リスク",
+    "riskLow": "低リスク"
   }
 }

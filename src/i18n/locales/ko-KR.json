@@ -407,6 +407,9 @@
     "demoChanged": "합성 데모는 변경되지 않은 데모 사례만 재생합니다. 값을 변경하면 결과가 반환되지 않습니다.",
     "signedInTitle": "이 기기에서 로그인됨",
     "waitingForServer": "서버를 기다리는 중입니다. 초대 코드를 다시 입력할 필요가 없습니다. 서버에 연결되면 접근이 재개됩니다.",
-    "reconnecting": "서버에 다시 연결하는 중…"
+    "reconnecting": "서버에 다시 연결하는 중…",
+    "riskHigh": "고위험",
+    "riskIntermediate": "중간 위험",
+    "riskLow": "저위험"
   }
 }

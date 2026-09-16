@@ -67,7 +67,15 @@ assert.ok(completenessIndex > warningIndex && completenessIndex < treatmentIndex
 assert.ok(treatmentIndex < biomarkerIndex && biomarkerIndex < confidenceIndex && confidenceIndex < toggleIndex, 'clinical hierarchy precedes technical toggle');
 assert.ok(toggleIndex < rulesIndex, 'reasoning rules are inside the later technical section');
 assert.match(screen, /subtypeValue, toneStyle\(data\.molecularSubtype\), localText\]\}>\{data\.molecularSubtype\}/, 'hero uses guarded top-level subtype');
-assert.match(screen, /data\.riskLevel \?\? t\('common:emDash'\)/, 'hero uses nullable top-level safety risk');
+assert.match(screen, /const riskText = data\.riskLevel === null \? t\('common:emDash'\) : riskKey \? t\(riskKey\) : data\.riskLevel;/, 'hero uses nullable top-level safety risk, in the reader\'s language');
+assert.match(screen, /toneStyle\(data\.riskLevel\)\]\}>\{riskText\}/, 'the risk colour follows the returned word, not the translation');
+for (const [value, key] of [['HIGH', 'build47:riskHigh'], [' intermediate ', 'build47:riskIntermediate'], ['Low', 'build47:riskLow'], ['VERY HIGH', null], ['', null], [null, null]]) {
+  assert.equal(presentation.riskLabelKey(value), key, `risk label of ${JSON.stringify(value)}`);
+}
+const riskLocales = { 'en-GB': 'HIGH', 'zh-CN': '高危' };
+for (const [code, high] of Object.entries(riskLocales)) {
+  assert.equal(JSON.parse(read(`src/i18n/locales/${code}.json`)).build47.riskHigh, high);
+}
 assert.match(screen, /accessibilityRole="button"/);
 assert.match(screen, /setTechnicalDetailsExpanded\(\(expanded\) => !expanded\)/);
 

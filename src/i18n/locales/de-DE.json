@@ -407,6 +407,9 @@
     "demoChanged": "Die synthetische Demo gibt nur den unveränderten Demonstrationsfall wieder. Mit geänderten Werten liefert sie kein Ergebnis.",
     "signedInTitle": "Auf diesem Gerät angemeldet",
     "waitingForServer": "Warten auf den Server. Der Einladungscode wird nicht erneut benötigt: Der Zugang wird fortgesetzt, sobald der Server erreichbar ist.",
-    "reconnecting": "Verbindung zum Server wird wiederhergestellt…"
+    "reconnecting": "Verbindung zum Server wird wiederhergestellt…",
+    "riskHigh": "HOCH",
+    "riskIntermediate": "MITTEL",
+    "riskLow": "NIEDRIG"
   }
 }

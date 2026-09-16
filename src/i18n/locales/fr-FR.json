@@ -407,6 +407,9 @@
     "demoChanged": "La démo synthétique ne rejoue que le cas de démonstration non modifié. Avec des valeurs modifiées, aucun résultat ne sera renvoyé.",
     "signedInTitle": "Connecté sur cet appareil",
     "waitingForServer": "En attente du serveur. Votre code d'invitation n'est plus nécessaire : l'accès reprendra dès que le serveur sera joignable.",
-    "reconnecting": "Reconnexion au serveur…"
+    "reconnecting": "Reconnexion au serveur…",
+    "riskHigh": "ÉLEVÉ",
+    "riskIntermediate": "INTERMÉDIAIRE",
+    "riskLow": "FAIBLE"
   }
 }
