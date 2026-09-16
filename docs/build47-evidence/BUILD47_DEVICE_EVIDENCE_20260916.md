@@ -128,4 +128,8 @@ Live inference took 141–440 ms (median 199 ms). No authentication failure, rat
 4. **Old sessions:** six Build 45 test sessions from Gates 10–11 (`gate10-*`, `gate11-smoke`) are still listed as live but unusable; revoke on request.
 5. **Plan phases 2 and 3:** the platform items P1–P7, and the four clinical questions for ZZU/UCD, unchanged.
 6. **Before external distribution:** Android D (Google Play minimum API level) and E (Chinese store filing) from `App_distribution_invite_code_14SEPT26.md`, plus Kraken's authorisation for anyone beyond the named test devices.
-7. **At close,** T3/T4 were stopped by the script, but port 8080 and one `acr-api` tunnel process still appeared active after Kraken closed T1/T2. Kraken to confirm.
+7. **Closed state, confirmed 14:47 UTC.** T3/T4 were stopped by the script. A first check straight after Kraken closed T1/T2 appeared to show them still active; on investigation:
+   - The `acr-api` process count was a false positive: the operator's `pgrep -f` pattern matched its own shell command line.
+   - The port 8080 listener was real but still shutting down.
+   - Re-checked, nothing listens on 8080 or 3001, and there is no platform JVM or `cloudflared` process. T1 health gives no answer, and `api.acragent.com` and the review endpoint both return 530.
+   - The only Java processes left belong to the VS Code Java extension, not T1.
