@@ -12,6 +12,7 @@ import { useAssessmentStore } from '../store/assessmentStore';
 import { getLocaleDirection, getTextAlign } from '../utils/rtl';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { buildClinicalResultPresentation, formatReturnedProbability, resultValueTone, TECHNICAL_DETAILS_DEFAULT_EXPANDED } from './resultPresentation';
+import { ENTRY_SCREEN_COUNT, firstEntryRoute, fullAssessmentField, isRiskWithheld } from './completeness';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -39,6 +40,18 @@ export const ResultScreen: React.FC = () => {
   const presentation = buildClinicalResultPresentation(result);
   const none = t('build44:noneReturned');
   const list = (items: string[]) => items.length ? items.map((item, index) => <Text key={`${item}-${index}`} style={[styles.listItem, localText]}>• {item}</Text>) : <Text style={[styles.hint, localText]}>{none}</Text>;
+  // Build 47 (M1–M4): an incomplete case says in the reader's language what the
+  // platform needs and where to enter it, and returns there with every value
+  // kept. T1's own completeness text stays visible, unchanged, in the warnings.
+  const completeness = data.dataCompleteness;
+  const incomplete = completeness.tier < 3;
+  const riskWithheld = isRiskWithheld(data);
+  const fieldName = (name: string) => { const field = fullAssessmentField(name); return field ? t(field.labelKey) : name; };
+  const fieldOnScreen = (name: string) => {
+    const field = fullAssessmentField(name);
+    return field ? t('build47:fieldOnScreen', { field: t(field.labelKey), screen: field.screen, total: ENTRY_SCREEN_COUNT }) : name;
+  };
+  const completeMissing = () => navigation.navigate(firstEntryRoute(completeness.missingFields));
 
   return (
     <ScreenLayout title={t('result:title')} subtitle={modeLabel} bannerText={t('assessment:clinicalTransparencyBanner')} footer={<>
@@ -53,8 +66,19 @@ export const ResultScreen: React.FC = () => {
       <View style={styles.subtypeBox}>
         <Text style={[styles.subtypeLabel, localText]}>{t('result:molecularSubtype')}</Text>
         <Text selectable style={[styles.subtypeValue, toneStyle(data.molecularSubtype), localText]}>{data.molecularSubtype}</Text>
-        <Text selectable style={[styles.subtypeText, localText]}>{t('build44:risk')}: <Text style={[styles.riskValue, toneStyle(data.riskLevel)]}>{data.riskLevel ?? t('common:emDash')}</Text></Text>
+        <Text selectable style={[styles.subtypeText, localText]}>{t('build44:risk')}: {riskWithheld
+          ? <Text style={styles.riskWithheld}>{t('build47:riskWithheld', { fields: completeness.missingFields.map(fieldName).join(', ') })}</Text>
+          : <Text style={[styles.riskValue, toneStyle(data.riskLevel)]}>{data.riskLevel ?? t('common:emDash')}</Text>}</Text>
       </View>
+
+      {incomplete ? <View style={styles.noticeBox}>
+        <Text accessibilityRole="header" style={[styles.noticeTitle, localText]}>{t('build47:notFullTitle')}</Text>
+        <Text style={[styles.noticeText, localText]}>{t('build47:platformNeeds')}</Text>
+        {completeness.missingFields.map((name) => <Text key={name} style={[styles.listItem, localText]}>• {fieldOnScreen(name)}</Text>)}
+        {riskWithheld ? <Text style={[styles.noticeText, localText]}>{t('build47:riskWithheldNotice')}</Text> : null}
+        <ACRButton title={t('build47:completeMissing')} variant="secondary" onPress={completeMissing} />
+        <Text style={[styles.hint, localText]}>{t('build47:completeMissingHint')}</Text>
+      </View> : null}
 
       {presentation.warnings.length ? <View style={styles.warningBox}>
         <Text style={[styles.warningTitle, localText]}>{t('result:warningsAndContext')}</Text>
@@ -63,9 +87,8 @@ export const ResultScreen: React.FC = () => {
 
       <ACRCard title={t('result:informationCompleteness')}>
         <Row label={t('build44:tier')} value={String(data.dataCompleteness.tier)} />
-        <Row label={t('build44:rulesBlocked')} value={String(data.dataCompleteness.rulesBlocked)} />
         <Text style={[styles.sectionLabel, localText]}>{t('build44:missingFields')}</Text>
-        {list(data.dataCompleteness.missingFields)}
+        {list(data.dataCompleteness.missingFields.map(fieldOnScreen))}
       </ACRCard>
 
       <ACRCard title={t('result:treatmentOptions')}>{list(presentation.treatments)}</ACRCard>
@@ -105,7 +128,8 @@ export const ResultScreen: React.FC = () => {
         <Row label={t('result:executionStatus')} value={result.delivery.currentExecution ? t('build44:currentExecution') : t('build44:noCurrentExecution')} />
         <Row label={t('result:molecularSubtype')} value={data.molecularSubtype} />
         <Row label={t('result:rootRisk')} value={data.riskLevel ?? t('common:emDash')} />
-        <Row label={t('result:deterministicRisk')} value={data.deterministic.riskLevel ?? t('common:emDash')} />
+        {/* Build 47 (M5): while T1 withholds the headline risk, the nested field is not an assessed risk (Gate 1 OBS-4). */}
+        <Row label={riskWithheld ? `${t('result:deterministicRisk')} ${t('build47:notAssessedRisk')}` : t('result:deterministicRisk')} value={data.deterministic.riskLevel ?? t('common:emDash')} muted={riskWithheld} />
         <Row label={t('result:timestamp')} value={data.timestamp} />
         <Row label={t('build44:patientId')} value={data.patientId} />
       </ACRCard>
@@ -134,7 +158,7 @@ export const ResultScreen: React.FC = () => {
 
       <ACRCard title={t('build44:completeness')}>
         <Row label={t('build44:tier')} value={String(data.dataCompleteness.tier)} />
-        <Row label={t('build44:rulesBlocked')} value={String(data.dataCompleteness.rulesBlocked)} />
+        <Row label={t('build47:rulesBlockedFixed')} value={String(data.dataCompleteness.rulesBlocked)} />
         <Text style={[styles.sectionLabel, localText]}>{t('build44:missingFields')}</Text>
         {list(data.dataCompleteness.missingFields)}
         <Text style={[styles.sectionLabel, localText]}>{t('build44:warnings')}</Text>
@@ -178,11 +202,11 @@ export const ResultScreen: React.FC = () => {
 const TONE_COLOUR = { high: ACRColors.resultHigh, low: ACRColors.resultLow, other: ACRColors.resultOther } as const;
 const toneStyle = (value: string | null | undefined) => ({ color: TONE_COLOUR[resultValueTone(value)] });
 
-const Row: React.FC<{ label: string; value: string }> = ({ label, value }) => {
+const Row: React.FC<{ label: string; value: string; muted?: boolean }> = ({ label, value, muted }) => {
   const { i18n } = useTranslation();
   const language = i18n.resolvedLanguage ?? i18n.language;
   const localText = { writingDirection: getLocaleDirection(language), textAlign: getTextAlign(language) };
-  return <View style={styles.row}><Text style={[styles.rowLabel, localText]}>{label}</Text><Text selectable style={[styles.rowValue, toneStyle(value), localText]}>{value}</Text></View>;
+  return <View style={styles.row}><Text style={[styles.rowLabel, localText]}>{label}</Text><Text selectable style={[styles.rowValue, muted ? styles.mutedValue : toneStyle(value), localText]}>{value}</Text></View>;
 };
 
 const styles = StyleSheet.create({
@@ -196,6 +220,11 @@ const styles = StyleSheet.create({
   subtypeValue: { ...ACRTypography.subtypeValue, color: ACRColors.primary, marginVertical: 5 },
   subtypeText: { fontSize: 11, color: ACRColors.ink },
   riskValue: { fontWeight: '700' },
+  riskWithheld: { fontWeight: '700', color: ACRColors.muted },
+  noticeBox: { backgroundColor: ACRColors.card, borderWidth: 1.5, borderColor: ACRColors.warningBorder, borderRadius: 12, padding: 12, marginBottom: 10, gap: 6 },
+  noticeTitle: { ...ACRTypography.cardTitle, color: ACRColors.warningText },
+  noticeText: { fontSize: 11, color: ACRColors.ink, lineHeight: 16 },
+  mutedValue: { color: ACRColors.muted, fontWeight: '400' },
   warningBox: { backgroundColor: ACRColors.warningBg, borderWidth: 1.5, borderColor: ACRColors.warningBorder, borderRadius: 12, padding: 12, marginBottom: 10 },
   warningTitle: { ...ACRTypography.cardTitle, color: ACRColors.warningText, marginBottom: 7 },
   technicalToggle: { backgroundColor: ACRColors.primary, borderRadius: 12, padding: 12, marginTop: 2, marginBottom: 10 },

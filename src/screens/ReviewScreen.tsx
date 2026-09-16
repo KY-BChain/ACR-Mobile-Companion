@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Pressable, Text, View, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -15,6 +15,8 @@ import { GatewayError, gatewayClient, toFailureState } from '../api/client';
 import { generateRequestId } from '../utils/uuid';
 import { getLocaleDirection, getTextAlign } from '../utils/rtl';
 import type { RootStackParamList } from '../navigation/AppNavigator';
+import { blankFullAssessmentFields, ENTRY_SCREEN_COUNT } from './completeness';
+import { matchesDemoCase } from '../store/sampleCase';
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -29,6 +31,15 @@ export const ReviewScreen: React.FC = () => {
   const value = (input: string | number | boolean | null, unit = '') => input === null || input === ''
     ? blank
     : `${typeof input === 'boolean' ? (input ? t('common:on') : t('common:off')) : input}${unit}`;
+  // Build 47 (M7): blank values the platform needs for a full assessment, each
+  // with a way back to its screen. Submission stays allowed.
+  const blanks = blankFullAssessmentFields(store.form, store.p1, store.p2);
+  // Build 47 (M9): in a live assessment, a Steps 1–3 value still holding the
+  // sample the app opened with is marked, so it is not sent unnoticed.
+  const markSamples = store.deliveryChoice === 'LIVE_PLATFORM' && !store.walkthroughOnly;
+  const sampleNote = (field: string) => markSamples && !store.edited.includes(field) ? t('build47:sampleNotChanged') : undefined;
+  // Build 47 (M12): synthetic demo replays only the unchanged demonstration case.
+  const demoChanged = store.deliveryChoice === 'SYNTHETIC_DEMO' && !store.walkthroughOnly && !matchesDemoCase(store.form, store.p1, store.p2);
 
   const fail = (error: unknown) => {
     const failure = toFailureState(error);
@@ -107,20 +118,32 @@ export const ReviewScreen: React.FC = () => {
         <Text style={[styles.hint, localText]}>{store.deliveryChoice === 'LIVE_PLATFORM' ? t('build44:liveReviewHint') : t('build44:demoReviewHint')}</Text>
       </ACRCard>
 
+      {demoChanged ? <ACRCard title={t('build47:demoChangedTitle')}>
+        <Text accessibilityRole="alert" style={[styles.warning, localText]}>{t('build47:demoChanged')}</Text>
+      </ACRCard> : null}
+
+      {blanks.length ? <ACRCard title={t('build47:neededTitle')}>
+        <Text style={[styles.hint, localText]}>{t('build47:neededIntro')}</Text>
+        {blanks.map((field) => <Pressable key={field.platformName} accessibilityRole="link" onPress={() => navigation.navigate(field.route)} style={({ pressed }) => [styles.link, pressed && styles.linkPressed]}>
+          <Text style={[styles.linkText, localText]}>{t('build47:goToField', { field: t(field.labelKey), screen: field.screen, total: ENTRY_SCREEN_COUNT })}</Text>
+        </Pressable>)}
+        <Text style={[styles.hint, localText]}>{t('build47:neededSubmitAllowed')}</Text>
+      </ACRCard> : null}
+
       <ACRCard title={t('review:enteredValues')}>
         <Row label={t('build44:patientId')} value={store.sessionId} />
-        <Row label={t('receptors:erStatus')} value={store.form.step1.erStatus} />
-        <Row label={t('receptors:prStatus')} value={store.form.step1.prStatus} />
-        <Row label={t('receptors:her2Status')} value={store.form.step1.her2Status} />
-        <Row label={t('receptors:ki67')} value={value(store.form.step1.ki67, ' %')} />
-        <Row label={t('tumour:stage')} value={value(store.form.step2.stage)} />
-        <Row label={t('tumour:grade')} value={value(store.form.step2.grade)} />
-        <Row label={t('tumour:histologicalSubtype')} value={value(store.form.step2.histologicalSubtype)} />
-        <Row label={t('tumour:nodalStatus')} value={value(store.form.step2.nodalStatus)} />
-        <Row label={t('tumour:age')} value={value(store.form.step2.age, store.form.step2.age ? ` ${t('build44:years')}` : '')} />
-        <Row label={t('markers:ca153')} value={value(store.form.step3.ca153, store.form.step3.ca153 ? ' U/mL' : '')} />
-        <Row label={t('markers:cea')} value={value(store.form.step3.cea, store.form.step3.cea ? ' ng/mL' : '')} />
-        <Row label={t('markers:surgeryDate')} value={value(store.form.step3.surgeryDate)} />
+        <Row label={t('receptors:erStatus')} value={store.form.step1.erStatus} note={sampleNote('erStatus')} />
+        <Row label={t('receptors:prStatus')} value={store.form.step1.prStatus} note={sampleNote('prStatus')} />
+        <Row label={t('receptors:her2Status')} value={store.form.step1.her2Status} note={sampleNote('her2Status')} />
+        <Row label={t('receptors:ki67')} value={value(store.form.step1.ki67, ' %')} note={sampleNote('ki67')} />
+        <Row label={t('tumour:stage')} value={value(store.form.step2.stage)} note={sampleNote('stage')} />
+        <Row label={t('tumour:grade')} value={value(store.form.step2.grade)} note={sampleNote('grade')} />
+        <Row label={t('tumour:histologicalSubtype')} value={value(store.form.step2.histologicalSubtype)} note={sampleNote('histologicalSubtype')} />
+        <Row label={t('tumour:nodalStatus')} value={value(store.form.step2.nodalStatus)} note={sampleNote('nodalStatus')} />
+        <Row label={t('tumour:age')} value={value(store.form.step2.age, store.form.step2.age ? ` ${t('build44:years')}` : '')} note={sampleNote('age')} />
+        <Row label={t('markers:ca153')} value={value(store.form.step3.ca153, store.form.step3.ca153 ? ' U/mL' : '')} note={sampleNote('ca153')} />
+        <Row label={t('markers:cea')} value={value(store.form.step3.cea, store.form.step3.cea ? ' ng/mL' : '')} note={sampleNote('cea')} />
+        <Row label={t('markers:surgeryDate')} value={value(store.form.step3.surgeryDate)} note={sampleNote('surgeryDate')} />
         <Row label={t('review:bayesianLayer')} value={value(store.form.step3.bayesianEnhanced)} />
       </ACRCard>
 
@@ -148,19 +171,25 @@ export const ReviewScreen: React.FC = () => {
   );
 };
 
-const Row: React.FC<{ label: string; value?: string; valueComponent?: React.ReactNode }> = ({ label, value, valueComponent }) => {
+const Row: React.FC<{ label: string; value?: string; valueComponent?: React.ReactNode; note?: string }> = ({ label, value, valueComponent, note }) => {
   const { i18n } = useTranslation();
   const language = i18n.resolvedLanguage ?? i18n.language;
   const localText = { writingDirection: getLocaleDirection(language), textAlign: getTextAlign(language) };
   // Gates 8-9: grouped so assistive technology announces the label and its
   // value as one item, rather than two unrelated text nodes.
-  return <View accessible accessibilityRole="text" accessibilityLabel={`${label}: ${value ?? ''}`} style={styles.row}><Text style={[styles.rowLabel, localText]}>{label}</Text>{valueComponent ?? <Text selectable style={[styles.rowValue, localText]}>{value}</Text>}</View>;
+  return <View accessible accessibilityRole="text" accessibilityLabel={`${label}: ${value ?? ''}${note ? `, ${note}` : ''}`} style={styles.row}><Text style={[styles.rowLabel, localText]}>{label}</Text>{valueComponent ?? <View style={styles.rowValueBlock}><Text selectable style={[styles.rowValue, localText]}>{value}</Text>{note ? <Text style={[styles.sampleNote, localText]}>{note}</Text> : null}</View>}</View>;
 };
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', gap: 10, paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: ACRColors.line, borderStyle: 'dashed' },
   rowLabel: { flex: 1, fontSize: 11, color: ACRColors.ink },
-  rowValue: { flex: 1, fontSize: 11, fontWeight: '600', color: ACRColors.ink },
+  rowValue: { fontSize: 11, fontWeight: '600', color: ACRColors.ink },
+  rowValueBlock: { flex: 1 },
+  sampleNote: { fontSize: 9.5, color: ACRColors.warningText, marginTop: 1 },
+  warning: { fontSize: 11, color: ACRColors.warningText, lineHeight: 16 },
+  link: { paddingVertical: 6 },
+  linkPressed: { opacity: 0.6 },
+  linkText: { fontSize: 11.5, fontWeight: '700', color: ACRColors.primary, textDecorationLine: 'underline' },
   hint: { ...ACRTypography.hint, color: ACRColors.muted, marginTop: 5 },
   muted: { fontSize: 11, color: ACRColors.muted },
 });

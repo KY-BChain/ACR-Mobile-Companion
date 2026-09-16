@@ -386,5 +386,27 @@
     "indeterminate": "The inference outcome is indeterminate. It was not retried automatically.",
     "retryVerification": "Retry verification",
     "backToAccess": "Back to access"
+  },
+  "build47": {
+    "notFullTitle": "Full assessment not reached",
+    "platformNeeds": "The platform needs these values for a full assessment, including risk:",
+    "fieldOnScreen": "{{field}} (screen {{screen}} of {{total}})",
+    "riskWithheldNotice": "Risk is withheld until they are entered.",
+    "riskWithheld": "withheld — needs {{fields}}",
+    "completeMissing": "Complete missing fields",
+    "completeMissingHint": "Opens the screen with the first missing value. Everything you entered is kept.",
+    "notAssessedRisk": "(not an assessed risk)",
+    "rulesBlockedFixed": "Rules blocked (the platform's fixed figure for this tier)",
+    "neededTitle": "Needed for a full assessment",
+    "neededIntro": "These values are blank. The platform needs them for a full assessment, including risk.",
+    "goToField": "Go to {{field}} (screen {{screen}} of {{total}})",
+    "neededSubmitAllowed": "You can still submit. The result will name what is missing.",
+    "neededMarker": "needed for a full assessment",
+    "sampleNotChanged": "sample value, not changed",
+    "demoChangedTitle": "Demonstration case changed",
+    "demoChanged": "Synthetic demo replays only the unchanged demonstration case. With changed values it will not return a result.",
+    "signedInTitle": "Signed in on this device",
+    "waitingForServer": "Waiting for the server. You do not need your invite code again: access resumes when the server is reachable.",
+    "reconnecting": "Reconnecting to the server…"
   }
 }

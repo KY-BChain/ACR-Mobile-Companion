@@ -69,7 +69,17 @@ const compiledStore = ts.transpileModule(storeSource, {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
 }).outputText;
 const storeModule = { exports: {} };
-new Function('module', 'exports', 'require', compiledStore)(storeModule, storeModule.exports, require);
+// Build 47: the store imports the TypeScript sample case, compiled the same way.
+const storeRequire = (name) => {
+  if (name !== './sampleCase') return require(name);
+  const sampleModule = { exports: {} };
+  const sampleCode = ts.transpileModule(read('src/store/sampleCase.ts'), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
+  }).outputText;
+  new Function('module', 'exports', 'require', sampleCode)(sampleModule, sampleModule.exports, require);
+  return sampleModule.exports;
+};
+new Function('module', 'exports', 'require', compiledStore)(storeModule, storeModule.exports, storeRequire);
 const store = storeModule.exports.useAssessmentStore;
 store.getState().setStep1({ ki67: '99' });
 store.getState().setP1({ tumorSize: '7.7' });

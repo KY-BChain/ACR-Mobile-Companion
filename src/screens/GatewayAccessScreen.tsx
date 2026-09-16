@@ -25,6 +25,7 @@ export const GatewayAccessScreen: React.FC = () => {
   const [inviteCode, setInviteCode] = useState('');
   const [connecting, setConnecting] = useState(false);
   const [savedAccess, setSavedAccess] = useState<'UNKNOWN' | 'NONE' | 'ACTIVE' | 'EXPIRED'>('UNKNOWN');
+  const [liveCheck, setLiveCheck] = useState(0);
   const {
     deliveryChoice, setDeliveryChoice, gatewayLive, setGatewayLive,
     accessReady, setAccessReady, attestation, setAttestation,
@@ -37,14 +38,14 @@ export const GatewayAccessScreen: React.FC = () => {
     let active = true;
     gatewayClient.checkLive().then(() => { if (active) setGatewayLive('UP'); }).catch(() => { if (active) setGatewayLive('DOWN'); });
     return () => { active = false; };
-  }, [setGatewayLive]);
+  }, [setGatewayLive, liveCheck]);
 
   // Build 46: whether this device holds a saved session — read from the
   // secure keystore, so it answers offline too. It gates the offline
   // walkthrough and shows the expired-invite message after 30 days.
   useEffect(() => {
     let active = true;
-    gatewayClient.savedAccessStatus().then((status) => { if (active) setSavedAccess(status); }).catch(() => undefined);
+    gatewayClient.savedAccessStatus().then((status) => { if (active) setSavedAccess(status); }).catch(() => { if (active) setSavedAccess('NONE'); });
     return () => { active = false; };
   }, [accessReady]);
 
@@ -56,7 +57,10 @@ export const GatewayAccessScreen: React.FC = () => {
   useEffect(() => {
     let active = true;
     if (gatewayLive === 'UP' && !accessReady && !walkthroughOnly) {
-      gatewayClient.restoreSession().then((restored) => { if (active && restored) setAccessReady(true); }).catch(() => undefined);
+      // Build 47 (M11): a restore the gateway refuses clears the saved session,
+      // so re-read it; the invite form then returns instead of "waiting".
+      const reread = () => gatewayClient.savedAccessStatus().then((status) => { if (active) setSavedAccess(status); }).catch(() => undefined);
+      gatewayClient.restoreSession().then((restored) => { if (!active) return; if (restored) setAccessReady(true); else void reread(); }).catch(() => { void reread(); });
     }
     return () => { active = false; };
   }, [gatewayLive, accessReady, walkthroughOnly, setAccessReady]);
@@ -128,6 +132,11 @@ export const GatewayAccessScreen: React.FC = () => {
     navigation.navigate('Step1');
   };
 
+  // Build 47 (M11): a device holding a saved, unexpired session is signed in even
+  // while the server is unreachable, so it is not shown an empty invite field.
+  const waitingForServer = !accessReady && !walkthroughOnly && savedAccess === 'ACTIVE';
+  const retryLive = () => { setGatewayLive('UNKNOWN'); setLiveCheck((count) => count + 1); };
+
   // Build 46 pairing answers are shown in the evaluator's language.
   const failureText = (code: string, message: string) => code === 'SERVICE_UNAVAILABLE' ? t('gatewayAccess:notConnected')
     : code === 'INVITE_EXPIRED' ? t('gatewayAccess:inviteExpired')
@@ -153,8 +162,13 @@ export const GatewayAccessScreen: React.FC = () => {
       {/* Once access is active (redeemed, or restored after a restart) the
           single-use invitation is spent; showing an empty invite field then
           reads as "access lost" (Gate 12 device finding). */}
-      {!accessReady ? <ACRCard title={t('gatewayAccess:inviteTitle')}>
+      {!accessReady && !waitingForServer && savedAccess !== 'UNKNOWN' ? <ACRCard title={t('gatewayAccess:inviteTitle')}>
         <ACRInput value={inviteCode} onChangeText={setInviteCode} secureTextEntry autoCapitalize="none" placeholder={t('gatewayAccess:invitePlaceholder')} hint={t('gatewayAccess:inviteHint')} />
+      </ACRCard> : null}
+      {waitingForServer ? <ACRCard title={t('build47:signedInTitle')}>
+        <Text accessibilityRole="alert" style={[styles.hint, textStyle]}>{gatewayLive === 'DOWN' ? t('build47:waitingForServer') : t('build47:reconnecting')}</Text>
+        <ACRButton title={t('common:retryCheck')} variant="secondary" onPress={retryLive} disabled={gatewayLive === 'UNKNOWN'} />
+        <ACRButton title={t('gatewayAccess:disconnect')} variant="secondary" onPress={confirmDisconnect} />
       </ACRCard> : null}
       {accessReady ? <>
         <ACRButton title={t('common:next')} onPress={() => navigation.navigate('Step1')} />

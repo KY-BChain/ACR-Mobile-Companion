@@ -386,5 +386,27 @@
     "indeterminate": "推理结果不确定，未自动重试。",
     "retryVerification": "重试验证",
     "backToAccess": "返回访问"
+  },
+  "build47": {
+    "notFullTitle": "未达到完整评估",
+    "platformNeeds": "平台需要以下数值才能进行包括风险在内的完整评估：",
+    "fieldOnScreen": "{{field}}（第 {{screen}}/{{total}} 屏）",
+    "riskWithheldNotice": "在填写这些数值之前，不显示风险。",
+    "riskWithheld": "暂不显示 — 需要{{fields}}",
+    "completeMissing": "补全缺失字段",
+    "completeMissingHint": "将打开第一个缺失数值所在的页面。已填写的内容全部保留。",
+    "notAssessedRisk": "（非已评估的风险）",
+    "rulesBlockedFixed": "被阻断的规则（平台对该层级给出的固定数值）",
+    "neededTitle": "完整评估所需",
+    "neededIntro": "以下数值为空。平台需要这些数值才能进行包括风险在内的完整评估。",
+    "goToField": "前往{{field}}（第 {{screen}}/{{total}} 屏）",
+    "neededSubmitAllowed": "仍可提交。结果将列出缺少的内容。",
+    "neededMarker": "完整评估所需",
+    "sampleNotChanged": "示例数值，未修改",
+    "demoChangedTitle": "演示病例已修改",
+    "demoChanged": "合成演示只会重放未修改的演示病例。数值修改后将不会返回结果。",
+    "signedInTitle": "已在本设备登录",
+    "waitingForServer": "正在等待服务器。无需再次输入邀请码：服务器可访问后将自动恢复访问。",
+    "reconnecting": "正在重新连接服务器…"
   }
 }

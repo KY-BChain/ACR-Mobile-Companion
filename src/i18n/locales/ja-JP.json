@@ -386,5 +386,27 @@
     "indeterminate": "推論結果は不確定です。自動再試行は行われませんでした。",
     "retryVerification": "検証を再試行",
     "backToAccess": "アクセスへ戻る"
+  },
+  "build47": {
+    "notFullTitle": "完全な評価に至っていません",
+    "platformNeeds": "リスクを含む完全な評価には、プラットフォームに次の値が必要です：",
+    "fieldOnScreen": "{{field}}（{{total}} 画面中 {{screen}} 画面目）",
+    "riskWithheldNotice": "これらが入力されるまで、リスクは表示されません。",
+    "riskWithheld": "保留中 — {{fields}}が必要",
+    "completeMissing": "不足している項目を入力",
+    "completeMissingHint": "最初の不足値がある画面を開きます。入力済みの内容はすべて保持されます。",
+    "notAssessedRisk": "（評価済みのリスクではありません）",
+    "rulesBlockedFixed": "ブロックされたルール（この段階に対するプラットフォームの固定値）",
+    "neededTitle": "完全な評価に必要",
+    "neededIntro": "次の値が空欄です。リスクを含む完全な評価にはプラットフォームがこれらを必要とします。",
+    "goToField": "{{field}}へ移動（{{total}} 画面中 {{screen}} 画面目）",
+    "neededSubmitAllowed": "このまま送信することもできます。結果に不足している項目が示されます。",
+    "neededMarker": "完全な評価に必要",
+    "sampleNotChanged": "サンプル値（未変更）",
+    "demoChangedTitle": "デモ症例が変更されました",
+    "demoChanged": "合成デモは変更されていないデモ症例のみを再生します。値を変更すると結果は返されません。",
+    "signedInTitle": "この端末でサインイン済み",
+    "waitingForServer": "サーバーを待っています。招待コードを再入力する必要はありません。サーバーに接続できるとアクセスが再開されます。",
+    "reconnecting": "サーバーに再接続しています…"
   }
 }

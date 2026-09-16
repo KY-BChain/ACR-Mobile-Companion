@@ -126,7 +126,7 @@ for (const [value, tone] of [
 }
 const colourScreen = read('src/screens/ResultScreen.tsx');
 assert.match(colourScreen, /high: ACRColors\.resultHigh, low: ACRColors\.resultLow, other: ACRColors\.resultOther/);
-assert.match(colourScreen, /style=\{\[styles\.rowValue, toneStyle\(value\), localText\]\}/, 'every result row value is colour-coded');
+assert.match(colourScreen, /style=\{\[styles\.rowValue, muted \? styles\.mutedValue : toneStyle\(value\), localText\]\}/, 'every result row value is colour-coded unless muted (Build 47 M5)');
 assert.match(colourScreen, /toneStyle\(data\.riskLevel\)/, 'the summary risk value is colour-coded');
 assert.match(colourScreen, /toneStyle\(data\.molecularSubtype\)/);
 const colourTokens = read('src/theme/colors.ts');

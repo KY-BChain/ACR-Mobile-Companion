@@ -103,19 +103,42 @@ def enableProguardInReleaseBuilds = (findProperty('android.enableProguardInRelea
  */
 def jscFlavor = 'org.webkit:android-jsc:+'
 
+/**
+ * Build 47 (Android A): release signing with CRIL's own key, never the debug key.
+ * The keystore and its passwords live outside the repository, by default in
+ * ~/.acr-signing/release-signing.properties (storeFile, storePassword, keyAlias,
+ * keyPassword); ACR_RELEASE_SIGNING_PROPERTIES may point elsewhere. A release
+ * build without them stops instead of silently signing with the debug key.
+ */
+def releaseSigningFile = file(System.getenv('ACR_RELEASE_SIGNING_PROPERTIES') ?: "${System.getProperty('user.home')}/.acr-signing/release-signing.properties")
+def releaseSigning = new Properties()
+if (releaseSigningFile.exists()) {
+    releaseSigningFile.withInputStream { releaseSigning.load(it) }
+}
+gradle.taskGraph.whenReady { graph ->
+    def releasePackaging = graph.allTasks.any { task ->
+        task.project == project && task.name ==~ /(assemble|bundle|package|sign)Release.*/
+    }
+    if (releasePackaging && !releaseSigningFile.exists()) {
+        throw new GradleException("Release signing properties not found at ${releaseSigningFile}. " +
+            "Release builds are signed with CRIL's release key only (see docs/operations/BUILD47_ANDROID_RELEASE_SIGNING.md).")
+    }
+}
+
 android {
     ndkVersion rootProject.ext.ndkVersion
 
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
+    // The Kotlin namespace stays as generated; only the installed app ID changes (Android B).
     namespace 'com.anonymous.acr_mobile_companion'
     defaultConfig {
-        applicationId 'com.anonymous.acr_mobile_companion'
+        applicationId 'com.acragent.companion'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 46
-        versionName "0.6.5"
+        versionCode 47
+        versionName "0.6.6"
     }
     signingConfigs {
         debug {
@@ -124,15 +147,32 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (releaseSigningFile.exists()) {
+                storeFile file(releaseSigning.getProperty('storeFile'))
+                storePassword releaseSigning.getProperty('storePassword')
+                keyAlias releaseSigning.getProperty('keyAlias')
+                keyPassword releaseSigning.getProperty('keyPassword')
+            }
+        }
+    }
+    // Build 47 (Android C): one APK per phone processor type, plus a universal
+    // APK for anyone unsure which to take. The app bundle (.aab) for Google Play
+    // is built separately with bundleRelease and is not affected by this split.
+    splits {
+        abi {
+            enable true
+            reset()
+            include 'arm64-v8a', 'armeabi-v7a'
+            universalApk true
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             shrinkResources (findProperty('android.enableShrinkResourcesInReleaseBuilds')?.toBoolean() ?: false)
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"

@@ -46,7 +46,8 @@ export const P2Screen: React.FC = () => {
     </>}>
       <WalkthroughNotice />
       <ACRCard title={t('p2:cardTitle')}>
-        <Text style={[styles.label, localeTextStyle]}>{t('p2:ecogScore')} <Text style={styles.small}>· {t('common:optional')}</Text></Text>
+        {/* Build 47 (M8): needed for a full assessment. */}
+        <Text style={[styles.label, localeTextStyle]}>{t('p2:ecogScore')} <Text style={styles.small}>· {t('common:optional')}</Text><Text style={styles.needed}> · {t('build47:neededMarker')}</Text></Text>
         <ACRInput value={p2.ecogScore} onChangeText={(value) => setP2({ ecogScore: value })} keyboardType="numeric" hint={t('p2:ecogHint')} />
         {!ecogValid ? <Text accessibilityRole="alert" style={[styles.error, localeTextStyle]}>{t('p2:ecogError')}</Text> : null}
         <Text style={[styles.label, localeTextStyle]}>{t('p2:pdl1Status')} <Text style={styles.small}>· {t('common:optional')}</Text></Text>
@@ -66,5 +67,6 @@ export const P2Screen: React.FC = () => {
 const styles = StyleSheet.create({
   label: { ...ACRTypography.label, marginTop: 9, marginBottom: 4 },
   small: { fontWeight: '400', color: ACRColors.muted },
+  needed: { fontWeight: '600', color: ACRColors.warningText },
   error: { ...ACRTypography.hint, color: ACRColors.stopBorder, marginTop: 4 },
 });

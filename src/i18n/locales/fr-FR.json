@@ -386,5 +386,27 @@
     "indeterminate": "Le résultat d'inférence est indéterminé. Il n'a pas été réessayé automatiquement.",
     "retryVerification": "Réessayer la vérification",
     "backToAccess": "Retour à l'accès"
+  },
+  "build47": {
+    "notFullTitle": "Évaluation complète non atteinte",
+    "platformNeeds": "La plateforme a besoin de ces valeurs pour une évaluation complète, risque compris :",
+    "fieldOnScreen": "{{field}} (écran {{screen}} sur {{total}})",
+    "riskWithheldNotice": "Le risque n'est pas communiqué tant qu'elles ne sont pas saisies.",
+    "riskWithheld": "non communiqué — nécessite {{fields}}",
+    "completeMissing": "Compléter les champs manquants",
+    "completeMissingHint": "Ouvre l'écran de la première valeur manquante. Toutes vos saisies sont conservées.",
+    "notAssessedRisk": "(risque non évalué)",
+    "rulesBlockedFixed": "Règles bloquées (valeur fixe de la plateforme pour ce niveau)",
+    "neededTitle": "Nécessaire pour une évaluation complète",
+    "neededIntro": "Ces valeurs sont vides. La plateforme en a besoin pour une évaluation complète, risque compris.",
+    "goToField": "Aller à {{field}} (écran {{screen}} sur {{total}})",
+    "neededSubmitAllowed": "Vous pouvez tout de même soumettre. Le résultat indiquera ce qui manque.",
+    "neededMarker": "nécessaire pour une évaluation complète",
+    "sampleNotChanged": "valeur d'exemple, non modifiée",
+    "demoChangedTitle": "Cas de démonstration modifié",
+    "demoChanged": "La démo synthétique ne rejoue que le cas de démonstration non modifié. Avec des valeurs modifiées, aucun résultat ne sera renvoyé.",
+    "signedInTitle": "Connecté sur cet appareil",
+    "waitingForServer": "En attente du serveur. Votre code d'invitation n'est plus nécessaire : l'accès reprendra dès que le serveur sera joignable.",
+    "reconnecting": "Reconnexion au serveur…"
   }
 }

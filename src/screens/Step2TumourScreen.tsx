@@ -64,11 +64,11 @@ export const Step2TumourScreen: React.FC = () => {
     >
       <WalkthroughNotice />
       <ACRCard title={t('tumour:cardTitle')}>
-        <Label text={t('tumour:stage')} optional />
+        <Label text={t('tumour:stage')} optional needed />
         <ACRChoiceGrid options={stageOptions} labels={stageLabels} selected={form.step2.stage ?? ''} onSelect={(stage) => setStep2({ stage: stage || null })} />
         <Text style={[styles.hint, localeTextStyle]}>{t('tumour:stageHint')}</Text>
 
-        <Label text={t('tumour:grade')} optional />
+        <Label text={t('tumour:grade')} optional needed />
         <ACRSegmentedControl
           options={gradeOptions.map((o) => o.value)}
           labels={gradeOptions.map((o) => o.label)}
@@ -79,7 +79,7 @@ export const Step2TumourScreen: React.FC = () => {
         <Label text={t('tumour:histologicalSubtype')} optional />
         <ACRChoiceGrid options={histologyOptions} labels={histologyLabels} selected={form.step2.histologicalSubtype ?? ''} onSelect={(histologicalSubtype) => setStep2({ histologicalSubtype: histologicalSubtype || null })} />
 
-        <Label text={t('tumour:nodalStatus')} optional />
+        <Label text={t('tumour:nodalStatus')} optional needed />
         <ACRSegmentedControl
           options={nodalOptions.map((o) => o.value)}
           labels={nodalOptions.map((o) => o.label)}
@@ -87,7 +87,7 @@ export const Step2TumourScreen: React.FC = () => {
           onSelect={(v) => setStep2({ nodalStatus: v ? v as 'N0' | 'N1' | 'N2' | 'N3' : null })}
         />
 
-        <Label text={t('tumour:age')} optional />
+        <Label text={t('tumour:age')} optional needed />
         <ACRInput
           value={form.step2.age}
           onChangeText={(text) => setStep2({ age: text })}
@@ -100,7 +100,9 @@ export const Step2TumourScreen: React.FC = () => {
   );
 };
 
-const Label: React.FC<{ text: string; optional?: boolean }> = ({ text, optional }) => {
+// Build 47 (M8): "needed" marks an optional value the platform needs for a full
+// assessment (see completeness.ts). Required status is unchanged (C45-02).
+const Label: React.FC<{ text: string; optional?: boolean; needed?: boolean }> = ({ text, optional, needed }) => {
   const { t, i18n } = useTranslation();
   const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
   return (
@@ -113,7 +115,7 @@ const Label: React.FC<{ text: string; optional?: boolean }> = ({ text, optional 
         },
       ]}
     >
-      {text} {optional ? <Text style={styles.small}>· {t('common:optional')}</Text> : null}
+      {text} {optional ? <Text style={styles.small}>· {t('common:optional')}</Text> : null}{needed ? <Text style={styles.needed}> · {t('build47:neededMarker')}</Text> : null}
     </Text>
   );
 };
@@ -128,6 +130,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: ACRColors.muted,
   },
+  needed: { fontWeight: '600', color: ACRColors.warningText },
   hint: {
     ...ACRTypography.hint,
     color: ACRColors.muted,

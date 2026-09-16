@@ -20,7 +20,7 @@ const ROUTE = 'https://api.acragent.com/api/infer';
 
 describe('client build identity configuration', () => {
   test('defaults to the Build 46 identity and accepts an explicit valid identity', () => {
-    expect(loadConfig({}).expectedClientBuildId).toBe('mob-v0.6.5+46');
+    expect(loadConfig({}).expectedClientBuildId).toBe('mob-v0.6.6+47');
     expect(loadConfig({ ACR_EXPECTED_CLIENT_BUILD_ID: 'mob-v0.6.5+45' }).expectedClientBuildId).toBe('mob-v0.6.5+45');
   });
 

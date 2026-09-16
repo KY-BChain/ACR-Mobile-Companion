@@ -386,5 +386,27 @@
     "indeterminate": "추론 결과가 불확정입니다. 자동 재시도하지 않았습니다.",
     "retryVerification": "검증 재시도",
     "backToAccess": "접근 화면으로"
+  },
+  "build47": {
+    "notFullTitle": "전체 평가에 도달하지 못함",
+    "platformNeeds": "위험도를 포함한 전체 평가를 위해 플랫폼에 다음 값이 필요합니다:",
+    "fieldOnScreen": "{{field}} ({{total}}개 화면 중 {{screen}}번째)",
+    "riskWithheldNotice": "이 값들이 입력될 때까지 위험도는 표시되지 않습니다.",
+    "riskWithheld": "표시 보류 — {{fields}} 필요",
+    "completeMissing": "누락된 항목 입력",
+    "completeMissingHint": "첫 번째 누락 값이 있는 화면을 엽니다. 입력한 값은 모두 유지됩니다.",
+    "notAssessedRisk": "(평가된 위험도가 아님)",
+    "rulesBlockedFixed": "차단된 규칙 (이 단계에 대한 플랫폼의 고정 수치)",
+    "neededTitle": "전체 평가에 필요",
+    "neededIntro": "다음 값이 비어 있습니다. 위험도를 포함한 전체 평가를 위해 플랫폼에 필요합니다.",
+    "goToField": "{{field}}(으)로 이동 ({{total}}개 화면 중 {{screen}}번째)",
+    "neededSubmitAllowed": "그래도 제출할 수 있습니다. 결과에 누락된 항목이 표시됩니다.",
+    "neededMarker": "전체 평가에 필요",
+    "sampleNotChanged": "예시 값, 변경되지 않음",
+    "demoChangedTitle": "데모 사례가 변경됨",
+    "demoChanged": "합성 데모는 변경되지 않은 데모 사례만 재생합니다. 값을 변경하면 결과가 반환되지 않습니다.",
+    "signedInTitle": "이 기기에서 로그인됨",
+    "waitingForServer": "서버를 기다리는 중입니다. 초대 코드를 다시 입력할 필요가 없습니다. 서버에 연결되면 접근이 재개됩니다.",
+    "reconnecting": "서버에 다시 연결하는 중…"
   }
 }

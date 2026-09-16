@@ -1,6 +1,7 @@
 /** One-assessment, in-memory-only state. No persistence or clinical data at rest. */
 import { create } from 'zustand';
 import type { AssessmentFormState, AssessmentResponse, AttestationResponse, DeliveryChoice, FailureState, P1State, P2State, PairingNotice } from '../types/api';
+import { BLANK_P1, BLANK_P2, DEMO_P1, DEMO_P2, SAMPLE_FORM } from './sampleCase';
 export type { ProvisionalGender, ProvisionalHer2Low, ProvisionalStatus, TreatmentIntent } from '../types/api';
 
 interface AssessmentStore {
@@ -10,6 +11,8 @@ interface AssessmentStore {
   setStep3: (data: Partial<AssessmentFormState['step3']>) => void;
   p1: P1State; setP1: (data: Partial<P1State>) => void;
   p2: P2State; setP2: (data: Partial<P2State>) => void;
+  /** Build 47 (M9): Steps 1–3 fields the clinician has set; the rest still hold the sample. */
+  edited: string[];
   result: AssessmentResponse | null; setResult: (result: AssessmentResponse | null) => void;
   attestation: AttestationResponse | null; setAttestation: (attestation: AttestationResponse | null) => void;
   failure: FailureState | null; setFailure: (failure: FailureState | null) => void;
@@ -24,35 +27,39 @@ interface AssessmentStore {
   resetCycle: () => void;
 }
 
-export const initialForm: AssessmentFormState = {
-  step1: { erStatus: 'positive', prStatus: 'positive', her2Status: 'negative', ki67: '25' },
-  step2: { stage: 'II', grade: '2', histologicalSubtype: 'IDC', nodalStatus: 'N0', age: '52' },
-  step3: { ca153: '40.0', cea: '6.0', surgeryDate: '2026-03-14', bayesianEnhanced: true },
-};
-export const initialP1: P1State = { tumorSize: '', gender: '' };
-export const initialP2: P2State = { ecogScore: '', pdl1Status: '', her2Low: '', lvef: '', treatmentIntent: '' };
+export const initialForm: AssessmentFormState = SAMPLE_FORM;
+export const initialP1: P1State = BLANK_P1;
+export const initialP2: P2State = BLANK_P2;
+
+const markEdited = (edited: string[], data: object) => [...new Set([...edited, ...Object.keys(data)])];
 
 export const useAssessmentStore = create<AssessmentStore>((set) => ({
   form: initialForm,
-  setStep1: (data) => set((state) => ({ form: { ...state.form, step1: { ...state.form.step1, ...data } } })),
-  setStep2: (data) => set((state) => ({ form: { ...state.form, step2: { ...state.form.step2, ...data } } })),
-  setStep3: (data) => set((state) => ({ form: { ...state.form, step3: { ...state.form.step3, ...data } } })),
+  setStep1: (data) => set((state) => ({ form: { ...state.form, step1: { ...state.form.step1, ...data } }, edited: markEdited(state.edited, data) })),
+  setStep2: (data) => set((state) => ({ form: { ...state.form, step2: { ...state.form.step2, ...data } }, edited: markEdited(state.edited, data) })),
+  setStep3: (data) => set((state) => ({ form: { ...state.form, step3: { ...state.form.step3, ...data } }, edited: markEdited(state.edited, data) })),
   p1: initialP1, setP1: (data) => set((state) => ({ p1: { ...state.p1, ...data } })),
   p2: initialP2, setP2: (data) => set((state) => ({ p2: { ...state.p2, ...data } })),
+  edited: [],
   result: null, setResult: (result) => set({ result }),
   attestation: null, setAttestation: (attestation) => set({ attestation }),
   failure: null, setFailure: (failure) => set({ failure }),
-  deliveryChoice: 'LIVE_PLATFORM', setDeliveryChoice: (deliveryChoice) => set({ deliveryChoice }),
+  // Build 47 (M12): choosing a delivery mode starts its case — the synthetic
+  // demonstration case for "Synthetic demo", the sample with blank P1/P2 for live.
+  deliveryChoice: 'LIVE_PLATFORM', setDeliveryChoice: (deliveryChoice) => set(deliveryChoice === 'SYNTHETIC_DEMO'
+    ? { deliveryChoice, form: initialForm, p1: DEMO_P1, p2: DEMO_P2, edited: [] }
+    : { deliveryChoice, form: initialForm, p1: initialP1, p2: initialP2, edited: [] }),
   gatewayLive: 'UNKNOWN', setGatewayLive: (gatewayLive) => set({ gatewayLive }),
   accessReady: false, setAccessReady: (accessReady) => set({ accessReady }),
   walkthroughOnly: false, setWalkthroughOnly: (walkthroughOnly) => set({ walkthroughOnly }),
   sessionId: '', setSessionId: (sessionId) => set({ sessionId }),
   pairingNotice: null, setPairingNotice: (pairingNotice) => set({ pairingNotice }),
-  reset: () => set({ form: initialForm, p1: initialP1, p2: initialP2, result: null, failure: null, walkthroughOnly: false, sessionId: '' }),
+  reset: () => set({ form: initialForm, p1: initialP1, p2: initialP2, edited: [], result: null, failure: null, walkthroughOnly: false, sessionId: '' }),
   resetCycle: () => set({
     form: initialForm,
     p1: initialP1,
     p2: initialP2,
+    edited: [],
     result: null,
     attestation: null,
     failure: null,

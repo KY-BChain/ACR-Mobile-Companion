@@ -430,7 +430,7 @@ const clientModule = compile('src/api/client.ts', (name) => {
       for (const line of source.split('\n').filter((l) => /<Row [^\n]*valueComponent=\{[^\n]*ACRStateBadge/.test(l))) {
         assert.match(line, /value=\{[^\n]*spokenState\(/, `${screen}: a badge row must give the screen reader the state`);
       }
-      assert.match(source, /accessibilityLabel=\{`\$\{label\}: \$\{value \?\? ''\}`\}/, `${screen}: the row speaks label and value`);
+      assert.match(source, /accessibilityLabel=\{`\$\{label\}: \$\{value \?\? ''\}(`\}|\$\{note \? `, \$\{note\}` : ''\}`\})/, `${screen}: the row speaks label and value (and a Build 47 sample note)`);
     }
   }
   console.log('PASS Build 46: redeem returns the pairing notice; saved access judged offline as ACTIVE, EXPIRED or NONE; Connect attests once; expired and wrong-device answers localised; badge rows announce their state');

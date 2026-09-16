@@ -188,7 +188,7 @@ describe('Build 46 changeover (option a)', () => {
     expect(loadConfig({}).previousClientBuildIds).toEqual([]);
     expect(loadConfig({ ACR_PREVIOUS_CLIENT_BUILD_IDS: ` ${PREVIOUS} ` }).previousClientBuildIds).toEqual([PREVIOUS]);
     expect(() => loadConfig({ ACR_PREVIOUS_CLIENT_BUILD_IDS: 'forty-five' })).toThrow(/ACR_PREVIOUS_CLIENT_BUILD_IDS/);
-    expect(() => loadConfig({ ACR_PREVIOUS_CLIENT_BUILD_IDS: BUILD })).toThrow(/must not repeat the current build/);
+    expect(() => loadConfig({ ACR_EXPECTED_CLIENT_BUILD_ID: BUILD, ACR_PREVIOUS_CLIENT_BUILD_IDS: BUILD })).toThrow(/must not repeat the current build/);
   });
 
   test('an assessment body must name the same build as its authenticated header', async () => {

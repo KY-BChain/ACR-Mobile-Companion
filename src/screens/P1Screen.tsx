@@ -43,7 +43,8 @@ export const P1Screen: React.FC = () => {
     >
       <WalkthroughNotice />
       <ACRCard title={t('p1:cardTitle')}>
-        <Text style={[styles.label, localeTextStyle]}>{t('p1:tumorSize')} <Text style={styles.small}>· {t('common:optional')}</Text></Text>
+        {/* Build 47 (M8): needed for a full assessment; unit and required status await C45-01/C45-02. */}
+        <Text style={[styles.label, localeTextStyle]}>{t('p1:tumorSize')} <Text style={styles.small}>· {t('common:optional')}</Text><Text style={styles.needed}> · {t('build47:neededMarker')}</Text></Text>
         <ACRInput value={p1.tumorSize} onChangeText={(value) => setP1({ tumorSize: value })} keyboardType="numeric" hint={t('p1:tumorSizeHint')} />
         {!tumorSizeValid ? <Text accessibilityRole="alert" style={[styles.error, localeTextStyle]}>{t('p1:tumorSizeError')}</Text> : null}
         <Text style={[styles.label, localeTextStyle]}>{t('p1:gender')} <Text style={styles.small}>· {t('common:optional')}</Text></Text>
@@ -58,6 +59,7 @@ export const P1Screen: React.FC = () => {
 const styles = StyleSheet.create({
   label: { ...ACRTypography.label, marginTop: 9, marginBottom: 4 },
   small: { fontWeight: '400', color: ACRColors.muted },
+  needed: { fontWeight: '600', color: ACRColors.warningText },
   hint: { ...ACRTypography.hint, color: ACRColors.muted, marginTop: 5 },
   error: { ...ACRTypography.hint, color: ACRColors.stopBorder, marginTop: 4 },
 });

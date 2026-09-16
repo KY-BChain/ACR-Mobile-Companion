@@ -386,5 +386,27 @@
     "indeterminate": "Das Inferenzergebnis ist unbestimmt. Es wurde nicht automatisch wiederholt.",
     "retryVerification": "Verifizierung wiederholen",
     "backToAccess": "Zurück zum Zugang"
+  },
+  "build47": {
+    "notFullTitle": "Keine vollständige Bewertung",
+    "platformNeeds": "Die Plattform benötigt diese Werte für eine vollständige Bewertung einschließlich Risiko:",
+    "fieldOnScreen": "{{field}} (Bildschirm {{screen}} von {{total}})",
+    "riskWithheldNotice": "Das Risiko wird erst angegeben, wenn sie eingetragen sind.",
+    "riskWithheld": "zurückgehalten — benötigt {{fields}}",
+    "completeMissing": "Fehlende Felder ergänzen",
+    "completeMissingHint": "Öffnet den Bildschirm mit dem ersten fehlenden Wert. Alle Eingaben bleiben erhalten.",
+    "notAssessedRisk": "(kein bewertetes Risiko)",
+    "rulesBlockedFixed": "Blockierte Regeln (fester Wert der Plattform für diese Stufe)",
+    "neededTitle": "Für eine vollständige Bewertung benötigt",
+    "neededIntro": "Diese Werte sind leer. Die Plattform benötigt sie für eine vollständige Bewertung einschließlich Risiko.",
+    "goToField": "Zu {{field}} (Bildschirm {{screen}} von {{total}})",
+    "neededSubmitAllowed": "Sie können trotzdem absenden. Das Ergebnis nennt, was fehlt.",
+    "neededMarker": "für vollständige Bewertung benötigt",
+    "sampleNotChanged": "Beispielwert, nicht geändert",
+    "demoChangedTitle": "Demonstrationsfall geändert",
+    "demoChanged": "Die synthetische Demo gibt nur den unveränderten Demonstrationsfall wieder. Mit geänderten Werten liefert sie kein Ergebnis.",
+    "signedInTitle": "Auf diesem Gerät angemeldet",
+    "waitingForServer": "Warten auf den Server. Der Einladungscode wird nicht erneut benötigt: Der Zugang wird fortgesetzt, sobald der Server erreichbar ist.",
+    "reconnecting": "Verbindung zum Server wird wiederhergestellt…"
   }
 }
