@@ -119,17 +119,21 @@ export const ReviewScreen: React.FC = () => {
         <Text style={[styles.hint, localText]}>{store.deliveryChoice === 'LIVE_PLATFORM' ? t('build44:liveReviewHint') : t('build44:demoReviewHint')}</Text>
       </ACRCard>
 
-      {demoChanged ? <ACRCard title={t('build47:demoChangedTitle')}>
-        <Text accessibilityRole="alert" style={[styles.warning, localText]}>{t('build47:demoChanged')}</Text>
-      </ACRCard> : null}
+      {/* Build 47 (Kraken, 16 Sept 2026): Review warnings that lead back to a
+          screen are highlighted in red. */}
+      {demoChanged ? <View style={styles.alertBox}>
+        <Text accessibilityRole="header" style={[styles.alertTitle, localText]}>{t('build47:demoChangedTitle')}</Text>
+        <Text accessibilityRole="alert" style={[styles.alertText, localText]}>{t('build47:demoChanged')}</Text>
+      </View> : null}
 
-      {blanks.length ? <ACRCard title={t('build47:neededTitle')}>
-        <Text style={[styles.hint, localText]}>{t('build47:neededIntro')}</Text>
+      {blanks.length ? <View style={styles.alertBox}>
+        <Text accessibilityRole="header" style={[styles.alertTitle, localText]}>{t('build47:neededTitle')}</Text>
+        <Text accessibilityRole="alert" style={[styles.alertText, localText]}>{t('build47:neededIntro')}</Text>
         {blanks.map((field) => <Pressable key={field.platformName} accessibilityRole="link" onPress={() => navigation.navigate(field.route)} style={({ pressed }) => [styles.link, pressed && styles.linkPressed]}>
           <Text style={[styles.linkText, localText]}>{t('build47:goToField', { field: t(field.labelKey), screen: field.screen, total: ENTRY_SCREEN_COUNT })}</Text>
         </Pressable>)}
-        <Text style={[styles.hint, localText]}>{t('build47:neededSubmitAllowed')}</Text>
-      </ACRCard> : null}
+        <Text style={[styles.alertText, localText]}>{t('build47:neededSubmitAllowed')}</Text>
+      </View> : null}
 
       <ACRCard title={t('review:enteredValues')}>
         <Row label={t('build44:patientId')} value={store.sessionId} />
@@ -187,10 +191,12 @@ const styles = StyleSheet.create({
   rowValue: { fontSize: 11, fontWeight: '600', color: ACRColors.ink },
   rowValueBlock: { flex: 1 },
   sampleNote: { fontSize: 9.5, color: ACRColors.warningText, marginTop: 1 },
-  warning: { fontSize: 11, color: ACRColors.warningText, lineHeight: 16 },
+  alertBox: { backgroundColor: ACRColors.stopBg, borderWidth: 1.5, borderColor: ACRColors.stopBorder, borderRadius: 12, padding: 12, marginBottom: 10, gap: 4 },
+  alertTitle: { ...ACRTypography.cardTitle, color: ACRColors.stopBorder },
+  alertText: { fontSize: 11, color: ACRColors.stopText, lineHeight: 16 },
   link: { paddingVertical: 6 },
   linkPressed: { opacity: 0.6 },
-  linkText: { fontSize: 11.5, fontWeight: '700', color: ACRColors.primary, textDecorationLine: 'underline' },
+  linkText: { fontSize: 11.5, fontWeight: '700', color: ACRColors.stopBorder, textDecorationLine: 'underline' },
   hint: { ...ACRTypography.hint, color: ACRColors.muted, marginTop: 5 },
   muted: { fontSize: 11, color: ACRColors.muted },
 });

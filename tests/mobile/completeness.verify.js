@@ -147,7 +147,24 @@ assert.match(access, /selectedColors=\{\{ SYNTHETIC_DEMO: ACRColors\.demo \}\}/)
 assert.match(review, /valueColor=\{store\.deliveryChoice === 'SYNTHETIC_DEMO' \? ACRColors\.demo : undefined\}/);
 const luminance = (hex) => { const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((c) => (c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4)); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
 assert.ok((1.05) / (luminance('#b45309') + 0.05) >= 4.5, 'amber meets WCAG AA against white, both ways');
-console.log('STATIC PASS return path keeps values, notice before unchanged T1 text, fixed figure moved, muted deterministic risk, Review blanks/sample/demo, markers, signed-in-offline card, time-limited live check with foreground re-check, amber demo mode');
+// Build 47 (Kraken, iPhone 13, 16 Sept): keyboard gives way; Review warnings in red.
+const input = read('src/components/ACRInput.tsx');
+assert.match(input, /onSubmitEditing=\{\(\) => Keyboard\.dismiss\(\)\}/);
+assert.match(input, /const needsDoneBar = Platform\.OS === 'ios' && keyboardType !== 'default' && editable && !readOnly;/, 'iOS number pads get a Done bar');
+assert.match(input, /<InputAccessoryView nativeID=\{accessoryId\}>/);
+const layout = read('src/components/ScreenLayout.tsx');
+assert.match(layout, /<KeyboardAvoidingView style=\{styles\.keyboardArea\} behavior=\{Platform\.OS === 'ios' \? 'padding' : undefined\}>/, 'footer rises above the keyboard');
+assert.match(layout, /keyboardShouldPersistTaps="handled"/, 'a tap on Next or Review works with the keyboard open');
+assert.ok(layout.indexOf('<KeyboardAvoidingView') < layout.indexOf('styles.footer'), 'the footer is inside the keyboard-avoiding area');
+assert.match(review, /\{blanks\.length \? <View style=\{styles\.alertBox\}>/);
+assert.match(review, /\{demoChanged \? <View style=\{styles\.alertBox\}>/);
+assert.match(review, /linkText: \{[^}]*color: ACRColors\.stopBorder/);
+const colours = read('src/theme/colors.ts');
+const hex = (name) => colours.match(new RegExp(`${name}: '(#[0-9a-f]{6})'`, 'i'))[1];
+const ratio = (a, b) => { const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
+assert.ok(ratio(hex('stopBorder'), hex('stopBg')) >= 4.5, 'red links meet WCAG AA on the red box');
+assert.ok(ratio(hex('stopText'), hex('stopBg')) >= 4.5);
+console.log('STATIC PASS return path keeps values, notice before unchanged T1 text, fixed figure moved, muted deterministic risk, Review blanks/sample/demo, markers, signed-in-offline card, time-limited live check with foreground re-check, amber demo mode, keyboard gives way, red Review warnings');
 
 // ── Locales: identical Build 47 keys and placeholders in all eight
 const localeDir = path.join(root, 'src/i18n/locales');

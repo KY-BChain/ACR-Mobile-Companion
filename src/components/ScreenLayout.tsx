@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
+import { KeyboardAvoidingView, Platform, View, ScrollView, StyleSheet, SafeAreaView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ACRColors } from '../theme/colors';
 import { getLocaleDirection } from '../utils/rtl';
@@ -37,10 +37,16 @@ export const ScreenLayout: React.FC<Props> = ({
       <ACRHeader title={title} subtitle={subtitle} titleStyle={titleStyle} />
       {bannerText ? <ACRBanner text={bannerText} variant={bannerVariant} /> : null}
       {steps ? <ACRStepIndicator total={steps.total} current={steps.current} /> : null}
-      <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
-        {children}
-      </ScrollView>
-      {footer ? <View style={styles.footer}>{footer}</View> : null}
+      {/* Build 47: the footer (Next / Review) rises above the keyboard on iOS; a
+          tap on it works while the keyboard is open, and dragging the page closes
+          the keyboard. */}
+      <KeyboardAvoidingView style={styles.keyboardArea} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}
+          keyboardShouldPersistTaps="handled" keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}>
+          {children}
+        </ScrollView>
+        {footer ? <View style={styles.footer}>{footer}</View> : null}
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -57,6 +63,9 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 15,
     borderBottomRightRadius: 15,
     alignSelf: 'center',
+  },
+  keyboardArea: {
+    flex: 1,
   },
   body: {
     flex: 1,
