@@ -5,6 +5,30 @@
 **Status:** findings and a provisional proposal. **For Kraken's review only.** Nothing here has been implemented, and no clinical threshold, staging rule or recommendation wording is set. Where this document sorts fields into "pathway-timing" or "data-entry" gaps, that sorting is CRIL's starting suggestion for ZZU/UCD/HKU to correct.
 **Sources:** mobile repository at branch `feature/mobile-v0.6.5-build46`; platform checkout `33daead` (read-only, unchanged); website `Final_FTP_v2_2_1/website/acr_pathway.html`.
 
+> **Update, 17 September 2026.** Build 47 (v0.6.6) shipped the mobile-only fixes from Part III and passed on three phones. **Resolved in the app:**
+> - B3: "Complete missing fields" returns to the screen with values kept.
+> - I-A.1: the platform's field names are translated into app labels.
+> - B5: a localised completeness notice.
+> - B6: Review lists blank needed fields, in red.
+> - B2: sample values are marked.
+> - B4: "needed for a full assessment" markers.
+> - The deterministic risk is greyed out while withheld, and "Rules blocked" moved to Technical details.
+>
+> **Still open (platform or clinical):**
+> - the gate mismatch (I-C);
+> - English-only platform wording;
+> - `rulesBlocked` being a constant;
+> - the silent future-surgery-date guard;
+> - HER2 equivocal.
+>
+> **New platform findings (17 September):**
+> - The Java backup classifier splits Luminal A/B at Ki-67 > 20 (the ontology uses 14) and calls every HER2+ case HER2-enriched.
+> - The Bayesian "classification confidence" is the top of its own five groups and can refer to a different subtype from the one shown.
+> - Marker and DCIS red-flag rules appear only under Technical details.
+> - R17a/R17b are applied without the T2 condition.
+>
+> The reviewer-facing account and test list for ZZU is `ACR_Companion_ZZU_Review_and_Test_List_17SEPT26.md`.
+
 ---
 
 ## Headline findings
