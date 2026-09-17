@@ -216,7 +216,6 @@
   "failClosed": {
     "title": "서비스 사용 불가",
     "subtitle": "기준선 검증 실패",
-    "heading": "평가 차단됨",
     "message": "서비스에서 연결된 추론 엔진이 수락된 기준선과 일치하는지 확인할 수 없습니다. 검증이 성공할 때까지 평가를 제출할 수 없습니다.",
     "verificationDetail": "검증 세부 정보",
     "expectedReasoner": "예상 추론 엔진",
@@ -227,7 +226,6 @@
     "expectedValuesHint": "예상 값은 수락된 기준 매니페스트에서 가져옵니다. 관찰로 보고되지 않습니다.",
     "sameTreatment": "불일치 시 동일한 처리. 다시 시도는 검증만 다시 실행 — 평가를 다시 제출하지 않습니다.",
     "blockedMessage": "서비스에서 연결된 추론 엔진이 수락된 기준선과 일치하는지 확인할 수 없습니다. 검증이 성공할 때까지 평가를 제출할 수 없습니다.",
-    "blockedTitle": "평가 차단됨",
     "observed": "관찰됨",
     "retryCheck": "다시 시도",
     "state": "상태",
@@ -279,7 +277,6 @@
   "errors": {
     "schemaInvalid": "잘못된 입력 형식입니다. 입력 내용을 확인하세요.",
     "authRequired": "세션이 만료되었습니다. 앱을 다시 시작하고 초대 코드를 사용하세요.",
-    "attestationMismatch": "연결된 추론 엔진이 수락된 기준선과 일치하지 않습니다. 평가가 차단되었습니다.",
     "attestationUnavailable": "추론 엔진 기준선을 검증할 수 없습니다. 다시 시도하세요.",
     "serviceUnavailable": "서비스를 일시적으로 사용할 수 없습니다. 나중에 다시 시도하세요.",
     "indeterminate": "평가 결과가 불확실합니다. 자동으로 다시 시도하지 마세요 — 지원팀에 문의하세요.",
@@ -411,5 +408,29 @@
     "riskHigh": "고위험",
     "riskIntermediate": "중간 위험",
     "riskLow": "저위험"
+  },
+  "legal": {
+    "title": "개인정보 및 쿠키",
+    "cookies": "이 앱은 쿠키와 추적을 사용하지 않습니다.",
+    "controllerLabel": "데이터 관리자",
+    "controller": "Cornerstone Research International Ltd (CRIL), c/o NovaUCD, Belfield Innovation Park, University College Dublin, Dublin 4, D04 V2P1, Ireland · info@acragent.com",
+    "processLabel": "처리하는 정보",
+    "process": "초대 라벨, 앱이 생성한 무작위 기기 식별자(해시로 보관), 페어링 날짜, 앱 버전, 보안 기록. IP 주소는 네트워크 제공업체 Cloudflare를 거치며 귀하의 국가 밖에서 처리될 수 있습니다.",
+    "neverLabel": "수집하지 않는 정보",
+    "never": "이름, 연락처, 환자 데이터. 입력한 합성 증례는 저장되지 않습니다.",
+    "whyLabel": "목적",
+    "why": "이 평가를 안전하게 운영하기 위함입니다.",
+    "keptLabel": "보관 기간",
+    "kept": "접근 권한은 페어링 후 30일에 종료되며, 기록은 평가 종료 후 30일에 삭제됩니다.",
+    "rightsLabel": "귀하의 권리",
+    "rights": "열람, 정정, 삭제, 처리 제한, 반대 — CRIL에 문의하십시오. EU/EEA/영국: 데이터 보호 기관에 민원을 제기할 수 있습니다.",
+    "readDetails": "자세히 보기",
+    "swipeHint": "옆으로 밀면 포스터 · 위로 밀면 계속"
+  },
+  "manual": {
+    "title": "사용 설명서",
+    "pageIndicator": "설명서 {{current}} / {{total}}",
+    "englishFallback": "이 설명서는 영어로 표시됩니다.",
+    "legalSection": "개인정보 및 쿠키 전문"
   }
 }

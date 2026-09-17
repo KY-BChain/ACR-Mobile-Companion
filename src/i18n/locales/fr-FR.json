@@ -216,7 +216,6 @@
   "failClosed": {
     "title": "Service indisponible",
     "subtitle": "Échec de vérification de la référence",
-    "heading": "Évaluation bloquée",
     "message": "Le service n'a pas pu vérifier que le moteur d'inférence connecté correspond à la référence acceptée. Aucune évaluation ne peut être soumise tant que la vérification ne réussit pas.",
     "verificationDetail": "Détail de vérification",
     "expectedReasoner": "Moteur d'inférence attendu",
@@ -227,7 +226,6 @@
     "expectedValuesHint": "Les valeurs attendues proviennent du manifeste de référence accepté ; elles ne sont jamais rapportées comme observations.",
     "sameTreatment": "Même traitement pour NON CONCORDANT. Réessayer relance uniquement la vérification — il ne resoumet jamais une évaluation.",
     "blockedMessage": "Le service n'a pas pu vérifier que le moteur d'inférence connecté correspond à la référence acceptée. Aucune évaluation ne peut être soumise tant que la vérification ne réussit pas.",
-    "blockedTitle": "Évaluation bloquée",
     "observed": "observé",
     "retryCheck": "Réessayer",
     "state": "État",
@@ -279,7 +277,6 @@
   "errors": {
     "schemaInvalid": "Format d'entrée invalide. Veuillez vérifier vos entrées.",
     "authRequired": "Session expirée. Veuillez redémarrer l'application et utiliser votre code d'invitation.",
-    "attestationMismatch": "Le moteur d'inférence connecté ne correspond pas à la référence acceptée. Évaluation bloquée.",
     "attestationUnavailable": "La référence du moteur d'inférence n'a pas pu être vérifiée. Veuillez réessayer.",
     "serviceUnavailable": "Service temporairement indisponible. Veuillez réessayer plus tard.",
     "indeterminate": "Le résultat de l'évaluation est incertain. Ne réessayez pas automatiquement — contactez le support.",
@@ -411,5 +408,29 @@
     "riskHigh": "ÉLEVÉ",
     "riskIntermediate": "INTERMÉDIAIRE",
     "riskLow": "FAIBLE"
+  },
+  "legal": {
+    "title": "Confidentialité et cookies",
+    "cookies": "Cette application n'utilise ni cookies ni suivi.",
+    "controllerLabel": "Responsable du traitement",
+    "controller": "Cornerstone Research International Ltd (CRIL), c/o NovaUCD, Belfield Innovation Park, University College Dublin, Dublin 4, D04 V2P1, Ireland · info@acragent.com",
+    "processLabel": "Nous traitons",
+    "process": "votre libellé d'invitation, un identifiant d'appareil aléatoire (conservé sous forme hachée), les dates d'appairage, la version de l'application et des enregistrements de sécurité. Votre adresse IP transite par notre fournisseur réseau, Cloudflare, qui peut la traiter hors de votre pays.",
+    "neverLabel": "Nous ne collectons jamais",
+    "never": "votre nom, vos coordonnées ni de données de patients. Les cas synthétiques saisis ne sont pas conservés.",
+    "whyLabel": "Pourquoi",
+    "why": "pour assurer le fonctionnement sécurisé de cette évaluation.",
+    "keptLabel": "Conservation",
+    "kept": "l'accès prend fin 30 jours après l'appairage ; les enregistrements sont supprimés 30 jours après la fin de l'évaluation.",
+    "rightsLabel": "Vos droits",
+    "rights": "accès, rectification, effacement, limitation, opposition — contactez CRIL. UE/EEE/Royaume-Uni : vous pouvez saisir votre autorité de protection des données.",
+    "readDetails": "LIRE LES DÉTAILS",
+    "swipeHint": "Balayez latéralement pour l'affiche · vers le haut pour continuer"
+  },
+  "manual": {
+    "title": "Manuel d'utilisation",
+    "pageIndicator": "Manuel {{current}} sur {{total}}",
+    "englishFallback": "Ce manuel est affiché en anglais.",
+    "legalSection": "Confidentialité et cookies en détail"
   }
 }

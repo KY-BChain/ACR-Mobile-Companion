@@ -53,6 +53,10 @@ export const AboutScreen: React.FC = () => {
         <ACRCard title={t('about:page3Title')}><Text accessibilityRole="text" style={[styles.bodyText, localeTextStyle]}>{t('about:page3Text')}</Text></ACRCard>
         <ACRCard title={t('about:page4Title')}><Text accessibilityRole="text" style={[styles.bodyText, localeTextStyle]}>{t('about:page4Text')}</Text></ACRCard>
         <ACRCard title={t('about:dataHandlingSection')}><Text style={[styles.bodyText, localeTextStyle]}>{t('about:dataHandlingText')}</Text></ACRCard>
+        <ACRCard title={t('legal:title')}>
+          <Text accessibilityRole="text" style={[styles.bodyText, localeTextStyle]}>{t('legal:cookies')}</Text>
+          <ACRButton title={t('manual:legalSection')} variant="secondary" onPress={() => navigation.navigate('Manual', { section: 'legal' })} />
+        </ACRCard>
         <Text accessibilityRole="text" style={[styles.versionLabel, localeTextStyle]}>{APP_VERSION_LABEL}</Text>
       </>}
     </ScreenLayout>

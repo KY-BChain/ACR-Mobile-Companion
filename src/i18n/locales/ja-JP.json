@@ -216,7 +216,6 @@
   "failClosed": {
     "title": "サービス利用不可",
     "subtitle": "ベースライン検証失敗",
-    "heading": "評価ブロック",
     "message": "サービスは、接続された推論エンジンが受け入れられたベースラインと一致することを確認できませんでした。検証が成功するまで、評価を送信することはできません。",
     "verificationDetail": "検証詳細",
     "expectedReasoner": "予想される推論エンジン",
@@ -227,7 +226,6 @@
     "expectedValuesHint": "予想値は受け入れられたベースラインマニフェストから取得されます。観測として報告されることはありません。",
     "sameTreatment": "不一致の場合も同様の処理。再試行は検証のみを再実行 — 評価を再送信することはありません。",
     "blockedMessage": "サービスは、接続された推論エンジンが受け入れられたベースラインと一致することを確認できませんでした。検証が成功するまで、評価を送信することはできません。",
-    "blockedTitle": "評価ブロック",
     "observed": "観測済み",
     "retryCheck": "再試行",
     "state": "状態",
@@ -279,7 +277,6 @@
   "errors": {
     "schemaInvalid": "無効な入力形式です。入力内容を確認してください。",
     "authRequired": "セッションの有効期限が切れました。アプリを再起動して招待コードを使用してください。",
-    "attestationMismatch": "接続された推論エンジンが受け入れられたベースラインと一致しません。評価はブロックされています。",
     "attestationUnavailable": "推論エンジンのベースラインを検証できませんでした。再試行してください。",
     "serviceUnavailable": "サービスは一時的に利用できません。後でもう一度お試しください。",
     "indeterminate": "評価結果が不確定です。自動的に再試行しないでください — サポートにお問い合わせください。",
@@ -411,5 +408,29 @@
     "riskHigh": "高リスク",
     "riskIntermediate": "中間リスク",
     "riskLow": "低リスク"
+  },
+  "legal": {
+    "title": "プライバシーとCookie",
+    "cookies": "本アプリはCookieも追跡も使用しません。",
+    "controllerLabel": "データ管理者",
+    "controller": "Cornerstone Research International Ltd (CRIL)、c/o NovaUCD, Belfield Innovation Park, University College Dublin, Dublin 4, D04 V2P1, Ireland · info@acragent.com",
+    "processLabel": "処理する情報",
+    "process": "招待ラベル、アプリが生成したランダムな端末識別子（ハッシュで保存）、ペアリング日、アプリのバージョン、セキュリティ記録。IPアドレスはネットワーク提供者Cloudflareを経由し、お客様の国外で処理される場合があります。",
+    "neverLabel": "収集しない情報",
+    "never": "お名前、連絡先、患者データ。入力された合成症例は保存されません。",
+    "whyLabel": "目的",
+    "why": "本評価を安全に運用するためです。",
+    "keptLabel": "保存期間",
+    "kept": "アクセスはペアリングから30日で終了し、記録は評価終了から30日で削除されます。",
+    "rightsLabel": "お客様の権利",
+    "rights": "開示、訂正、削除、制限、異議 — CRILにご連絡ください。EU/EEA/英国：データ保護機関に苦情を申し立てることができます。",
+    "readDetails": "詳細を読む",
+    "swipeHint": "横スワイプでポスター · 上スワイプで続行"
+  },
+  "manual": {
+    "title": "ユーザーマニュアル",
+    "pageIndicator": "マニュアル {{current}} / {{total}}",
+    "englishFallback": "このマニュアルは英語で表示されます。",
+    "legalSection": "プライバシーとCookieの全文"
   }
 }

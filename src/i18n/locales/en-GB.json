@@ -193,8 +193,6 @@
   "failClosed": {
     "title": "Service unavailable",
     "subtitle": "Baseline verification failed",
-    "heading": "Assessment blocked",
-    "blockedTitle": "Assessment blocked",
     "message": "The service could not verify that the connected reasoner matches the accepted baseline. No assessment can be submitted until verification succeeds.",
     "blockedMessage": "The service could not verify that the connected reasoner matches the accepted baseline. No assessment can be submitted until verification succeeds.",
     "verificationDetail": "Verification detail",
@@ -295,7 +293,6 @@
   "errors": {
     "schemaInvalid": "Invalid input format. Please check your entries.",
     "authRequired": "Session expired. Please restart the app and redeem your invite code.",
-    "attestationMismatch": "The connected reasoner does not match the accepted baseline. Assessment blocked.",
     "attestationUnavailable": "The reasoner baseline could not be verified. Please retry.",
     "serviceUnavailable": "Service temporarily unavailable. Please try again later.",
     "indeterminate": "The assessment outcome is uncertain. Do not retry automatically — contact support.",
@@ -411,5 +408,29 @@
     "riskHigh": "HIGH",
     "riskIntermediate": "INTERMEDIATE",
     "riskLow": "LOW"
+  },
+  "legal": {
+    "title": "Privacy & Cookies",
+    "cookies": "This app uses no cookies and no tracking.",
+    "controllerLabel": "Controller",
+    "controller": "Cornerstone Research International Ltd (CRIL), c/o NovaUCD, Belfield Innovation Park, University College Dublin, Dublin 4, D04 V2P1, Ireland · info@acragent.com",
+    "processLabel": "We process",
+    "process": "your invite label, a random device identifier (held hashed), pairing dates, app version and security records. Your IP address passes through our network provider, Cloudflare, which may process it outside your country.",
+    "neverLabel": "We never collect",
+    "never": "your name, contact details or patient data. Synthetic case entries are not stored.",
+    "whyLabel": "Why",
+    "why": "to run this evaluation securely.",
+    "keptLabel": "Kept",
+    "kept": "access ends 30 days after pairing; records are deleted 30 days after the evaluation ends.",
+    "rightsLabel": "Your rights",
+    "rights": "access, correction, deletion, restriction, objection — contact CRIL. EU/EEA/UK: you may complain to your data protection authority.",
+    "readDetails": "READ DETAILS",
+    "swipeHint": "Swipe sideways for the poster · swipe up to continue"
+  },
+  "manual": {
+    "title": "User manual",
+    "pageIndicator": "Manual {{current}} of {{total}}",
+    "englishFallback": "This manual is shown in English.",
+    "legalSection": "Privacy & Cookies in full"
   }
 }

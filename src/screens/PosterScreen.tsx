@@ -1,8 +1,10 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import {
   Image,
   PanResponder,
+  ScrollView,
   StyleSheet,
+  Text,
   View,
   useWindowDimensions,
   type ImageSourcePropType,
@@ -13,6 +15,10 @@ import { useTranslation } from 'react-i18next';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { RootStackParamList } from '../navigation/AppNavigator';
 import { getPosterLocale, type PosterLocale } from '../utils/posterLocale';
+import { PrivacyNotice } from '../components/PrivacyNotice';
+import { ACRButton } from '../components/ACRButton';
+import { ACRColors, ACRTypography } from '../theme/colors';
+import { getLocaleDirection, getTextAlign } from '../utils/rtl';
 
 const POSTER_ASPECT_RATIO = 1536 / 1024;
 const SWIPE_CAPTURE_DISTANCE = 12;
@@ -26,29 +32,47 @@ const POSTERS: Record<PosterLocale, ImageSourcePropType> = {
 
 type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
+/**
+ * Two pages: the introduction poster, and the short privacy and cookies notice
+ * (Kraken, 17 September 2026). Sideways swipes move between them; an upward
+ * swipe continues to Welcome from either page.
+ */
 export const PosterScreen: React.FC = () => {
   const navigation = useNavigation<NavProp>();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
   const navigationInProgress = useRef(false);
+  const [page, setPage] = useState<0 | 1>(0);
+  const pageRef = useRef<0 | 1>(0);
 
   const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
   const poster = POSTERS[getPosterLocale(activeLanguage)];
   const availableHeight = Math.max(1, height - insets.top - insets.bottom);
   const posterWidth = Math.min(width, availableHeight / POSTER_ASPECT_RATIO);
   const posterHeight = posterWidth * POSTER_ASPECT_RATIO;
+  const localText = {
+    writingDirection: getLocaleDirection(activeLanguage),
+    textAlign: getTextAlign(activeLanguage),
+  };
+
+  const showPage = (next: 0 | 1) => { pageRef.current = next; setPage(next); };
 
   const panResponder = useMemo(
     () => PanResponder.create({
       onMoveShouldSetPanResponder: (_event, gestureState) => (
-        gestureState.dy < -SWIPE_CAPTURE_DISTANCE
-        && Math.abs(gestureState.dy) > Math.abs(gestureState.dx)
+        (gestureState.dy < -SWIPE_CAPTURE_DISTANCE && Math.abs(gestureState.dy) > Math.abs(gestureState.dx))
+        || (Math.abs(gestureState.dx) > SWIPE_CAPTURE_DISTANCE && Math.abs(gestureState.dx) > Math.abs(gestureState.dy))
       ),
       onPanResponderRelease: (_event, gestureState) => {
-        if (gestureState.dy <= -SWIPE_NAVIGATION_DISTANCE && !navigationInProgress.current) {
+        if (gestureState.dy <= -SWIPE_NAVIGATION_DISTANCE && Math.abs(gestureState.dy) > Math.abs(gestureState.dx)) {
+          if (navigationInProgress.current) return;
           navigationInProgress.current = true;
           navigation.replace('Welcome');
+          return;
+        }
+        if (Math.abs(gestureState.dx) >= SWIPE_NAVIGATION_DISTANCE) {
+          showPage(pageRef.current === 0 ? 1 : 0);
         }
       },
       onPanResponderTerminate: () => {
@@ -60,19 +84,34 @@ export const PosterScreen: React.FC = () => {
 
   return (
     <View
-      style={[
-        styles.root,
-        { paddingTop: insets.top, paddingBottom: insets.bottom },
-      ]}
+      style={[styles.root, { paddingTop: insets.top, paddingBottom: insets.bottom }]}
       {...panResponder.panHandlers}
     >
-      <Image
-        source={poster}
-        style={{ width: posterWidth, height: posterHeight }}
-        resizeMode="contain"
-        accessible
-        accessibilityLabel="ACR Platform introduction poster"
-      />
+      {page === 0 ? (
+        <Image
+          source={poster}
+          style={{ width: posterWidth, height: posterHeight }}
+          resizeMode="contain"
+          accessible
+          accessibilityLabel="ACR Platform introduction poster"
+        />
+      ) : (
+        <View style={styles.noticePage}>
+          <ScrollView
+            style={styles.noticeScroll}
+            contentContainerStyle={styles.noticeContent}
+            keyboardShouldPersistTaps="handled"
+          >
+            <PrivacyNotice />
+          </ScrollView>
+          <ACRButton
+            title={t('legal:readDetails')}
+            variant="primary"
+            onPress={() => navigation.navigate('Manual', { section: 'legal' })}
+          />
+          <Text style={[styles.hint, localText]}>{t('legal:swipeHint')}</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -83,5 +122,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#FFFFFF',
+  },
+  noticePage: {
+    flex: 1,
+    alignSelf: 'stretch',
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+  },
+  noticeScroll: {
+    flex: 1,
+  },
+  noticeContent: {
+    paddingBottom: 10,
+  },
+  hint: {
+    ...ACRTypography.hint,
+    color: ACRColors.muted,
+    marginTop: 8,
+    textAlign: 'center',
   },
 });

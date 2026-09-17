@@ -13,6 +13,7 @@ import { ReviewScreen } from '../screens/ReviewScreen';
 import { ResultScreen } from '../screens/ResultScreen';
 import { AboutScreen } from '../screens/AboutScreen';
 import { FailClosedScreen } from '../screens/FailClosedScreen';
+import { ManualScreen } from '../screens/ManualScreen';
 import { isRTL } from '../utils/rtl';
 
 export type RootStackParamList = {
@@ -27,6 +28,7 @@ export type RootStackParamList = {
   Review: undefined;
   Result: undefined;
   About: undefined;
+  Manual: { section?: 'legal' } | undefined;
   FailClosed: undefined;
 };
 
@@ -54,6 +56,7 @@ export const AppNavigator: React.FC = () => {
         <Stack.Screen name="Review" component={ReviewScreen} />
         <Stack.Screen name="Result" component={ResultScreen} />
         <Stack.Screen name="About" component={AboutScreen} />
+        <Stack.Screen name="Manual" component={ManualScreen} />
         <Stack.Screen name="FailClosed" component={FailClosedScreen} />
       </Stack.Navigator>
   );

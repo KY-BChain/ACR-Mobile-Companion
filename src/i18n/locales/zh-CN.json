@@ -216,7 +216,6 @@
   "failClosed": {
     "title": "服务不可用",
     "subtitle": "基线验证失败",
-    "heading": "评估被阻止",
     "message": "服务无法验证连接的推理引擎是否与已接受的基线匹配。在验证成功之前，无法提交任何评估。",
     "verificationDetail": "验证详情",
     "expectedReasoner": "预期推理引擎",
@@ -227,7 +226,6 @@
     "expectedValuesHint": "预期值来自已接受的基线清单；它们永远不会被报告为观察值。",
     "sameTreatment": "不匹配同样处理。重试仅重新运行验证 — 绝不会重新提交评估。",
     "blockedMessage": "服务无法验证连接的推理引擎是否与已接受的基线匹配。在验证成功之前，无法提交任何评估。",
-    "blockedTitle": "评估被阻止",
     "observed": "已观察",
     "retryCheck": "重试检查",
     "state": "状态",
@@ -279,7 +277,6 @@
   "errors": {
     "schemaInvalid": "输入格式无效。请检查您的输入。",
     "authRequired": "会话已过期。请重新启动应用并使用您的邀请码。",
-    "attestationMismatch": "连接的推理引擎与已接受的基线不匹配。评估被阻止。",
     "attestationUnavailable": "无法验证推理引擎基线。请重试。",
     "serviceUnavailable": "服务暂时不可用。请稍后再试。",
     "indeterminate": "评估结果不确定。请勿自动重试 — 请联系支持人员。",
@@ -411,5 +408,29 @@
     "riskHigh": "高危",
     "riskIntermediate": "中危",
     "riskLow": "低危"
+  },
+  "legal": {
+    "title": "隐私与 Cookies",
+    "cookies": "本应用不使用 Cookies，也不进行任何跟踪。",
+    "controllerLabel": "数据控制者",
+    "controller": "Cornerstone Research International Ltd（CRIL），c/o NovaUCD, Belfield Innovation Park, University College Dublin, Dublin 4, D04 V2P1, Ireland · info@acragent.com",
+    "processLabel": "我们处理",
+    "process": "您的邀请码标签、应用生成的随机设备标识符（以哈希形式保存）、配对日期、应用版本和安全记录。您的 IP 地址会经由我们的网络服务商 Cloudflare 处理，其处理地点可能在您所在国家/地区之外。",
+    "neverLabel": "我们绝不收集",
+    "never": "您的姓名、联系方式或患者数据。合成病例输入不会被保存。",
+    "whyLabel": "目的",
+    "why": "以安全的方式运行本次评估。",
+    "keptLabel": "保留期限",
+    "kept": "访问权限于配对后 30 天结束；记录在评估结束后 30 天删除。",
+    "rightsLabel": "您的权利",
+    "rights": "查阅、更正、删除、限制处理、反对 — 请联系 CRIL。欧盟/欧洲经济区/英国：您可向所在地数据保护机构投诉。",
+    "readDetails": "阅读详情",
+    "swipeHint": "左右滑动查看海报 · 向上滑动继续"
+  },
+  "manual": {
+    "title": "使用手册",
+    "pageIndicator": "手册 {{current}} / {{total}}",
+    "englishFallback": "本手册以英文显示。",
+    "legalSection": "隐私与 Cookies 全文"
   }
 }

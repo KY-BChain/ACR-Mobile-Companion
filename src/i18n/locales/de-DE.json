@@ -216,7 +216,6 @@
   "failClosed": {
     "title": "Dienst nicht verfügbar",
     "subtitle": "Baseline-Verifizierung fehlgeschlagen",
-    "heading": "Bewertung blockiert",
     "message": "Der Dienst konnte nicht verifizieren, dass der verbundene Reasoner mit der akzeptierten Baseline übereinstimmt. Keine Bewertung kann gesendet werden, bis die Verifizierung erfolgreich ist.",
     "verificationDetail": "Verifizierungsdetails",
     "expectedReasoner": "Erwarteter Reasoner",
@@ -227,7 +226,6 @@
     "expectedValuesHint": "Erwartete Werte stammen aus dem akzeptierten Baseline-Manifest; sie werden nie als Beobachtungen gemeldet.",
     "sameTreatment": "Gleiche Behandlung bei NICHT ÜBEREINSTIMMEND. Wiederholen führt nur die Verifizierung erneut aus — es wird nie eine Bewertung erneut gesendet.",
     "blockedMessage": "Der Dienst konnte nicht verifizieren, dass der verbundene Reasoner mit der akzeptierten Baseline übereinstimmt. Keine Bewertung kann gesendet werden, bis die Verifizierung erfolgreich ist.",
-    "blockedTitle": "Bewertung blockiert",
     "observed": "beobachtet",
     "retryCheck": "Erneut versuchen",
     "state": "Status",
@@ -279,7 +277,6 @@
   "errors": {
     "schemaInvalid": "Ungültiges Eingabeformat. Bitte überprüfen Sie Ihre Eingaben.",
     "authRequired": "Sitzung abgelaufen. Bitte starten Sie die App neu und verwenden Sie Ihren Einladungscode.",
-    "attestationMismatch": "Der verbundene Reasoner stimmt nicht mit der akzeptierten Baseline überein. Bewertung blockiert.",
     "attestationUnavailable": "Die Reasoner-Baseline konnte nicht verifiziert werden. Bitte versuchen Sie es erneut.",
     "serviceUnavailable": "Dienst vorübergehend nicht verfügbar. Bitte versuchen Sie es später erneut.",
     "indeterminate": "Das Bewertungsergebnis ist ungewiss. Nicht automatisch wiederholen — kontaktieren Sie den Support.",
@@ -411,5 +408,29 @@
     "riskHigh": "HOCH",
     "riskIntermediate": "MITTEL",
     "riskLow": "NIEDRIG"
+  },
+  "legal": {
+    "title": "Datenschutz und Cookies",
+    "cookies": "Diese App verwendet keine Cookies und kein Tracking.",
+    "controllerLabel": "Verantwortlicher",
+    "controller": "Cornerstone Research International Ltd (CRIL), c/o NovaUCD, Belfield Innovation Park, University College Dublin, Dublin 4, D04 V2P1, Ireland · info@acragent.com",
+    "processLabel": "Wir verarbeiten",
+    "process": "Ihre Einladungsbezeichnung, eine zufällige Gerätekennung (nur als Hash gespeichert), Kopplungsdaten, die App-Version und Sicherheitsaufzeichnungen. Ihre IP-Adresse läuft über unseren Netzanbieter Cloudflare, der sie außerhalb Ihres Landes verarbeiten kann.",
+    "neverLabel": "Wir erheben nie",
+    "never": "Ihren Namen, Ihre Kontaktdaten oder Patientendaten. Synthetische Falleingaben werden nicht gespeichert.",
+    "whyLabel": "Zweck",
+    "why": "den sicheren Betrieb dieser Evaluierung.",
+    "keptLabel": "Speicherdauer",
+    "kept": "Der Zugang endet 30 Tage nach der Kopplung; Aufzeichnungen werden 30 Tage nach Ende der Evaluierung gelöscht.",
+    "rightsLabel": "Ihre Rechte",
+    "rights": "Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch — wenden Sie sich an CRIL. EU/EWR/UK: Sie können sich bei Ihrer Datenschutzbehörde beschweren.",
+    "readDetails": "DETAILS LESEN",
+    "swipeHint": "Seitwärts wischen für das Poster · nach oben wischen zum Fortfahren"
+  },
+  "manual": {
+    "title": "Benutzerhandbuch",
+    "pageIndicator": "Handbuch {{current}} von {{total}}",
+    "englishFallback": "Dieses Handbuch wird auf Englisch angezeigt.",
+    "legalSection": "Datenschutz und Cookies im Detail"
   }
 }
