@@ -241,8 +241,8 @@ F10 uses T1's own subtype result, so the check stays with the reasoner.
 
 - Entry rules and initial values: `src/screens/Step1ReceptorsScreen.tsx`, `Step2TumourScreen.tsx`, `Step3MarkersScreen.tsx`, `P1Screen.tsx`, `P2Screen.tsx`, `src/store/assessmentStore.ts` and `src/utils/provisionalValidation.ts`.
 - Gateway ranges: `schemas/acr.cds.v1.request.schema.json`.
-- How T1 uses each field: `docs/loop/ACR_MOBILE_BACKEND_REASONER_FLOW_REAFFIRMATION_v0.1.md` (twenty-field consumer matrix).
-- Tier evidence: `docs/build45-evidence/gate1/GATE1_EVIDENCE_T4501_T4502_20260909.md`, §3.2 and OBS-4.
-- Open clinical questions C45-01 to C45-11: `docs/loop/ACR_MOBILE_BUILD45_TECHNICAL_CLINICAL_REVIEW_BACKLOG_v0.1.md`.
+- How T1 uses each field: `docs/archive/build44/ACR_MOBILE_BACKEND_REASONER_FLOW_REAFFIRMATION_v0.1.md` (twenty-field consumer matrix).
+- Tier evidence: `docs/archive/build45/build45-evidence/gate1/GATE1_EVIDENCE_T4501_T4502_20260909.md`, §3.2 and OBS-4.
+- Open clinical questions C45-01 to C45-11: `docs/archive/build45/ACR_MOBILE_BUILD45_TECHNICAL_CLINICAL_REVIEW_BACKLOG_v0.1.md`.
 - T1's tier and risk rules: platform `ACR-Ontology-Interface/src/main/java/org/acr/platform/service/ReasonerService.java` (`assessDataCompleteness`, `calculateRiskLevel`, and the tier 1/2 risk suppression), commit `33daead`, read-only.
 - Website display: platform `Final_FTP_v2_2_1/website/acr_pathway.html` (identical to `acr-test-website/acr_pathway.html`).

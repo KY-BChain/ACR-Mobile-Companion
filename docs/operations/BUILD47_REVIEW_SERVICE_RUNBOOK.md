@@ -1,7 +1,7 @@
 # Build 47 — Review Service and Device Build Runbook
 
 > **Working runbook for v0.6.6 (build 47).** It is Kraken's Build 46 working copy
-> (`BUILD46_REVIEW_SERVICE_RUNBOOK_with_invite-code_13SEPT26.md`) brought up to date for
+> (now `docs/archive/build46/BUILD46_REVIEW_SERVICE_RUNBOOK_with_invite-code_13SEPT26.md`) brought up to date for
 > Build 47. What changed since Build 46:
 > - The service script is now `scripts/build47-review-service.sh`. The old name prints the new one.
 > - The Android app has a new app ID and is signed with CRIL's release key, so Android phones install it as a new app and **pair afresh**.

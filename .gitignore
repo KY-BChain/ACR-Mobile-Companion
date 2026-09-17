@@ -57,7 +57,7 @@ local.properties
 
 # Local execution evidence can contain machine/device/session identifiers.
 # The redacted consolidated evidence is committed instead.
-docs/loop/ACR_MOBILE_CDS_PARITY_LOOP_STATE_v1.6.json
-docs/loop/ACR_MOBILE_CDS_PARITY_LOOP_JOURNAL_v1.6.jsonl
-docs/loop/archive/
-docs/loop/mock-api-investigation-v1.0/
+docs/archive/build44/ACR_MOBILE_CDS_PARITY_LOOP_STATE_v1.6.json
+docs/archive/build44/ACR_MOBILE_CDS_PARITY_LOOP_JOURNAL_v1.6.jsonl
+docs/archive/build44/loop-archive/
+docs/archive/build44/mock-api-investigation-v1.0/

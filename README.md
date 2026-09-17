@@ -36,7 +36,8 @@ App.tsx          — Entry point
 gateway/         — Thin authentication/validation/transport interface
 schemas/         — Versioned request, response, error and attestation contracts
 e2e/             — Same-backend and explicit-replay integration tests
-docs/loop/       — Build 44 execution record and Build 45 review backlog
+docs/             — current v0.6.6 (Build 47) documents: clinical/, operations/, build47-evidence/
+docs/archive/     — earlier releases (v0.5, Build 44, 45, 46) and early project notes
 ```
 
 ## Getting Started
