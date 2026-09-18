@@ -61,3 +61,10 @@ docs/archive/build44/ACR_MOBILE_CDS_PARITY_LOOP_STATE_v1.6.json
 docs/archive/build44/ACR_MOBILE_CDS_PARITY_LOOP_JOURNAL_v1.6.jsonl
 docs/archive/build44/loop-archive/
 docs/archive/build44/mock-api-investigation-v1.0/
+
+# Security-sensitive documents: this repository is public. The backend security
+# plan and the refactoring backlog name live weaknesses (LAN exposure, absent
+# rate limiting), so they live in ~/.acr-secure-docs and are never committed.
+docs/operations/ACR_BACKEND_SECURITY_PLAN*.md
+docs/operations/REFACTORING_BACKLOG.md
+**/*SECURITY_PLAN*.md

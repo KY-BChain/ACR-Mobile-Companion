@@ -2,7 +2,7 @@
   "expo": {
     "name": "ACR Companion",
     "slug": "acr-mobile-companion",
-    "version": "0.6.6",
+    "version": "0.6.7",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -16,7 +16,7 @@
     ],
     "ios": {
       "bundleIdentifier": "com.anonymous.acr-mobile-companion",
-      "buildNumber": "47",
+      "buildNumber": "48",
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -24,7 +24,7 @@
     },
     "android": {
       "package": "com.acragent.companion",
-      "versionCode": 47
+      "versionCode": 48
     }
   }
 }

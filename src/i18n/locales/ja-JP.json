@@ -431,6 +431,7 @@
     "title": "ユーザーマニュアル",
     "pageIndicator": "マニュアル {{current}} / {{total}}",
     "englishFallback": "このマニュアルは英語で表示されます。",
-    "legalSection": "プライバシーとCookieの全文"
+    "legalSection": "プライバシーとCookieの全文",
+    "goToStart": "第1節へ移動"
   }
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -43,19 +43,25 @@ export const ManualScreen: React.FC = () => {
       bannerText={t('app:trialBanner')}
       bannerVariant="trial"
       footer={<>
+        {/* Close is on every page: a reader who opened the manual at the legal
+            notice must not have to walk to section 17 to leave it. */}
+        <ACRButton title={t('common:close')} variant="secondary" onPress={() => navigation.goBack()} />
         <ACRButton
-          title={page === 0 ? t('common:close') : t('common:back')}
-          variant="secondary"
-          onPress={() => (page === 0 ? navigation.goBack() : setPage(page - 1))}
-        />
-        <ACRButton
-          title={last ? t('common:close') : t('common:next')}
+          title={last ? t('manual:goToStart') : t('common:next')}
           variant="primary"
-          onPress={() => (last ? navigation.goBack() : setPage(page + 1))}
+          onPress={() => (last ? setPage(0) : setPage(page + 1))}
         />
       </>}
     >
       {isEnglishFallback ? <Text style={[styles.fallback, localText]}>{t('manual:englishFallback')}</Text> : null}
+      {/* The manual can open at any section — the legal notice from the poster or
+          About — so section 1 and the previous section are always one tap away. */}
+      {page > 0 ? (
+        <View style={styles.topRow}>
+          <ACRButton title={t('common:back')} variant="secondary" compact onPress={() => setPage(page - 1)} />
+          <ACRButton title={t('manual:goToStart')} variant="secondary" compact onPress={() => setPage(0)} />
+        </View>
+      ) : null}
       <ACRCard title={current.title}>
         {current.blocks.map((block, index) => {
           if (block.type === 'heading') {
@@ -84,6 +90,12 @@ export const ManualScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
   body: {
     ...ACRTypography.body,
     fontSize: 13,

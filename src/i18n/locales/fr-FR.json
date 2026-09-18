@@ -431,6 +431,7 @@
     "title": "Manuel d'utilisation",
     "pageIndicator": "Manuel {{current}} sur {{total}}",
     "englishFallback": "Ce manuel est affiché en anglais.",
-    "legalSection": "Confidentialité et cookies en détail"
+    "legalSection": "Confidentialité et cookies en détail",
+    "goToStart": "Aller à la section 1"
   }
 }

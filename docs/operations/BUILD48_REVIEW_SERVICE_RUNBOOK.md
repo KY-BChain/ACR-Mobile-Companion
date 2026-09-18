@@ -1,20 +1,22 @@
-# Build 47 — Review Service and Device Build Runbook
+# Build 48 — Review Service and Device Build Runbook
 
-> **Working runbook for v0.6.6 (build 47).** It is Kraken's Build 46 working copy
-> (now `docs/archive/build46/BUILD46_REVIEW_SERVICE_RUNBOOK_with_invite-code_13SEPT26.md`) brought up to date for
-> Build 47. What changed since Build 46:
-> - The service script is now `scripts/build47-review-service.sh`. The old name prints the new one.
-> - The Android app has a new app ID and is signed with CRIL's release key, so Android phones install it as a new app and **pair afresh**.
-> - The optional synthetic demonstration fixture (§9) is new.
+> **Working runbook for v0.6.7 (build 48).** It is Kraken's Build 47 working copy
+> (now `docs/archive/build47/BUILD47_REVIEW_SERVICE_RUNBOOK.md`) brought up to date for
+> Build 48. What changed since Build 47:
+> - The service script is now `scripts/build48-review-service.sh`. The old name prints the new one.
+> - The app ID is unchanged, so every phone updates in place and **keeps its pairing**.
+> - New in the app: the poster's second page carries the Privacy & Cookies notice, and READ DETAILS opens the reviewer manual on the phone.
+> - New on the service: `acr-invite purge` deletes records 30 days after they stop being current, which is what the privacy notice promises (§10).
+> - A new demonstration fixture must be captured for `mob-v0.6.7+48`; the Build 47 fixture is not accepted (§9).
 
-**Scope:** starting and stopping the Build 47 remote-review service, issuing invitations, rebuilding the apps for the named test devices, and the demonstration fixture. For the Build 47 device results, see `docs/build47-evidence/`.
+**Scope:** starting and stopping the Build 48 remote-review service, issuing invitations, rebuilding the apps for the named test devices, and the demonstration fixture. For the Build 48 device results, see `docs/build48-evidence/`; Build 47 is in `docs/archive/build47/`.
 
 | Tier | What | Who starts it |
 |---|---|---|
 | T1 | ACR Platform (Spring Boot, `:8080`) | **Kraken**, by hand; never by this runbook's script |
 | T2 | `acr-api` Cloudflare tunnel → `api.acragent.com` | **Kraken**, by hand; never by this runbook's script |
-| T3 | Build 47 gateway, `127.0.0.1:3001` (loopback only) | `scripts/build47-review-service.sh` |
-| T4 | `acr-mobile-review` tunnel → `mobile-gateway-review.acragent.com` | `scripts/build47-review-service.sh` |
+| T3 | Build 48 gateway, `127.0.0.1:3001` (loopback only) | `scripts/build48-review-service.sh` |
+| T4 | `acr-mobile-review` tunnel → `mobile-gateway-review.acragent.com` | `scripts/build48-review-service.sh` |
 
 **Start order: T1 → T2 → T3 → T4. Stop order: T4 → T3 → T2 → T1.**
 
@@ -58,7 +60,7 @@ curl -fsS https://api.acragent.com/api/infer/health | jq .
 
 ```zsh
 cd /Users/Kraken/DAPP/acr-mobile-companion
-scripts/build47-review-service.sh start
+scripts/build48-review-service.sh start
 ```
 
 The script:
@@ -72,17 +74,18 @@ The script:
 
 ```zsh
 cd /Users/Kraken/DAPP/acr-mobile-companion
-scripts/build47-review-service.sh status   # read-only check of T1–T4
-scripts/build47-review-service.sh stop     # stops T4, then T3 — do this before closing T1/T2
+scripts/build48-review-service.sh status   # read-only check of T1–T4
+scripts/build48-review-service.sh stop     # stops T4, then T3 — do this before closing T1/T2
+scripts/acr-services.sh stop               # all four in reverse, asking before it signals T1/T2
 ```
 
-**When you finish:** first run `scripts/build47-review-service.sh stop`. Then close T2, then T1, each with Ctrl+C.
+**When you finish:** first run `scripts/build48-review-service.sh stop`. Then close T2, then T1, each with Ctrl+C.
 
-**Phones.** A phone with a saved session reconnects by itself, with no code, and shows VERIFIED. While the service is down, Build 47 shows **"Signed in on this device"** with a Retry button instead of an empty invite field.
-- All three test phones run Build 47 (16 September 2026):
+**Phones.** A phone with a saved session reconnects by itself, with no code, and shows VERIFIED. While the service is down, the app shows **"Signed in on this device"** with a Retry button instead of an empty invite field.
+- All three test phones ran Build 47 (16 September 2026) and update in place to Build 48:
   - Samsung `gate47-samsung-2` and Xiaomi `gate47-xiaomi`: sessions valid until 16 October.
   - iPhone `gate12-iphone13`: session valid until 12 October.
-- The Build 47 iPhone app stops launching after **23 September, 13:49 UTC** (its 7-day profile). Rebuild before then (§7).
+- The iPhone app is signed with a 7-day development profile: note the new expiry at each rebuild and rebuild before it (§7).
 - A later Android update installs over Build 47 and keeps the session, provided it is signed with the CRIL release key.
 
 The script runs seven checks in order and **stops at the first one that fails**. Nothing after a failed check is started. If a check fails after T3/T4 are already up (steps 5 and 7), it stops them again.
@@ -92,7 +95,7 @@ The script runs seven checks in order and **stops at the first one that fails**.
 | 1 | Prerequisites | gateway code and dependencies, auth store, pepper file at `0600`, tunnel config, ontology file, `cloudflared`, Node 22.5+ with `node:sqlite` |
 | 2 | T1 / T2 (read-only) | T1 local health 200 · T2 connector running · T2 public health 200 · the edge allow-list refuses a non-inference platform path (403, header-only request) |
 | 3 | Port 3001 | free (no second gateway, no other program) |
-| 4 | Start T3 | gateway listening on `127.0.0.1:3001` within 20 s; current build `mob-v0.6.6+47`, still accepting Build 46 sessions (§5, changeover); demo fixture used if present |
+| 4 | Start T3 | gateway listening on `127.0.0.1:3001` within 20 s; current build `mob-v0.6.7+48`, still accepting Build 46 sessions (§5, changeover); demo fixture used if present |
 | 5 | Local gateway checks | a request shaped as the edge forwards it → 200; a bare local request → 403/421 (the TLS and host backstop) |
 | 6 | Start T4 | tunnel connector running |
 | 7 | Public checks | HTTPS `/m/v1/live` → 200 within 60 s · **HTTP → 403** (cleartext blocked at the edge, AT-14) · unknown route → 404 |
@@ -111,7 +114,7 @@ Expected output (abridged):
 3. Port 3001
   PASS  port 3001 is free
 4. Start T3 gateway (loopback only)
-  PASS  synthetic demo fixture: /Users/Kraken/.acr-gateway/fixtures/demo-mob-v0.6.6+47
+  PASS  synthetic demo fixture: /Users/Kraken/.acr-gateway/fixtures/demo-mob-v0.6.7+48
   PASS  gateway listening on 127.0.0.1:3001 (PID …)
 5. Local gateway checks
   PASS  local request as the edge forwards it: 200
@@ -131,8 +134,8 @@ The first assessment after the platform has been idle may time out once (Gate 12
 ## 2. Status and stop
 
 ```sh
-scripts/build47-review-service.sh status   # read-only: T1–T4 and the public endpoint
-scripts/build47-review-service.sh stop     # stops T4 first, then T3; never touches T1/T2
+scripts/build48-review-service.sh status   # read-only: T1–T4 and the public endpoint
+scripts/build48-review-service.sh stop     # stops T4 first, then T3; never touches T1/T2
 ```
 
 Stop T3/T4 **before** stopping T1/T2, so no request reaches a half-closed platform.
@@ -152,7 +155,7 @@ The gateway log holds allow-listed metadata only: time, route, status, error cod
 | `edge allow-list NOT active` | the Cloudflare rule "Restrict api.acragent.com to required paths" is missing | **do not continue**; restore the rule |
 | `a gateway is already running` | T3 is already up | `status`, or `stop` then `start` |
 | `node … has no node:sqlite` / `node not found` | wrong Node | `nvm install 22 && nvm use 22` |
-| `scripts/build46-review-service.sh was renamed for Build 47` | old script name | use `scripts/build47-review-service.sh` |
+| `scripts/build47-review-service.sh was renamed for Build 48` | old script name | use `scripts/build48-review-service.sh` |
 | `gateway did not start` and the log says `synthetic fixture directory failed closed verification` | the demo fixture does not match this build or the platform baseline | move the fixture folder aside, `start` again, and re-capture it (§9) |
 | public HTTPS `530` after 60 s | the tunnel could not connect | check the tunnel log and internet access; `stop`, then `start` |
 | **public HTTP not 403** | cleartext reaches the service (AT-14) | the script has already stopped T3/T4; restore the WAF rule "Block HTTP - mobile gateway" |
@@ -166,7 +169,7 @@ The gateway log holds allow-listed metadata only: time, route, status, error cod
 
 Use two Terminal windows; closing a window stops that service.
 
-**Do not start the gateway with an older build as the current build.** A gateway expecting an older build refuses Build 47 phones as the wrong build, and each phone then deletes its saved session and needs a new code.
+**Do not start the gateway with an older build as the current build.** A gateway expecting an older build refuses Build 48 phones as the wrong build, and each phone then deletes its saved session and needs a new code.
 
 ```sh
 # Window A — checks, then T3
@@ -175,8 +178,8 @@ curl -s -o /dev/null -w "T2 %{http_code}\n" https://api.acragent.com/api/infer/h
 lsof -nP -iTCP:3001 -sTCP:LISTEN                                                            # nothing
 cd /Users/Kraken/DAPP/acr-mobile-companion/gateway
 ACR_GATEWAY_HOST=127.0.0.1 ACR_GATEWAY_PORT=3001 \
-ACR_EXPECTED_CLIENT_BUILD_ID=mob-v0.6.6+47 \
-ACR_PREVIOUS_CLIENT_BUILD_IDS=mob-v0.6.5+46 \
+ACR_EXPECTED_CLIENT_BUILD_ID=mob-v0.6.7+48 \
+ACR_PREVIOUS_CLIENT_BUILD_IDS=mob-v0.6.6+47 \
 ACR_PUBLIC_HOSTNAME=mobile-gateway-review.acragent.com \
 ACR_UPSTREAM_INFER_URL=https://api.acragent.com/api/infer \
 ACR_EVIDENCE_HEALTH_URL=https://api.acragent.com/api/infer/health \
@@ -187,7 +190,7 @@ ACR_UPSTREAM_TIMEOUT_MS=8000 \
 ACR_AUTH_STORE_PATH=$HOME/.acr-gateway/gate10/auth.db \
 ACR_AUTH_PEPPER_PATH=$HOME/.acr-gateway/gate10/pepper.bin \
 node src/listener.js                                  # → "ACR gateway listening on 127.0.0.1:3001"
-# add  ACR_SYNTHETIC_FIXTURE_DIR="$HOME/.acr-gateway/fixtures/demo-mob-v0.6.6+47"  when that folder exists
+# add  ACR_SYNTHETIC_FIXTURE_DIR="$HOME/.acr-gateway/fixtures/demo-mob-v0.6.7+48"  when that folder exists
 
 # Window B — local check, then T4
 curl -s -o /dev/null -w "%{http_code}\n" -H 'Host: mobile-gateway-review.acragent.com' \
@@ -201,7 +204,7 @@ curl -s -o /dev/null -w "http  %{http_code}\n" http://mobile-gateway-review.acra
 
 Stop: Ctrl-C in window B (tunnel) first, then window A (gateway).
 
-**Changeover.** `ACR_PREVIOUS_CLIENT_BUILD_IDS=mob-v0.6.5+46` lets a phone still on Build 46 keep its session; it moves to Build 47 when the updated app next refreshes. Only the iPhone uses this: the Android Build 47 app is a new app and pairs afresh. Once no Build 46 app is in use, set it to `""` in the script.
+**Changeover.** `ACR_PREVIOUS_CLIENT_BUILD_IDS=mob-v0.6.6+47` lets a phone still on Build 47 keep its session; it moves to Build 48 when the updated app next refreshes. The app ID is unchanged since Build 47, so **all three phones update in place and keep their pairing**. Once no Build 47 app is in use, set it to `""` in the script.
 
 ## 6. Issuing an invitation
 
@@ -218,7 +221,7 @@ The code is printed once and never stored in plaintext. What happens next:
 2. **The first phone to use it is paired with it.** That phone shows the pop-up *"Invite Code accepted and paired with this mobile device and this mobile device only. For 30 days."*
 3. **The 30 days count from pairing.**
 4. **The same phone can re-enter its own code**, for example after Disconnect access. It signs back in and its expiry does not change. Disconnect asks first: *"You'll need to re-enter the invite code again."*
-5. **Any other phone is refused.** It gets *"Incorrect device used. This device is not authorised for this invite code."* A new app ID counts as another phone: the Build 47 Android app cannot use a code paired with the Build 46 app.
+5. **Any other phone is refused.** It gets *"Incorrect device used. This device is not authorised for this invite code."* A new app ID would count as another phone, but Build 48 keeps the Build 47 app ID, so pairings carry over.
 6. **After 30 days the code has expired.** The phone shows *"Invite Code Expired. Request a refreshed one."*
 
 **Managing codes:**
@@ -230,7 +233,7 @@ Use one label per invitee. Distribution beyond the named test devices needs Krak
 
 **Changing the 30-day term:**
 - The term is set on line 13 of `gateway/src/auth/lifetimes.js` (`SESSION_MS = 30 * 24 * 60 * 60 * 1000`).
-- After changing it, run `scripts/build47-review-service.sh stop`, then `start`.
+- After changing it, run `scripts/build48-review-service.sh stop`, then `start`.
 - No app rebuild is needed.
 - It applies to phones paired afterwards.
 
@@ -359,7 +362,7 @@ The fixture is tied to the app build ID and to the platform baseline (reasoner v
 ```sh
 F=$HOME/.acr-gateway/fixtures
 mkdir -p "$F/requests" && chmod 700 "$F" "$F/requests"
-REQ="$F/requests/demo-mob-v0.6.6+47.json"      # the demonstration request (see the Build 47 evidence)
+REQ="$F/requests/demo-mob-v0.6.7+48.json"      # the demonstration request (see the Build 47 evidence)
 cd /Users/Kraken/DAPP/acr-mobile-companion/gateway
 ACR_EVIDENCE_HEALTH_URL=https://api.acragent.com/api/infer/health \
 ACR_EVIDENCE_STATUS_URL=https://api.acragent.com/api/ontolator/status \
@@ -368,11 +371,11 @@ ACR_EVIDENCE_ONTOLOGY_PATH=/Users/Kraken/DAPP/ACR-platform/ontology/breast-cance
 node src/capture-tool.js --authorize-synthetic-capture \
   --upstream=https://api.acragent.com/api/infer \
   --request="$REQ" --request-sha256=$(shasum -a 256 "$REQ" | cut -d' ' -f1) \
-  --output="$F/demo-mob-v0.6.6+47.candidate"
+  --output="$F/demo-mob-v0.6.7+48.candidate"
 # → "Synthetic capture candidate written as PENDING_INDEPENDENT_REVIEW."
 ```
 
-**Review, then approve.** The capture is written as a candidate that the gateway will not replay. Kraken reviews the captured result: subtype, tier 3, risk and treatments. Only after that approval is the manifest changed to `"verificationStatus": "VERIFIED_PLATFORM_CAPTURE"` and `"eligibleForDeliveredReplay": true`, and the folder renamed to `demo-mob-v0.6.6+47`. The next `start` then reports `synthetic demo fixture: …`.
+**Review, then approve.** The capture is written as a candidate that the gateway will not replay. Kraken reviews the captured result: subtype, tier 3, risk and treatments. Only after that approval is the manifest changed to `"verificationStatus": "VERIFIED_PLATFORM_CAPTURE"` and `"eligibleForDeliveredReplay": true`, and the folder renamed to `demo-mob-v0.6.7+48`. The next `start` then reports `synthetic demo fixture: …`.
 
 ## Additional info re invite code (KY 13SEPT26)
 
@@ -420,4 +423,4 @@ So neither the database alone nor someone reading it can recover a code. That's 
 
 **Two practical points:**
 - **Keep `auth.db` and `pepper.bin` together, and treat `pepper.bin` as a secret.** Without it, no stored hash can be checked. So losing it ends every session and invite, and a copy of it together with the database is what an attacker would need to try guessing codes.
-- **The folder is named `gate10`** because it was created as the Gate 10 test store. It holds the test phones' sessions and, by Kraken's decision of 14 September, the organisation-tagged codes for invitees. Starting a separate store is a single `init` command, with the script started as `ACR_AUTH_DIR=<new folder> scripts/build47-review-service.sh start`.
+- **The folder is named `gate10`** because it was created as the Gate 10 test store. It holds the test phones' sessions and, by Kraken's decision of 14 September, the organisation-tagged codes for invitees. Starting a separate store is a single `init` command, with the script started as `ACR_AUTH_DIR=<new folder> scripts/build48-review-service.sh start`.

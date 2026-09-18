@@ -9,9 +9,11 @@ interface Props {
   variant?: ButtonVariant;
   onPress: () => void;
   disabled?: boolean;
+  /** Sized to its text and centred, for a button that is not part of a footer row. */
+  compact?: boolean;
 }
 
-export const ACRButton: React.FC<Props> = ({ title, variant = 'primary', onPress, disabled }) => {
+export const ACRButton: React.FC<Props> = ({ title, variant = 'primary', onPress, disabled, compact }) => {
   const styleMap = {
     primary: styles.primary,
     secondary: styles.secondary,
@@ -28,7 +30,7 @@ export const ACRButton: React.FC<Props> = ({ title, variant = 'primary', onPress
       accessibilityRole="button"
       accessibilityLabel={title}
       accessibilityState={{ disabled: Boolean(disabled) }}
-      style={[styles.base, styleMap[variant], disabled && styles.disabled]}
+      style={[styles.base, styleMap[variant], compact && styles.compact, disabled && styles.disabled]}
       onPress={onPress}
       disabled={disabled}
       activeOpacity={0.8}
@@ -46,6 +48,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1,
+  },
+  compact: {
+    flex: 0,
+    alignSelf: 'center',
+    paddingVertical: 9,
+    paddingHorizontal: 22,
   },
   primary: {
     backgroundColor: ACRColors.primary,

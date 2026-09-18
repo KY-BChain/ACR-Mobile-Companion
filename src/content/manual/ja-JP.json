@@ -1,0 +1,766 @@
+{
+  "source": "docs/clinical/ACR_Companion_User_Manual_JA.md",
+  "pages": [
+    {
+      "title": "1. 読み進める前に",
+      "blocks": [
+        {
+          "type": "bullet",
+          "text": "合成データのみ。 実患者の情報を、コード化・仮名化されたものであっても入力しないでください。本アプリは氏名や病院番号を要求しません。"
+        },
+        {
+          "type": "bullet",
+          "text": "臨床使用不可。 結果は評価用の意思決定支援です。誰かの診断や治療に使用してはなりません。"
+        },
+        {
+          "type": "bullet",
+          "text": "本アプリには臨床ルールは含まれていません。 結果に表示される内容はすべてACR Platformから来ています。アプリは入力内容を収集し、安全に送信し、回答を表示するだけです。"
+        },
+        {
+          "type": "bullet",
+          "text": "ルールの仕組み（サブタイプ、リスク、治療ライン、ベイズ信頼度）は、 companion 文書『ACR Companion — ZZUレビュアー向けレビューおよびテストリスト』で説明されています。本マニュアルはアプリの使い方を説明します。"
+        },
+        {
+          "type": "paragraph",
+          "text": "本マニュアルでは、太字は英語画面でのボタン名および画面名です。"
+        }
+      ]
+    },
+    {
+      "title": "2. 必要なもの",
+      "blocks": [
+        {
+          "type": "row",
+          "label": "電話",
+          "value": "Android phone または iPhone"
+        },
+        {
+          "type": "row",
+          "label": "招待コード",
+          "value": "CRILから送られる個人用コード。他人に知らせないでください"
+        },
+        {
+          "type": "row",
+          "label": "インターネット",
+          "value": "結果取得のための Wi-Fi またはモバイルデータ"
+        },
+        {
+          "type": "row",
+          "label": "言語",
+          "value": "English (UK)、简体中文、Français、Deutsch、Русский、العربية、한국어、日本語。確認済みは英語と中国語のみで、他は草稿翻訳です"
+        }
+      ]
+    },
+    {
+      "title": "3. アプリのインストール",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "CRILがお使いの電話への入手方法を案内します。 CRILから送られたファイルまたはリンクのみをインストールしてください。"
+        },
+        {
+          "type": "paragraph",
+          "text": "Android"
+        },
+        {
+          "type": "bullet",
+          "text": "1. CRILから送られたインストールファイル（.apkで終わる）を開きます。"
+        },
+        {
+          "type": "bullet",
+          "text": "2. 電話が求めたら、この提供元（ブラウザやファイルマネージャーなど）からのインストールを許可します。XiaomiやSamsungなど一部の電話では追加のセキュリティ確認が表示されるので、続行を選びます。"
+        },
+        {
+          "type": "bullet",
+          "text": "3. インストール完了後、ACR Companionを開きます。"
+        },
+        {
+          "type": "paragraph",
+          "text": "iPhone"
+        },
+        {
+          "type": "paragraph",
+          "text": "iPhoneへのインストールはCRILが別途手配します。初回起動時に開発者を信頼するよう求められる場合があります：設定 → 一般 → VPNとデバイス管理で信頼してください。"
+        },
+        {
+          "type": "paragraph",
+          "text": "以前のバージョンがすでにインストールされている場合、上書き更新するか先に削除するかをCRILが指示します。"
+        }
+      ]
+    },
+    {
+      "title": "4. 画面一覧",
+      "blocks": [
+        {
+          "type": "row",
+          "label": "—",
+          "value": "画面: 評価アクセス · 行うこと: 招待コードで接続；Live platform または Synthetic demonstration を選択"
+        },
+        {
+          "type": "row",
+          "label": "—",
+          "value": "画面: ウェルカム（開始前） · 行うこと: 注意事項を読む；言語を変更；Aboutを開く"
+        },
+        {
+          "type": "row",
+          "label": "1/5",
+          "value": "画面: 受容体ステータス · 行うこと: ER、PR、HER2、Ki-67"
+        },
+        {
+          "type": "row",
+          "label": "2/5",
+          "value": "画面: 腫瘍特性 · 行うこと: 病期、グレード、組織型、リンパ節状態、年齢"
+        },
+        {
+          "type": "row",
+          "label": "3/5",
+          "value": "画面: バイオマーカーと手術 · 行うこと: CA 15-3、CEA、手術日、ベイズオプション"
+        },
+        {
+          "type": "row",
+          "label": "4/5",
+          "value": "画面: 主要契約フィールド · 行うこと: 腫瘍サイズ、性別"
+        },
+        {
+          "type": "row",
+          "label": "5/5",
+          "value": "画面: 追加契約フィールド · 行うこと: ECOG、PD-L1、HER2-low、LVEF、治療意図"
+        },
+        {
+          "type": "row",
+          "label": "—",
+          "value": "画面: レビュー · 行うこと: すべて確認し、送信"
+        },
+        {
+          "type": "row",
+          "label": "—",
+          "value": "画面: 評価結果 · 行うこと: 結果を読む"
+        },
+        {
+          "type": "paragraph",
+          "text": "各入力画面の上部にステップ n / 5、下部に戻ると次へが表示されます。"
+        }
+      ]
+    },
+    {
+      "title": "5. アプリを開いて言語を選ぶ",
+      "blocks": [
+        {
+          "type": "bullet",
+          "text": "1. アプリを開きます。評価アクセスから始まります。"
+        },
+        {
+          "type": "bullet",
+          "text": "2. 言語を変更するには、戻るをタップしてウェルカム画面に移動し、言語をタップして選択します。すべての画面が選択に従います。アラビア語は右から左に読みます。"
+        },
+        {
+          "type": "bullet",
+          "text": "3. ウェルカム画面にはAboutもあり、ACR Platformの説明とアプリのバージョンを表示します。"
+        },
+        {
+          "type": "bullet",
+          "text": "4. ウェルカム画面で数秒待つと、1ページの紹介ポスターが表示されます。横にスワイプするとプライバシーとCookiesの通知が表示され、詳細を読むでこのマニュアルを電話で開けます。上にスワイプして続行します。"
+        },
+        {
+          "type": "bullet",
+          "text": "5. 理解しました — 開始をタップして評価アクセスに戻ります。"
+        }
+      ]
+    },
+    {
+      "title": "6. 初回接続",
+      "blocks": [
+        {
+          "type": "bullet",
+          "text": "1. 評価アクセスで招待コードにコードを入力します。"
+        },
+        {
+          "type": "bullet",
+          "text": "2. 安全に接続をタップします。"
+        },
+        {
+          "type": "bullet",
+          "text": "3. メッセージが確認します：「招待コードが承認され、このモバイルデバイスとのみペアリングされました。30日間有効です。」 ペアリング日と有効期限（UTC）も表示されます。続行をタップします。"
+        },
+        {
+          "type": "bullet",
+          "text": "4. 次へをタップして評価を開始します。"
+        },
+        {
+          "type": "paragraph",
+          "text": "注意："
+        },
+        {
+          "type": "bullet",
+          "text": "コードは1台の電話でのみ機能します。 最初に入力した電話とペアリングされます。他の電話では「不正なデバイスが使用されました。」と表示されます。"
+        },
+        {
+          "type": "bullet",
+          "text": "アクセスはペアリングから30日間有効です。その後、「招待コードの有効期限が切れました。新しいコードを申請してください。」と表示されます。CRILに新しいコードを依頼してください。"
+        },
+        {
+          "type": "bullet",
+          "text": "コードの入力は1回だけです。 その後はアプリを開くたびに自動再接続します。再入力が必要なのはアクセスを切断した後だけです（セクション12）。30日間はリセットされません。"
+        },
+        {
+          "type": "bullet",
+          "text": "コード自体は電話に保存されません。"
+        },
+        {
+          "type": "heading",
+          "text": "接続パネル"
+        },
+        {
+          "type": "paragraph",
+          "text": "同じ画面の接続証拠に表示されます："
+        },
+        {
+          "type": "bullet",
+          "text": "ゲートウェイ： 接続済み、サーバー未接続、確認中…"
+        },
+        {
+          "type": "bullet",
+          "text": "ベースライン証明： VERIFIEDはACR Platformが承認版と完全に一致し、ライブ結果を生成できることを意味します。MISMATCHまたはUNAVAILABLEはライブ結果がブロックされることを意味します。"
+        }
+      ]
+    },
+    {
+      "title": "7. Live platform または Synthetic demonstration",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "開始前に配信モードで選択します："
+        },
+        {
+          "type": "row",
+          "label": "Live platform（青）",
+          "value": "起こること: 入力がACR Platformに送られ、臨床ルールが今適用されます · 用途: すべての実テストケース"
+        },
+        {
+          "type": "row",
+          "label": "Synthetic demonstration（琥珀色）",
+          "value": "起こること: ルールは実行されません。アプリが固定のデモ症例を入力し、サービスがその症例について以前にライブプラットフォームから記録された結果を表示します · 用途: 完全な結果を簡単に見る、またはライブプラットフォームがオフラインのとき"
+        },
+        {
+          "type": "paragraph",
+          "text": "デモモードでは値を変更しないでください。変更すると、レビューに赤いデモ症例が変更されましたボックスが表示され、結果は返りません。"
+        }
+      ]
+    },
+    {
+      "title": "8. 症例の入力",
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "一般ヒント"
+        },
+        {
+          "type": "bullet",
+          "text": "必須項目： 画面1のER、PR、HER2、Ki-67のみ。Ki-67が0〜100の数値になるまで次へは使用できません。"
+        },
+        {
+          "type": "bullet",
+          "text": "その他はすべて任意ですが、一部の値は完全評価に必要と表示されます。なくてもプラットフォームは回答しますが、リスクは保留されます（セクション10）。"
+        },
+        {
+          "type": "bullet",
+          "text": "選択肢はボタンです：タップして選択します。"
+        },
+        {
+          "type": "bullet",
+          "text": "数値： 入力後、キーボード上の完了（iPhone）またはキーボードの確定/完了キー（Android）をタップしてキーボードを閉じます。"
+        },
+        {
+          "type": "bullet",
+          "text": "誤り： 無効な値は赤で短い説明とともに表示されます。例：「0から100の値を入力してください。」"
+        },
+        {
+          "type": "bullet",
+          "text": "サンプル値： 時間短縮のため、新しいLive評価の画面1〜3は合成サンプル症例ですでに入力済みで開きます。テストに合わせて変更してください。画面4と5は空で開きます。"
+        },
+        {
+          "type": "heading",
+          "text": "画面1/5 — 受容体ステータス"
+        },
+        {
+          "type": "row",
+          "label": "ER status",
+          "value": "入力: positive / negative · 必須"
+        },
+        {
+          "type": "row",
+          "label": "PR status",
+          "value": "入力: positive / negative · 必須"
+        },
+        {
+          "type": "row",
+          "label": "HER2 status",
+          "value": "入力: positive / negative · 必須"
+        },
+        {
+          "type": "row",
+          "label": "Ki-67 (%)",
+          "value": "入力: 0–100 · 必須"
+        },
+        {
+          "type": "paragraph",
+          "text": "ヒント「Luminal A < 14, Luminal B ≥ 14」は参考のみで、サブタイプはプラットフォームが決定します。"
+        },
+        {
+          "type": "paragraph",
+          "text": "注意：HER2は現在PositiveまたはNegativeのみです。「2+, ISH pending」（equivocal）の選択肢はまだありません。通常equivocalとして記録される症例は現時点ではそのように入力できません。テストに影響する場合はCRILに知らせてください。"
+        },
+        {
+          "type": "paragraph",
+          "text": "画面にはセッションIDも表示されます。これは各評価用に作成されるランダムな参照で、患者識別子ではありません。"
+        },
+        {
+          "type": "heading",
+          "text": "画面2/5 — 腫瘍特性"
+        },
+        {
+          "type": "row",
+          "label": "Stage",
+          "value": "入力: 0〜IV、亜期あり · 完全評価に必要"
+        },
+        {
+          "type": "row",
+          "label": "Grade",
+          "value": "入力: 1、2、3 · 完全評価に必要"
+        },
+        {
+          "type": "row",
+          "label": "Histological subtype",
+          "value": "入力: IDC、ILC、DCIS、Paget病 · 任意"
+        },
+        {
+          "type": "row",
+          "label": "Nodal status",
+          "value": "入力: N0、N1、N2、N3 · 完全評価に必要"
+        },
+        {
+          "type": "row",
+          "label": "Age (years)",
+          "value": "入力: 整数年、18〜120 · 完全評価に必要"
+        },
+        {
+          "type": "heading",
+          "text": "画面3/5 — バイオマーカーと手術"
+        },
+        {
+          "type": "row",
+          "label": "CA 15-3 (U/mL)",
+          "value": "入力: 0以上 · 任意"
+        },
+        {
+          "type": "row",
+          "label": "CEA (ng/mL)",
+          "value": "入力: 0以上 · 任意"
+        },
+        {
+          "type": "row",
+          "label": "Surgery date",
+          "value": "入力: YYYY-MM-DD（未来日も可） · 任意"
+        },
+        {
+          "type": "row",
+          "label": "Bayesian enhancement",
+          "value": "入力: ON / OFF · 任意"
+        },
+        {
+          "type": "heading",
+          "text": "画面4/5 — 主要契約フィールド"
+        },
+        {
+          "type": "paragraph",
+          "text": "この画面と次はEVALUATION ONLY · PROVISIONAL FIELDSと表示されます：臨床定義はまだレビュー中です。"
+        },
+        {
+          "type": "row",
+          "label": "Tumour size",
+          "value": "入力: 0より大きい数値。単位は未定 · 完全評価に必要"
+        },
+        {
+          "type": "row",
+          "label": "Gender",
+          "value": "入力: female / male / other / unknown · 任意"
+        },
+        {
+          "type": "heading",
+          "text": "画面5/5 — 追加契約フィールド"
+        },
+        {
+          "type": "row",
+          "label": "ECOG score",
+          "value": "入力: 整数、0〜4 · 完全評価に必要"
+        },
+        {
+          "type": "row",
+          "label": "PD-L1 status",
+          "value": "入力: positive / negative / not tested · 任意"
+        },
+        {
+          "type": "row",
+          "label": "HER2-low",
+          "value": "入力: positive / negative / unknown · 任意"
+        },
+        {
+          "type": "row",
+          "label": "LVEF (%)",
+          "value": "入力: 0–100 · 任意"
+        },
+        {
+          "type": "row",
+          "label": "Treatment intent",
+          "value": "入力: neoadjuvant / adjuvant / unspecified · 任意"
+        },
+        {
+          "type": "paragraph",
+          "text": "終了したらレビューをタップします。"
+        }
+      ]
+    },
+    {
+      "title": "9. レビューと送信",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "レビューは送信前にすべての値を一覧表示します。"
+        },
+        {
+          "type": "bullet",
+          "text": "赤いボックス「完全評価に必要」： 空欄のままにしたが必要な値を一覧表示します。…へ移動リンクをタップするとその画面にジャンプし、他の入力は保持されます。それでも送信できます。"
+        },
+        {
+          "type": "bullet",
+          "text": "「サンプル値、未変更」： 変更していないサンプル値に印が付き、自分の入力と区別できます。"
+        },
+        {
+          "type": "bullet",
+          "text": "配信モード： LiveまたはSynthetic demonstration（琥珀色）を表示します。"
+        },
+        {
+          "type": "bullet",
+          "text": "ベースライン： プラットフォームがVERIFIEDのときのみ送信できます。"
+        },
+        {
+          "type": "paragraph",
+          "text": "編集で画面1に戻るか、送信で症例を送ります。"
+        },
+        {
+          "type": "paragraph",
+          "text": "Live症例を送信すると、サービスはまずプラットフォームが承認版のままか確認します。確認できない場合、結果は表示されません。Service unavailableと理由が表示されます。Retry verificationは確認だけを繰り返し、症例を再送信しません。"
+        },
+        {
+          "type": "paragraph",
+          "text": "注意：不完全な症例の完了結果内に表示されることがあるプラットフォーム自身の「ASSESSMENT BLOCKED」という文言とは異なります。その結果でもサブタイプ、治療ライン、バイオマーカーは表示され、リスクのみ保留されます。"
+        }
+      ]
+    },
+    {
+      "title": "10. 結果を読む",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "評価結果画面は上から順に表示します："
+        },
+        {
+          "type": "bullet",
+          "text": "1. 臨床概要： 分子サブタイプとリスク。リスクはあなたの言語の語です：HIGH、INTERMEDIATE、LOW。赤は高、緑は低、青はその他。結果の出所（検証済みライブプラットフォーム、または以前に記録された合成結果）を示す行があります。"
+        },
+        {
+          "type": "bullet",
+          "text": "2. 完全評価に到達せず（不完全症例のみ；下記参照）。"
+        },
+        {
+          "type": "bullet",
+          "text": "3. 警告と文脈： プラットフォーム自身のメッセージをそのまま英語で表示。"
+        },
+        {
+          "type": "bullet",
+          "text": "4. 情報完全性： 完全性ティアと不足値、画面番号。"
+        },
+        {
+          "type": "bullet",
+          "text": "5. 返された治療オプション： プラットフォームが書いたとおり。"
+        },
+        {
+          "type": "bullet",
+          "text": "6. 返されたバイオマーカー結果。"
+        },
+        {
+          "type": "bullet",
+          "text": "7. 分類信頼度： ベイズ拡張がONのとき表示。この数値に依拠する前にレビューおよびテストリストのC7節を読んでください：表示されたサブタイプとは異なるサブタイプを指す場合があります。"
+        },
+        {
+          "type": "bullet",
+          "text": "8. 技術詳細： 発火したルール、推論トレース、生値、プラットフォームバージョン。"
+        },
+        {
+          "type": "heading",
+          "text": "症例が不完全なとき"
+        },
+        {
+          "type": "paragraph",
+          "text": "プラットフォームが必要とする値を省略した場合："
+        },
+        {
+          "type": "bullet",
+          "text": "完全評価に到達せずが不足値と画面を挙げます。例：「Tumour size（画面4/5）」。"
+        },
+        {
+          "type": "bullet",
+          "text": "リスクは「保留 — …が必要」と表示。"
+        },
+        {
+          "type": "bullet",
+          "text": "サブタイプ、治療オプション、バイオマーカーは引き続き表示。"
+        },
+        {
+          "type": "bullet",
+          "text": "不足フィールドを補完をタップ。最初の不足値の画面が開き、入力済みの内容はすべて保持されます。値を追加し、レビューに進み再送信します。"
+        },
+        {
+          "type": "heading",
+          "text": "結果は保存されません"
+        },
+        {
+          "type": "paragraph",
+          "text": "結果は画面が開いている間だけ存在します。電話のストレージには何も書き込まれません。記録が必要な場合は手で値を控えるか、組織が許可する場合はスクリーンショットを撮ってください。"
+        }
+      ]
+    },
+    {
+      "title": "11. 次の評価を開始",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "新しい評価または完了をタップ。すべての入力が消去され、アプリは接続を保ったまま評価アクセスに戻ります。次へをタップして開始します。"
+        }
+      ]
+    },
+    {
+      "title": "12. 切断",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "評価アクセスでアクセスを切断をタップ。アプリが確認します：「招待コードを再入力する必要があります。」 切断をタップ。CRILが指示した場合、または電話を他人に渡す場合のみ行ってください。"
+        }
+      ]
+    },
+    {
+      "title": "13. メッセージと対処",
+      "blocks": [
+        {
+          "type": "row",
+          "label": "確認中…",
+          "value": "意味: アプリがサービスに接続中 · 対処: 約10秒待つ"
+        },
+        {
+          "type": "row",
+          "label": "このデバイスでサインイン済み — 「サーバーを待っています…」",
+          "value": "意味: ペアリング済みだがサービスに到達できない · 対処: インターネットを確認；再確認をタップ。招待コード不要"
+        },
+        {
+          "type": "row",
+          "label": "サーバー未接続",
+          "value": "意味: ACR評価サービスがオフライン · 対処: 後で試すかCRILに連絡。提供されていればSynthetic demonstrationを使用可"
+        },
+        {
+          "type": "row",
+          "label": "ゲートウェイ接続済み — Live Platformオフライン",
+          "value": "意味: サービスは稼働中だがACR Platformが停止 · 対処: Synthetic demonstrationを使用、または後で試す"
+        },
+        {
+          "type": "row",
+          "label": "Service unavailable / MISMATCH",
+          "value": "意味: プラットフォームが承認版でない · 対処: ライブテストを続けない；CRILに連絡"
+        },
+        {
+          "type": "row",
+          "label": "「不正なデバイスが使用されました。」",
+          "value": "意味: コードが別の電話とペアリング済み · 対処: ペアリング済みの電話を使うか、CRILに新コードを依頼"
+        },
+        {
+          "type": "row",
+          "label": "「招待コードの有効期限が切れました。新しいコードを申請してください。」",
+          "value": "意味: 30日経過 · 対処: CRILに新コードを依頼"
+        },
+        {
+          "type": "row",
+          "label": "デモ症例が変更されました（赤）",
+          "value": "意味: デモ値が変更された · 対処: 元に戻すか、Live platformに切り替える"
+        },
+        {
+          "type": "row",
+          "label": "検証済み合成フィクスチャは利用できません。",
+          "value": "意味: 記録済みデモがない · 対処: Live platformを使用；またはペアリング済み電話で5画面すべてを順に表示し、結果なしで画面を見る"
+        },
+        {
+          "type": "row",
+          "label": "「リクエストが多すぎます…」",
+          "value": "意味: 短時間に試行しすぎ · 対処: 数分待つ"
+        },
+        {
+          "type": "row",
+          "label": "「評価結果が不確実です。」",
+          "value": "意味: 回答が明確に届かなかった · 対処: 繰り返し送信しない；時刻を記録しCRILに連絡"
+        }
+      ]
+    },
+    {
+      "title": "14. データとプライバシー",
+      "blocks": [
+        {
+          "type": "bullet",
+          "text": "招待コードは保存されません。セッションとランダムなインストール識別子は電話のセキュアキーストアにのみ保持され、切断時に削除されます。"
+        },
+        {
+          "type": "bullet",
+          "text": "症例入力と結果はメモリ内のみに保持され、評価終了時に消去されます。"
+        },
+        {
+          "type": "bullet",
+          "text": "アプリには分析も広告もなく、無線更新もできません：すべての変更は新しいレビュー済みバージョンです。"
+        },
+        {
+          "type": "bullet",
+          "text": "サービスは安全維持のため技術イベント（リクエストの時刻と結果など）を記録します；臨床値は記録しません。"
+        }
+      ]
+    },
+    {
+      "title": "15. 法的通知：GDPRとCookies",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "本アプリのみに適用。ACR Platformウェブサイトには独自の通知があります。"
+        },
+        {
+          "type": "heading",
+          "text": "Cookies"
+        },
+        {
+          "type": "paragraph",
+          "text": "本アプリはCookies、Webビーコン、追跡技術を使用しません。"
+        },
+        {
+          "type": "heading",
+          "text": "データ保護"
+        },
+        {
+          "type": "paragraph",
+          "text": "管理者：Cornerstone Research International Ltd (CRIL), c/o NovaUCD, Belfield Innovation Park, University College Dublin, Dublin 4, D04 V2P1, Ireland。メール：info@acragent.com · www.acragent.com"
+        },
+        {
+          "type": "bullet",
+          "text": "収集データ：招待ラベルと組織タグ；アプリが作成するランダムなデバイス識別子（ハッシュ形式のみ）；ペアリング日と有効期限；アプリバージョン；セキュリティイベントとリクエスト記録（時刻、経路、結果 — 内容は含まない）。"
+        },
+        {
+          "type": "bullet",
+          "text": "ネットワークデータ：あなたのIPアドレスは、サービス提供と保護のため、ネットワークプロバイダーCloudflareにより処理されます。"
+        },
+        {
+          "type": "bullet",
+          "text": "収集しないもの：氏名や連絡先、患者データ。合成症例入力は結果返却のみに処理され、保存されません。"
+        },
+        {
+          "type": "bullet",
+          "text": "目的：本招待評価の運用と安全確保。"
+        },
+        {
+          "type": "bullet",
+          "text": "法的根拠：法務レビューで確認予定。"
+        },
+        {
+          "type": "bullet",
+          "text": "受領者：Cloudflare, Inc.。あなたの国以外で処理する場合があります。"
+        },
+        {
+          "type": "bullet",
+          "text": "保持：アクセスはペアリング後30日または取消しで終了；記録は評価終了後30日で削除。CRILはこの期間を変更することがあります。"
+        },
+        {
+          "type": "bullet",
+          "text": "あなたの権利：アクセス、訂正、削除、制限、異議 — CRILに連絡（セクション16）。EU/EEA/UK：データ保護機関に苦情を申し立てられます。"
+        },
+        {
+          "type": "paragraph",
+          "text": "完全なプライバシーポリシーはCRILに請求すれば入手可能。"
+        }
+      ]
+    },
+    {
+      "title": "16. 問題またはコメントの報告",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "CRILに以下を添えて送ってください："
+        },
+        {
+          "type": "bullet",
+          "text": "電話モデルとOSバージョン；"
+        },
+        {
+          "type": "bullet",
+          "text": "アプリバージョン（About）；"
+        },
+        {
+          "type": "bullet",
+          "text": "使用言語；"
+        },
+        {
+          "type": "bullet",
+          "text": "日時；"
+        },
+        {
+          "type": "bullet",
+          "text": "入力内容（合成値のみ）、期待した結果、実際に見た結果；"
+        },
+        {
+          "type": "bullet",
+          "text": "役立つ場合はスクリーンショット。"
+        },
+        {
+          "type": "paragraph",
+          "text": "ルール自体に関する臨床コメントはレビューおよびテストリストに記載してください。"
+        }
+      ]
+    },
+    {
+      "title": "17. 用語",
+      "blocks": [
+        {
+          "type": "row",
+          "label": "ACR Platform",
+          "value": "意味: 医学知識モデルとルールを保持し、結果を生成するサーバー"
+        },
+        {
+          "type": "row",
+          "label": "Gateway",
+          "value": "意味: アプリとACR Platform間の安全なサービス"
+        },
+        {
+          "type": "row",
+          "label": "Baseline / attestation",
+          "value": "意味: プラットフォームが承認版と完全に一致するかの確認"
+        },
+        {
+          "type": "row",
+          "label": "Tier",
+          "value": "意味: 症例の完全度：1または2はリスク保留；3は完全評価"
+        },
+        {
+          "type": "row",
+          "label": "Synthetic",
+          "value": "意味: 患者由来ではない、作られたテストデータ"
+        },
+        {
+          "type": "row",
+          "label": "Bayesian enhancement",
+          "value": "意味: ルールベース結果に追加される任意の確率推定"
+        }
+      ]
+    }
+  ]
+}

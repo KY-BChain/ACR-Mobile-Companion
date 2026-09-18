@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Image,
   PanResponder,
@@ -22,6 +22,10 @@ import { getLocaleDirection, getTextAlign } from '../utils/rtl';
 
 const POSTER_ASPECT_RATIO = 1536 / 1024;
 const SWIPE_CAPTURE_DISTANCE = 12;
+// The poster and the privacy notice turn into each other every few seconds, as
+// Welcome turns to the poster (Kraken, 18 September 2026). Any swipe, or opening
+// the manual, stops the rotation and leaves the reader in control.
+const PAGE_TURN_MS = 6000;
 const SWIPE_NAVIGATION_DISTANCE = 40;
 
 const POSTERS: Record<PosterLocale, ImageSourcePropType> = {
@@ -34,8 +38,9 @@ type NavProp = NativeStackNavigationProp<RootStackParamList>;
 
 /**
  * Two pages: the introduction poster, and the short privacy and cookies notice
- * (Kraken, 17 September 2026). Sideways swipes move between them; an upward
- * swipe continues to Welcome from either page.
+ * (Kraken, 17 September 2026). They turn into each other every few seconds until
+ * the reader takes over. Sideways swipes move between them; an upward swipe
+ * continues to Welcome from either page.
  */
 export const PosterScreen: React.FC = () => {
   const navigation = useNavigation<NavProp>();
@@ -45,6 +50,7 @@ export const PosterScreen: React.FC = () => {
   const navigationInProgress = useRef(false);
   const [page, setPage] = useState<0 | 1>(0);
   const pageRef = useRef<0 | 1>(0);
+  const turnedByHand = useRef(false);
 
   const activeLanguage = i18n.resolvedLanguage ?? i18n.language;
   const poster = POSTERS[getPosterLocale(activeLanguage)];
@@ -56,7 +62,19 @@ export const PosterScreen: React.FC = () => {
     textAlign: getTextAlign(activeLanguage),
   };
 
-  const showPage = (next: 0 | 1) => { pageRef.current = next; setPage(next); };
+  const showPage = useCallback((next: 0 | 1, byHand = true) => {
+    if (byHand) turnedByHand.current = true;
+    pageRef.current = next;
+    setPage(next);
+  }, []);
+
+  useEffect(() => {
+    if (turnedByHand.current) return undefined;
+    const timer = setTimeout(() => {
+      if (!turnedByHand.current) showPage(page === 0 ? 1 : 0, false);
+    }, PAGE_TURN_MS);
+    return () => clearTimeout(timer);
+  }, [page, showPage]);
 
   const panResponder = useMemo(
     () => PanResponder.create({
@@ -79,7 +97,7 @@ export const PosterScreen: React.FC = () => {
         navigationInProgress.current = false;
       },
     }),
-    [navigation],
+    [navigation, showPage],
   );
 
   return (
@@ -107,7 +125,11 @@ export const PosterScreen: React.FC = () => {
           <ACRButton
             title={t('legal:readDetails')}
             variant="primary"
-            onPress={() => navigation.navigate('Manual', { section: 'legal' })}
+            compact
+            onPress={() => {
+              turnedByHand.current = true;   // reading the manual stops the rotation
+              navigation.navigate('Manual', { section: 'legal' });
+            }}
           />
           <Text style={[styles.hint, localText]}>{t('legal:swipeHint')}</Text>
         </View>

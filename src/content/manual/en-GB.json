@@ -1,5 +1,5 @@
 {
-  "source": "docs/clinical/ACR_Companion_User_Manual_EN_17SEPT26.md",
+  "source": "docs/clinical/ACR_Companion_User_Manual_EN.md",
   "pages": [
     {
       "title": "1. Before you read on",
@@ -304,7 +304,11 @@
         },
         {
           "type": "paragraph",
-          "text": "The hint \"Luminal A < 14, Luminal B ≥ 14\" is guidance only; the platform decides the subtype. Please note: HER2 currently offers Positive or Negative only. There is no \"2+, ISH pending\" (equivocal) choice yet. A case that would normally be recorded as equivocal cannot be entered as such at this time; please tell CRIL if this affects your testing."
+          "text": "The hint \"Luminal A < 14, Luminal B ≥ 14\" is guidance only; the platform decides the subtype."
+        },
+        {
+          "type": "paragraph",
+          "text": "Please note: HER2 currently offers Positive or Negative only. There is no \"2+, ISH pending\" (equivocal) choice yet. A case that would normally be recorded as equivocal cannot be entered as such at this time; please tell CRIL if this affects your testing."
         },
         {
           "type": "paragraph",

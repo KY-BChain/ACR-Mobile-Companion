@@ -431,6 +431,7 @@
     "title": "User manual",
     "pageIndicator": "Manual {{current}} of {{total}}",
     "englishFallback": "This manual is shown in English.",
-    "legalSection": "Privacy & Cookies in full"
+    "legalSection": "Privacy & Cookies in full",
+    "goToStart": "Go to section 1"
   }
 }

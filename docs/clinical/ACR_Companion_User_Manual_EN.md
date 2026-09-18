@@ -1,9 +1,10 @@
-# ACR Companion (version 0.6.6): user manual for reviewers
+# ACR Companion: user manual for reviewers
 
-**Date:** 17 September 2026
-**Status:** DRAFT, for Kraken (CRIL) to approve before it is sent to reviewers.
+**Applies to:** v0.6.7 (Build 48). The version you have is shown on the **About** screen.
+**Updated:** 18 September 2026
+**Status:** approved by CRIL for the invited evaluation. Not for public distribution.
 **For:** invited clinical reviewers and review testers.
-**Chinese version:** ACR_Companion_User_Manual_ZH-CN_17SEPT26.
+**Chinese version:** ACR_Companion_User_Manual_ZH-CN.
 
 ---
 
@@ -125,7 +126,9 @@ In demonstration mode, **do not change any value**. If you do, Review shows a re
 | HER2 status | positive / negative | required |
 | Ki-67 (%) | 0–100 | required |
 
-The hint *"Luminal A < 14, Luminal B ≥ 14"* is guidance only; the platform decides the subtype. *Please note: HER2 currently offers Positive or Negative only. There is no "2+, ISH pending" (equivocal) choice yet. A case that would normally be recorded as equivocal cannot be entered as such at this time; please tell CRIL if this affects your testing.*
+The hint *"Luminal A < 14, Luminal B ≥ 14"* is guidance only; the platform decides the subtype.
+
+*Please note: HER2 currently offers Positive or Negative only. There is no "2+, ISH pending" (equivocal) choice yet. A case that would normally be recorded as equivocal cannot be entered as such at this time; please tell CRIL if this affects your testing.*
 
 The screen also shows the **Session ID**, a random reference created for each assessment. It is not a patient identifier.
 

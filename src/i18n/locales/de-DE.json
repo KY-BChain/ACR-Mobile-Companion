@@ -431,6 +431,7 @@
     "title": "Benutzerhandbuch",
     "pageIndicator": "Handbuch {{current}} von {{total}}",
     "englishFallback": "Dieses Handbuch wird auf Englisch angezeigt.",
-    "legalSection": "Datenschutz und Cookies im Detail"
+    "legalSection": "Datenschutz und Cookies im Detail",
+    "goToStart": "Zu Abschnitt 1"
   }
 }

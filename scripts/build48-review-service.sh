@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Build 47 remote-review service: T3 (gateway, 127.0.0.1:3001) + T4 (acr-mobile-review tunnel).
+# Build 48 remote-review service: T3 (gateway, 127.0.0.1:3001) + T4 (acr-mobile-review tunnel).
 #
-#   scripts/build47-review-service.sh start    checked start: T1/T2 checks, then T3, then T4
-#   scripts/build47-review-service.sh status   read-only health of T1-T4
-#   scripts/build47-review-service.sh stop     stop T4, then T3
+#   scripts/build48-review-service.sh start    checked start: T1/T2 checks, then T3, then T4
+#   scripts/build48-review-service.sh status   read-only health of T1-T4
+#   scripts/build48-review-service.sh stop     stop T4, then T3
 #
 # T1 (Spring Boot, :8080) and T2 (acr-api tunnel) are only ever CHECKED. This
 # script never starts, stops or restarts them.
 #
-# Runbook: docs/operations/BUILD47_REVIEW_SERVICE_RUNBOOK.md
+# Runbook: docs/operations/BUILD48_REVIEW_SERVICE_RUNBOOK.md
 set -uo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -23,13 +23,13 @@ TUNNEL_CONFIG="$HOME/.cloudflared/acr-mobile-review.yml"
 PLATFORM_ORIGIN="https://api.acragent.com"
 ONTOLOGY_PATH="${ACR45_ONTOLOGY_PATH:-/Users/Kraken/DAPP/ACR-platform/ontology/breast-cancer/ACR_Ontology_Full_v2_2.owl}"
 PORT=3001
-CLIENT_BUILD_ID="mob-v0.6.6+47"
-# Build 47 changeover: a Build 46 session keeps working and moves to Build 47
-# at the next refresh from the updated app (the iPhone keeps its bundle ID).
-# The Android app has a new app ID in Build 47, so Android phones pair afresh.
-# Set to "" once no Build 46 phone remains.
-PREVIOUS_CLIENT_BUILD_IDS="${ACR_PREVIOUS_CLIENT_BUILD_IDS-mob-v0.6.5+46}"
-# Build 47 (M12): the verified synthetic demonstration fixture, captured from
+CLIENT_BUILD_ID="mob-v0.6.7+48"
+# Build 48 changeover: a Build 47 session keeps working and moves to Build 48
+# at the next refresh from the updated app. The app ID is unchanged since
+# Build 47, so every phone updates in place and keeps its pairing.
+# Set to "" once no Build 47 phone remains.
+PREVIOUS_CLIENT_BUILD_IDS="${ACR_PREVIOUS_CLIENT_BUILD_IDS-mob-v0.6.6+47}"
+# Build 48: the verified synthetic demonstration fixture, captured from
 # the live platform for this build ID. Used only when the directory exists; the
 # gateway refuses to start if a configured fixture fails verification.
 FIXTURE_DIR="${ACR_SYNTHETIC_FIXTURE_DIR-$STATE_DIR/fixtures/demo-$CLIENT_BUILD_ID}"
@@ -100,7 +100,7 @@ stop_services() {
 
 start() {
   local c gp tp i stamp glog tlog
-  step "Build 47 review service — checked start ($(date -u +%FT%TZ))"
+  step "Build 48 review service — checked start ($(date -u +%FT%TZ))"
 
   step "1. Prerequisites"
   check_files
@@ -189,11 +189,11 @@ start() {
   step "Service is up."
   note "Phones: open ACR Companion — it reconnects by itself (no invite code) and shows VERIFIED."
   note "The first assessment after the platform has been idle may time out once; retry."
-  note "Stop with: scripts/build47-review-service.sh stop"
+  note "Stop with: scripts/build48-review-service.sh stop"
 }
 
 stop() {
-  step "Build 47 review service — stop ($(date -u +%FT%TZ))"
+  step "Build 48 review service — stop ($(date -u +%FT%TZ))"
   stop_services
   sleep 2
   [ -z "$(gateway_pid)" ] && ok "port $PORT free" || bad "port $PORT still in use"
@@ -203,7 +203,7 @@ stop() {
 
 status() {
   local gp tp
-  step "Build 47 review service — status ($(date -u +%FT%TZ))"
+  step "Build 48 review service — status ($(date -u +%FT%TZ))"
   step "T1 / T2 (read-only)"
   check_platform || true
   step "T3 / T4"

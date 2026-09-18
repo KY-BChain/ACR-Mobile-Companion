@@ -10,9 +10,17 @@ const fs = require('fs');
 const path = require('path');
 
 const REPO = path.resolve(__dirname, '..');
+// Every language the app offers has its own manual, named by the same
+// convention: docs/clinical/ACR_Companion_User_Manual_<CODE>.md.
 const SOURCES = {
-  'en-GB': 'docs/clinical/ACR_Companion_User_Manual_EN_17SEPT26.md',
-  'zh-CN': 'docs/clinical/ACR_Companion_User_Manual_ZH-CN_17SEPT26.md',
+  'en-GB': 'docs/clinical/ACR_Companion_User_Manual_EN.md',
+  'zh-CN': 'docs/clinical/ACR_Companion_User_Manual_ZH-CN.md',
+  'fr-FR': 'docs/clinical/ACR_Companion_User_Manual_FR.md',
+  'de-DE': 'docs/clinical/ACR_Companion_User_Manual_DE.md',
+  'ru-RU': 'docs/clinical/ACR_Companion_User_Manual_RU.md',
+  'ar-SA': 'docs/clinical/ACR_Companion_User_Manual_AR.md',
+  'ko-KR': 'docs/clinical/ACR_Companion_User_Manual_KO.md',
+  'ja-JP': 'docs/clinical/ACR_Companion_User_Manual_JA.md',
 };
 const OUT_DIR = path.join(REPO, 'src/content/manual');
 

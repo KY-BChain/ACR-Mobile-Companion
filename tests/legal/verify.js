@@ -13,6 +13,7 @@ const root = path.resolve(__dirname, '../..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const json = (file) => JSON.parse(read(file));
 const LOCALES = ['en-GB', 'fr-FR', 'de-DE', 'ru-RU', 'ar-SA', 'zh-CN', 'ko-KR', 'ja-JP'];
+const legalIndex = (pages) => pages.findIndex((page) => /^15\./.test(page.title.trim()));
 
 // ── The notice says the same six things in every language
 const baseKeys = Object.keys(json('src/i18n/locales/en-GB.json').legal).sort();
@@ -23,7 +24,7 @@ for (const locale of LOCALES) {
   const bundle = json(`src/i18n/locales/${locale}.json`);
   assert.deepEqual(Object.keys(bundle.legal).sort(), baseKeys, `${locale} legal keys`);
   assert.deepEqual(Object.keys(bundle.manual).sort(),
-    ['englishFallback', 'legalSection', 'pageIndicator', 'title'], `${locale} manual keys`);
+    ['englishFallback', 'goToStart', 'legalSection', 'pageIndicator', 'title'], `${locale} manual keys`);
   for (const [key, value] of Object.entries(bundle.legal)) {
     assert.ok(value.trim().length > 0, `${locale} legal:${key} is empty`);
     assert.doesNotMatch(value, /\[[^\]]*\]|TODO|TBD/, `${locale} legal:${key} still holds a placeholder`);
@@ -43,7 +44,7 @@ for (const locale of LOCALES) {
 }
 
 // ── The in-app manual is the document, not a retyped copy of it
-const generated = { 'en-GB': json('src/content/manual/en-GB.json'), 'zh-CN': json('src/content/manual/zh-CN.json') };
+const generated = Object.fromEntries(LOCALES.map((locale) => [locale, json(`src/content/manual/${locale}.json`)]));
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'acr-manual-'));
 execFileSync(process.execPath, [path.join(root, 'scripts/build-manual-content.js')], { cwd: root, stdio: 'pipe' });
 for (const [locale, before] of Object.entries(generated)) {
@@ -58,12 +59,18 @@ for (const [locale, before] of Object.entries(generated)) {
   for (const required of [/CRIL/, /info@acragent\.com/, /Cloudflare/, /30/]) {
     assert.match(text, required, `${locale} legal section is missing ${required}`);
   }
+  assert.equal(after.pages.length, generated['en-GB'].pages.length,
+    `${locale} manual must have the same sections as English`);
+  assert.equal(legalIndex(after.pages), 14, `${locale} legal notice must be section 15`);
 }
 fs.rmSync(scratch, { recursive: true, force: true });
 
-// English is the only fallback, and it is declared on screen
+// Every offered language has its own manual; English stays the fallback for any other
 const manualIndex = read('src/content/manual/index.ts');
-assert.match(manualIndex, /isEnglishFallback: true/, 'other languages fall back to English');
+for (const locale of LOCALES) {
+  assert.ok(manualIndex.includes(`'${locale}':`), `index.ts must register the ${locale} manual`);
+}
+assert.match(manualIndex, /isEnglishFallback: true/, 'an unknown language falls back to English');
 assert.match(read('src/screens/ManualScreen.tsx'), /manual:englishFallback/, 'the fallback is stated on screen');
 assert.match(read('src/screens/ManualScreen.tsx'), /manual:pageIndicator/, 'the manual is paged like About');
 
@@ -75,6 +82,26 @@ assert.match(poster, /legal:readDetails/, 'page two carries READ DETAILS');
 assert.match(poster, /navigation\.navigate\('Manual', \{ section: 'legal' \}\)/, 'READ DETAILS opens the legal section');
 assert.match(poster, /navigation\.replace\('Welcome'\)/, 'an upward swipe still continues to Welcome');
 assert.match(poster, /Math\.abs\(gestureState\.dx\) >= SWIPE_NAVIGATION_DISTANCE/, 'sideways swipes turn the page');
+// Build 48: poster and notice turn into each other on a timer until the reader
+// takes over, and READ DETAILS is sized to its text rather than filling the width.
+assert.match(poster, /const PAGE_TURN_MS = \d+;/, 'the two pages turn on a timer');
+assert.match(poster, /showPage\(page === 0 \? 1 : 0, false\)/, 'the timer turns both ways, not only to the notice');
+assert.match(poster, /if \(turnedByHand\.current\) return undefined;/, 'a swipe stops the rotation');
+assert.match(poster, /turnedByHand\.current = true;\s+\/\/ reading the manual stops the rotation/,
+  'opening the manual stops the rotation');
+assert.match(poster, /compact\n\s+onPress=\{\(\) => \{/, 'READ DETAILS is a compact button');
+// The manual can open at the legal section, so section 1 must stay reachable.
+const manualScreen = read('src/screens/ManualScreen.tsx');
+assert.match(manualScreen, /title=\{t\('manual:goToStart'\)\} variant="secondary" compact onPress=\{\(\) => setPage\(0\)\}/,
+  'a control returns to section 1');
+assert.match(manualScreen, /title=\{t\('common:back'\)\} variant="secondary" compact onPress=\{\(\) => setPage\(page - 1\)\}/,
+  'a control steps to the previous section');
+// Every page can be left: Close is in the footer whatever section is open.
+assert.match(manualScreen, /<ACRButton title=\{t\('common:close'\)\} variant="secondary" onPress=\{\(\) => navigation\.goBack\(\)\} \/>/,
+  'Close is available on every page of the manual');
+const button = read('src/components/ACRButton.tsx');
+assert.match(button, /compact\?: boolean;/, 'the button offers a compact size');
+assert.match(button, /compact: \{\s*flex: 0,\s*alignSelf: 'center',/, 'a compact button is sized to its text');
 
 // The notice itself carries every element, each labelled
 const notice = read('src/components/PrivacyNotice.tsx');
@@ -92,4 +119,4 @@ const navigator = read('src/navigation/AppNavigator.tsx');
 assert.match(navigator, /Manual: \{ section\?: 'legal' \} \| undefined;/, 'the Manual route is typed');
 assert.match(navigator, /<Stack\.Screen name="Manual" component=\{ManualScreen\} \/>/, 'the Manual screen is registered');
 
-process.stdout.write(`PASS privacy notice and in-app manual: ${baseKeys.length} notice keys in 8 locales with controller, contact, Cloudflare and retention; ${generated['en-GB'].pages.length} manual pages generated from docs/clinical (EN and ZH, English fallback elsewhere); poster page two carries the notice and READ DETAILS; retired "Assessment blocked" wording absent\n`);
+process.stdout.write(`PASS privacy notice and in-app manual: ${baseKeys.length} notice keys in 8 locales with controller, contact, Cloudflare and retention; ${generated['en-GB'].pages.length} manual pages in each of ${LOCALES.length} languages, generated from docs/clinical; poster page two carries the notice and READ DETAILS; retired "Assessment blocked" wording absent\n`);

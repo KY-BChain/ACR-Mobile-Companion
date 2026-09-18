@@ -5,8 +5,8 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '../..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const appConfig = JSON.parse(read('app.json'));
-const expectedVersion = '0.6.6';
-const expectedBuild = '47';
+const expectedVersion = '0.6.7';
+const expectedBuild = '48';
 
 assert.equal(appConfig.expo.name, 'ACR Companion');
 assert.equal(appConfig.expo.version, expectedVersion);
@@ -67,4 +67,4 @@ assert.equal(
 const gatewayConfig = read('src/config/gateway.ts');
 assert.match(gatewayConfig, /ACTIVE_GATEWAY_ORIGIN: GovernedOrigin = BUILD45_REVIEW_ORIGIN/, 'the compiled origin is the Build 45 review hostname');
 assert.doesNotMatch(gatewayConfig, /http:\/\//, 'no cleartext origin is compiled into the app');
-console.log('PASS version/native consistency: Expo, Android, iOS and derived gateway build ID are 0.6.6 / 47; one compiled https origin and no cleartext exception on either platform');
+console.log('PASS version/native consistency: Expo, Android, iOS and derived gateway build ID are 0.6.7 / 48; one compiled https origin and no cleartext exception on either platform');

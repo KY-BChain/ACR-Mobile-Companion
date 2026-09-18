@@ -12,6 +12,9 @@
 const ACCESS_TOKEN_MS = 15 * 60 * 1000;                 // AUTH-02, AUTH-14
 const SESSION_MS = 30 * 24 * 60 * 60 * 1000;            // AUTH-02, AUTH-14
 const INVITE_ACTIVATION_MS = 7 * 24 * 60 * 60 * 1000;   // AUTH-01
+// Build 48: the privacy notice promises that records are deleted 30 days after
+// they stop being current. `acr-invite purge` enforces it.
+const RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 
 /** AT-09: 10 failed attempts in 1 minute blocks further attempts for 5 minutes. */
 const AUTH_ATTEMPT_WINDOW_MS = 60 * 1000;
@@ -23,6 +26,7 @@ const GENERAL_WINDOW_MS = 5 * 60 * 1000;
 const GENERAL_MAX = 300;
 
 module.exports = Object.freeze({
+  RETENTION_MS,
   ACCESS_TOKEN_MS,
   SESSION_MS,
   INVITE_ACTIVATION_MS,

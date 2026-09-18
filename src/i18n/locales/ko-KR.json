@@ -431,6 +431,7 @@
     "title": "사용 설명서",
     "pageIndicator": "설명서 {{current}} / {{total}}",
     "englishFallback": "이 설명서는 영어로 표시됩니다.",
-    "legalSection": "개인정보 및 쿠키 전문"
+    "legalSection": "개인정보 및 쿠키 전문",
+    "goToStart": "1장으로 이동"
   }
 }

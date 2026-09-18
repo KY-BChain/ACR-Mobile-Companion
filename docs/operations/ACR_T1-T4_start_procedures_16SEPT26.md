@@ -25,3 +25,20 @@ If any step fails or times out, the script shows ✘ with the reason and stops. 
 Tested: the syntax check passed, and it ran once while all four services were already healthy. Every step reported "already running", no windows opened, nothing started.
 
 Not tested: actually opening the windows, since that would start T1/T2. The first time it opens a window, macOS may ask to allow Terminal to be controlled. Click OK.
+
+## Stopping
+
+The same script stops everything, in reverse order:
+
+```sh
+cd /Users/Kraken/DAPP/acr-mobile-companion
+scripts/acr-services.sh stop
+```
+
+It stops T4 and T3 first, then shows which of T1 and T2 are running and asks you
+to confirm before signalling them — the ACR Platform website loses its back end
+at that moment. Answer anything but `y` and T1 and T2 are left running, to be
+closed with Ctrl+C in their own windows.
+
+Claude never starts or stops T1 or T2; only you do, whether by this command or
+by Ctrl+C.

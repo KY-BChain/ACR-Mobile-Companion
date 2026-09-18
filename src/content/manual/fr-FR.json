@@ -1,0 +1,766 @@
+{
+  "source": "docs/clinical/ACR_Companion_User_Manual_FR.md",
+  "pages": [
+    {
+      "title": "1. Avant de continuer",
+      "blocks": [
+        {
+          "type": "bullet",
+          "text": "Données synthétiques uniquement. N’entrez jamais les informations d’un patient réel, même codées ou pseudonymisées. L’application ne demande ni nom ni numéro d’hôpital."
+        },
+        {
+          "type": "bullet",
+          "text": "Ne pas utiliser en clinique. Les résultats sont une aide à la décision pour l’évaluation. Ils ne doivent pas servir à diagnostiquer ou à traiter qui que ce soit."
+        },
+        {
+          "type": "bullet",
+          "text": "L’application ne contient aucune règle clinique. Tout ce que vous voyez dans un résultat provient de la plateforme ACR. L’application recueille vos saisies, les envoie de manière sécurisée et affiche la réponse."
+        },
+        {
+          "type": "bullet",
+          "text": "Fonctionnement des règles (sous-type, risque, lignes de traitement, confiance bayésienne) : voir le document compagnon ACR Companion — liste de revue et de test pour les évaluateurs ZZU. Ce manuel explique comment utiliser l’application."
+        },
+        {
+          "type": "paragraph",
+          "text": "Dans ce manuel, les mots en gras sont les noms des boutons et des écrans tels qu’ils apparaissent en anglais."
+        }
+      ]
+    },
+    {
+      "title": "2. Ce dont vous avez besoin",
+      "blocks": [
+        {
+          "type": "row",
+          "label": "Téléphone",
+          "value": "Un téléphone Android ou un iPhone"
+        },
+        {
+          "type": "row",
+          "label": "Code d’invitation",
+          "value": "Un code personnel envoyé par CRIL. Gardez-le privé"
+        },
+        {
+          "type": "row",
+          "label": "Internet",
+          "value": "Wi-Fi ou données mobiles, pour obtenir les résultats"
+        },
+        {
+          "type": "row",
+          "label": "Langue",
+          "value": "English (UK), 简体中文, Français, Deutsch, Русский, العربية, 한국어 ou 日本語. Seuls l’anglais et le chinois ont été vérifiés ; les autres traductions sont des brouillons"
+        }
+      ]
+    },
+    {
+      "title": "3. Installation de l’application",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "CRIL vous indiquera comment obtenir l’application pour votre téléphone. Installez uniquement le fichier ou le lien envoyé par CRIL."
+        },
+        {
+          "type": "paragraph",
+          "text": "Android"
+        },
+        {
+          "type": "bullet",
+          "text": "1. Ouvrez le fichier d’installation (se terminant par .apk) envoyé par CRIL."
+        },
+        {
+          "type": "bullet",
+          "text": "2. Si le téléphone le demande, autorisez l’installation depuis cette source (par exemple votre navigateur ou gestionnaire de fichiers). Certains téléphones, comme Xiaomi et Samsung, affichent une invite de sécurité supplémentaire : choisissez de continuer."
+        },
+        {
+          "type": "bullet",
+          "text": "3. Une fois l’installation terminée, ouvrez ACR Companion."
+        },
+        {
+          "type": "paragraph",
+          "text": "iPhone"
+        },
+        {
+          "type": "paragraph",
+          "text": "L’installation sur iPhone est organisée séparément par CRIL. La première fois que l’application est ouverte, l’iPhone peut vous demander de faire confiance au développeur : allez dans Réglages → Général → VPN et gestion de l’appareil et faites confiance."
+        },
+        {
+          "type": "paragraph",
+          "text": "Si une version antérieure est déjà installée, CRIL vous indiquera s’il faut la mettre à jour par-dessus ou la supprimer d’abord."
+        }
+      ]
+    },
+    {
+      "title": "4. Les écrans en un coup d’œil",
+      "blocks": [
+        {
+          "type": "row",
+          "label": "—",
+          "value": "Écran: Accès à l’évaluation · Ce que vous y faites: Se connecter avec le code d’invitation ; choisir Plateforme live ou Démonstration synthétique"
+        },
+        {
+          "type": "row",
+          "label": "—",
+          "value": "Écran: Bienvenue (Avant de commencer) · Ce que vous y faites: Lire les avis ; changer la langue ; ouvrir À propos"
+        },
+        {
+          "type": "row",
+          "label": "1 sur 5",
+          "value": "Écran: Statut des récepteurs · Ce que vous y faites: ER, PR, HER2, Ki-67"
+        },
+        {
+          "type": "row",
+          "label": "2 sur 5",
+          "value": "Écran: Caractéristiques de la tumeur · Ce que vous y faites: Stade, grade, histologie, statut ganglionnaire, âge"
+        },
+        {
+          "type": "row",
+          "label": "3 sur 5",
+          "value": "Écran: Biomarqueurs et chirurgie · Ce que vous y faites: CA 15-3, CEA, date de chirurgie, option bayésienne"
+        },
+        {
+          "type": "row",
+          "label": "4 sur 5",
+          "value": "Écran: Champs contractuels principaux · Ce que vous y faites: Taille de la tumeur, sexe"
+        },
+        {
+          "type": "row",
+          "label": "5 sur 5",
+          "value": "Écran: Champs contractuels supplémentaires · Ce que vous y faites: ECOG, PD-L1, HER2-low, LVEF, intention thérapeutique"
+        },
+        {
+          "type": "row",
+          "label": "—",
+          "value": "Écran: Revue · Ce que vous y faites: Tout vérifier, puis Envoyer"
+        },
+        {
+          "type": "row",
+          "label": "—",
+          "value": "Écran: Résultat de l’évaluation · Ce que vous y faites: Lire le résultat"
+        },
+        {
+          "type": "paragraph",
+          "text": "Chaque écran de saisie affiche Étape n sur 5 en haut, avec Retour et Suivant en bas."
+        }
+      ]
+    },
+    {
+      "title": "5. Ouvrir l’application et choisir une langue",
+      "blocks": [
+        {
+          "type": "bullet",
+          "text": "1. Ouvrez l’application. Elle démarre sur Accès à l’évaluation."
+        },
+        {
+          "type": "bullet",
+          "text": "2. Pour changer la langue, appuyez sur Retour pour atteindre l’écran Bienvenue, appuyez sur Langue et choisissez. Tous les écrans suivent votre choix ; l’arabe se lit de droite à gauche."
+        },
+        {
+          "type": "bullet",
+          "text": "3. L’écran Bienvenue contient aussi À propos, qui décrit la plateforme ACR et affiche la version de l’application."
+        },
+        {
+          "type": "bullet",
+          "text": "4. Si vous restez sur l’écran Bienvenue quelques secondes, une affiche d’introduction d’une page apparaît. Balayez latéralement pour l’avis Confidentialité et cookies, où LIRE LES DÉTAILS ouvre ce manuel sur le téléphone. Balayez vers le haut pour continuer."
+        },
+        {
+          "type": "bullet",
+          "text": "5. Appuyez sur J’ai compris — Commencer pour revenir à Accès à l’évaluation."
+        }
+      ]
+    },
+    {
+      "title": "6. Première connexion",
+      "blocks": [
+        {
+          "type": "bullet",
+          "text": "1. Sur Accès à l’évaluation, saisissez votre code d’invitation dans Code d’invitation."
+        },
+        {
+          "type": "bullet",
+          "text": "2. Appuyez sur Connexion sécurisée."
+        },
+        {
+          "type": "bullet",
+          "text": "3. Un message confirme : « Code d’invitation accepté et appairé avec cet appareil mobile et cet appareil mobile uniquement. Pour 30 jours. » Il indique aussi la date d’appairage et la date d’expiration (en UTC). Appuyez sur Continuer."
+        },
+        {
+          "type": "bullet",
+          "text": "4. Appuyez sur Suivant pour commencer une évaluation."
+        },
+        {
+          "type": "paragraph",
+          "text": "À noter :"
+        },
+        {
+          "type": "bullet",
+          "text": "Votre code ne fonctionne que sur un seul téléphone. Le premier téléphone sur lequel il est saisi y est appairé. Sur tout autre téléphone, l’application affiche « Appareil incorrect utilisé. »"
+        },
+        {
+          "type": "bullet",
+          "text": "L’accès dure 30 jours à partir de l’appairage. Ensuite, l’application affiche « Code d’invitation expiré. Demandez-en un nouveau. » Demandez un nouveau code à CRIL."
+        },
+        {
+          "type": "bullet",
+          "text": "Vous ne saisissez le code qu’une seule fois. Ensuite, l’application se reconnecte automatiquement à chaque ouverture. Vous ne le saisirez à nouveau qu’après Déconnecter l’accès (voir section 12), et les 30 jours ne recommencent pas."
+        },
+        {
+          "type": "bullet",
+          "text": "Le code lui-même n’est jamais stocké sur le téléphone."
+        },
+        {
+          "type": "heading",
+          "text": "Le panneau de connexion"
+        },
+        {
+          "type": "paragraph",
+          "text": "Preuve de connexion sur le même écran affiche :"
+        },
+        {
+          "type": "bullet",
+          "text": "Passerelle : Connectée, Serveur non connecté ou Vérification…"
+        },
+        {
+          "type": "bullet",
+          "text": "Attestation de référence : VÉRIFIÉE signifie que la plateforme ACR est exactement la version approuvée, et que des résultats live peuvent être produits. NON CORRESPONDANTE ou INDISPONIBLE signifie que les résultats live sont bloqués."
+        }
+      ]
+    },
+    {
+      "title": "7. Plateforme live ou démonstration synthétique",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Choisissez sous Mode de livraison avant de commencer :"
+        },
+        {
+          "type": "row",
+          "label": "Plateforme live (bleu)",
+          "value": "Ce qui se passe: Vos saisies sont envoyées à la plateforme ACR, qui applique ses règles cliniques maintenant · À utiliser pour: Tous les cas de test réels"
+        },
+        {
+          "type": "row",
+          "label": "Démonstration synthétique (ambre)",
+          "value": "Ce qui se passe: Aucune règle n’est exécutée. L’application remplit un cas de démonstration fixe, et le service affiche un résultat enregistré auparavant depuis la plateforme live pour exactement ce cas · À utiliser pour: Un aperçu rapide d’un résultat complet, ou lorsque la plateforme live est hors ligne"
+        },
+        {
+          "type": "paragraph",
+          "text": "En mode démonstration, ne modifiez aucune valeur. Si vous le faites, la Revue affiche un encadré rouge Cas de démonstration modifié et aucun résultat n’est renvoyé."
+        }
+      ]
+    },
+    {
+      "title": "8. Saisir un cas",
+      "blocks": [
+        {
+          "type": "heading",
+          "text": "Conseils généraux"
+        },
+        {
+          "type": "bullet",
+          "text": "Champs obligatoires : uniquement ER, PR, HER2 et Ki-67 sur l’écran 1. Suivant reste indisponible tant que Ki-67 n’est pas un nombre de 0 à 100."
+        },
+        {
+          "type": "bullet",
+          "text": "Tout le reste est facultatif, mais certaines valeurs sont marquées nécessaires pour une évaluation complète. Sans elles, la plateforme répond quand même, mais retient le risque (section 10)."
+        },
+        {
+          "type": "bullet",
+          "text": "Les choix sont des boutons : appuyez sur l’un pour le sélectionner."
+        },
+        {
+          "type": "bullet",
+          "text": "Nombres : après la saisie, appuyez sur Terminé au-dessus du clavier (iPhone) ou sur la touche valider/terminé du clavier (Android) pour fermer le clavier."
+        },
+        {
+          "type": "bullet",
+          "text": "Erreurs : une valeur invalide s’affiche en rouge avec une courte explication, par exemple « Entrez une valeur de 0 à 100. »"
+        },
+        {
+          "type": "bullet",
+          "text": "Valeurs d’exemple : pour gagner du temps, les écrans 1 à 3 d’une nouvelle évaluation Live s’ouvrent déjà remplis avec un cas d’exemple synthétique. Modifiez-les selon votre test. Les écrans 4 et 5 s’ouvrent vides."
+        },
+        {
+          "type": "heading",
+          "text": "Écran 1 sur 5 — Statut des récepteurs"
+        },
+        {
+          "type": "row",
+          "label": "Statut ER",
+          "value": "Saisie: positif / négatif · obligatoire"
+        },
+        {
+          "type": "row",
+          "label": "Statut PR",
+          "value": "Saisie: positif / négatif · obligatoire"
+        },
+        {
+          "type": "row",
+          "label": "Statut HER2",
+          "value": "Saisie: positif / négatif · obligatoire"
+        },
+        {
+          "type": "row",
+          "label": "Ki-67 (%)",
+          "value": "Saisie: 0–100 · obligatoire"
+        },
+        {
+          "type": "paragraph",
+          "text": "L’indication « Luminal A < 14, Luminal B ≥ 14 » n’est qu’une aide ; la plateforme décide du sous-type."
+        },
+        {
+          "type": "paragraph",
+          "text": "À noter : HER2 propose actuellement uniquement Positif ou Négatif. Il n’y a pas encore de choix « 2+, ISH en attente » (équivoque). Un cas qui serait normalement enregistré comme équivoque ne peut pas être saisi comme tel pour le moment ; veuillez informer CRIL si cela affecte vos tests."
+        },
+        {
+          "type": "paragraph",
+          "text": "L’écran affiche aussi l’ID de session, une référence aléatoire créée pour chaque évaluation. Ce n’est pas un identifiant patient."
+        },
+        {
+          "type": "heading",
+          "text": "Écran 2 sur 5 — Caractéristiques de la tumeur"
+        },
+        {
+          "type": "row",
+          "label": "Stade",
+          "value": "Saisie: 0 à IV, avec sous-stades · nécessaire pour une évaluation complète"
+        },
+        {
+          "type": "row",
+          "label": "Grade",
+          "value": "Saisie: 1, 2 ou 3 · nécessaire pour une évaluation complète"
+        },
+        {
+          "type": "row",
+          "label": "Sous-type histologique",
+          "value": "Saisie: IDC, ILC, DCIS ou maladie de Paget · facultatif"
+        },
+        {
+          "type": "row",
+          "label": "Statut ganglionnaire",
+          "value": "Saisie: N0, N1, N2 ou N3 · nécessaire pour une évaluation complète"
+        },
+        {
+          "type": "row",
+          "label": "Âge (années)",
+          "value": "Saisie: années entières, 18–120 · nécessaire pour une évaluation complète"
+        },
+        {
+          "type": "heading",
+          "text": "Écran 3 sur 5 — Biomarqueurs et chirurgie"
+        },
+        {
+          "type": "row",
+          "label": "CA 15-3 (U/mL)",
+          "value": "Saisie: 0 ou plus · facultatif"
+        },
+        {
+          "type": "row",
+          "label": "CEA (ng/mL)",
+          "value": "Saisie: 0 ou plus · facultatif"
+        },
+        {
+          "type": "row",
+          "label": "Date de chirurgie",
+          "value": "Saisie: AAAA-MM-JJ (les dates futures sont acceptées) · facultatif"
+        },
+        {
+          "type": "row",
+          "label": "Amélioration bayésienne",
+          "value": "Saisie: ON / OFF · facultatif"
+        },
+        {
+          "type": "heading",
+          "text": "Écran 4 sur 5 — Champs contractuels principaux"
+        },
+        {
+          "type": "paragraph",
+          "text": "Cet écran et le suivant sont étiquetés ÉVALUATION UNIQUEMENT · CHAMPS PROVISOIRES : leurs définitions cliniques sont encore en cours de revue."
+        },
+        {
+          "type": "row",
+          "label": "Taille de la tumeur",
+          "value": "Saisie: un nombre supérieur à 0. L’unité n’est pas encore décidée · nécessaire pour une évaluation complète"
+        },
+        {
+          "type": "row",
+          "label": "Sexe",
+          "value": "Saisie: féminin / masculin / autre / inconnu · facultatif"
+        },
+        {
+          "type": "heading",
+          "text": "Écran 5 sur 5 — Champs contractuels supplémentaires"
+        },
+        {
+          "type": "row",
+          "label": "Score ECOG",
+          "value": "Saisie: nombre entier, 0–4 · nécessaire pour une évaluation complète"
+        },
+        {
+          "type": "row",
+          "label": "Statut PD-L1",
+          "value": "Saisie: positif / négatif / non testé · facultatif"
+        },
+        {
+          "type": "row",
+          "label": "HER2-low",
+          "value": "Saisie: positif / négatif / inconnu · facultatif"
+        },
+        {
+          "type": "row",
+          "label": "LVEF (%)",
+          "value": "Saisie: 0–100 · facultatif"
+        },
+        {
+          "type": "row",
+          "label": "Intention thérapeutique",
+          "value": "Saisie: néoadjuvant / adjuvant / non précisé · facultatif"
+        },
+        {
+          "type": "paragraph",
+          "text": "Appuyez sur Revue lorsque vous avez terminé."
+        }
+      ]
+    },
+    {
+      "title": "9. Revue et envoi",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Revue liste chaque valeur avant tout envoi."
+        },
+        {
+          "type": "bullet",
+          "text": "Encadré rouge « Nécessaire pour une évaluation complète » : liste les valeurs que vous avez laissées vides et dont la plateforme a besoin. Appuyez sur un lien Aller à … pour sauter à cet écran ; vos autres saisies sont conservées. Vous pouvez quand même envoyer."
+        },
+        {
+          "type": "bullet",
+          "text": "« valeur d’exemple, non modifiée » : marque une valeur d’exemple que vous n’avez pas modifiée, pour distinguer vos propres saisies."
+        },
+        {
+          "type": "bullet",
+          "text": "Mode de livraison : affiche Live ou Démonstration synthétique (en ambre)."
+        },
+        {
+          "type": "bullet",
+          "text": "Référence : l’envoi n’est possible que lorsque la plateforme est VÉRIFIÉE."
+        },
+        {
+          "type": "paragraph",
+          "text": "Appuyez sur Modifier pour revenir à l’écran 1, ou sur Envoyer pour envoyer le cas."
+        },
+        {
+          "type": "paragraph",
+          "text": "Lorsque vous envoyez un cas live, le service vérifie d’abord que la plateforme est toujours la version approuvée. S’il ne peut pas le confirmer, aucun résultat n’est affiché. Vous voyez Service indisponible avec la raison, par exemple que la plateforme ne correspond pas à la version approuvée. Relancer la vérification répète uniquement la vérification ; cela ne renvoie jamais votre cas."
+        },
+        {
+          "type": "paragraph",
+          "text": "À noter : le libellé « ASSESSMENT BLOCKED » de la plateforme, que vous pouvez voir dans un résultat complet pour un cas incomplet (section 10), est différent. Ce résultat affiche encore le sous-type, les lignes de traitement et les biomarqueurs ; seul le risque est retenu."
+        }
+      ]
+    },
+    {
+      "title": "10. Lire le résultat",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "L’écran Résultat de l’évaluation affiche, de haut en bas :"
+        },
+        {
+          "type": "bullet",
+          "text": "1. Résumé clinique : Sous-type moléculaire et Risque. Le risque est un mot dans votre langue : ÉLEVÉ, INTERMÉDIAIRE ou FAIBLE. Rouge signifie élevé, vert faible, bleu autre chose. Une ligne indique l’origine du résultat (plateforme live vérifiée, ou résultat synthétique enregistré auparavant)."
+        },
+        {
+          "type": "bullet",
+          "text": "2. Évaluation complète non atteinte (cas incomplets uniquement ; voir ci-dessous)."
+        },
+        {
+          "type": "bullet",
+          "text": "3. Avertissements et contexte : les messages propres à la plateforme, affichés tels quels, en anglais."
+        },
+        {
+          "type": "bullet",
+          "text": "4. Complétude des informations : le niveau de complétude et les valeurs manquantes, avec leurs numéros d’écran."
+        },
+        {
+          "type": "bullet",
+          "text": "5. Options de traitement renvoyées : exactement telles que la plateforme les a écrites."
+        },
+        {
+          "type": "bullet",
+          "text": "6. Résultats de biomarqueurs renvoyés."
+        },
+        {
+          "type": "bullet",
+          "text": "7. Confiance de classification : affichée lorsque l’amélioration bayésienne est ON. Lisez la liste de revue et de test, section C7, avant de vous fier à ce chiffre : il peut se rapporter à un sous-type différent de celui affiché."
+        },
+        {
+          "type": "bullet",
+          "text": "8. Détails techniques : règles déclenchées, trace de raisonnement, valeurs brutes et version de la plateforme."
+        },
+        {
+          "type": "heading",
+          "text": "Lorsqu’un cas est incomplet"
+        },
+        {
+          "type": "paragraph",
+          "text": "Si vous avez omis une valeur dont la plateforme a besoin :"
+        },
+        {
+          "type": "bullet",
+          "text": "Évaluation complète non atteinte nomme les valeurs manquantes et leurs écrans, par exemple « Taille de la tumeur (écran 4 sur 5) »."
+        },
+        {
+          "type": "bullet",
+          "text": "Risque indique « retenu — nécessite … »."
+        },
+        {
+          "type": "bullet",
+          "text": "Le sous-type, les options de traitement et les biomarqueurs sont toujours affichés."
+        },
+        {
+          "type": "bullet",
+          "text": "Appuyez sur Compléter les champs manquants. L’application ouvre l’écran avec la première valeur manquante, en conservant tout ce que vous avez saisi. Ajoutez la valeur, allez dans Revue et envoyez à nouveau."
+        },
+        {
+          "type": "heading",
+          "text": "Le résultat n’est pas enregistré"
+        },
+        {
+          "type": "paragraph",
+          "text": "Le résultat n’existe que tant que l’écran est ouvert. Rien n’est écrit dans le stockage du téléphone. Si vous avez besoin d’un enregistrement, notez les valeurs à la main, ou prenez une capture d’écran si votre organisation l’autorise."
+        }
+      ]
+    },
+    {
+      "title": "11. Commencer une autre évaluation",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Appuyez sur Nouvelle évaluation ou Terminé. Toutes les saisies sont effacées et l’application revient à Accès à l’évaluation, toujours connectée. Appuyez sur Suivant pour commencer."
+        }
+      ]
+    },
+    {
+      "title": "12. Se déconnecter",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Sur Accès à l’évaluation, appuyez sur Déconnecter l’accès. L’application demande confirmation : « Vous devrez saisir à nouveau le code d’invitation. » Appuyez sur Déconnecter. Ne faites cela que si CRIL vous le demande, ou si vous confiez le téléphone à quelqu’un d’autre."
+        }
+      ]
+    },
+    {
+      "title": "13. Messages et que faire",
+      "blocks": [
+        {
+          "type": "row",
+          "label": "Vérification…",
+          "value": "Ce que cela signifie: L’application contacte le service · Que faire: Attendez environ 10 secondes"
+        },
+        {
+          "type": "row",
+          "label": "Connecté sur cet appareil — « En attente du serveur… »",
+          "value": "Ce que cela signifie: Vous êtes appairé, mais le service est inaccessible · Que faire: Vérifiez votre internet ; appuyez sur Relancer la vérification. Aucun code d’invitation n’est nécessaire"
+        },
+        {
+          "type": "row",
+          "label": "Serveur non connecté",
+          "value": "Ce que cela signifie: Le service d’évaluation ACR est hors ligne · Que faire: Réessayez plus tard, ou informez CRIL. Vous pouvez encore utiliser Démonstration synthétique si elle est proposée"
+        },
+        {
+          "type": "row",
+          "label": "Passerelle connectée — plateforme Live hors ligne",
+          "value": "Ce que cela signifie: Le service est actif mais la plateforme ACR ne l’est pas · Que faire: Utilisez Démonstration synthétique, ou réessayez plus tard"
+        },
+        {
+          "type": "row",
+          "label": "Service indisponible / NON CORRESPONDANTE",
+          "value": "Ce que cela signifie: La plateforme n’est pas la version approuvée · Que faire: Ne continuez pas les tests live ; informez CRIL"
+        },
+        {
+          "type": "row",
+          "label": "« Appareil incorrect utilisé. »",
+          "value": "Ce que cela signifie: Le code est appairé avec un autre téléphone · Que faire: Utilisez votre téléphone appairé, ou demandez un nouveau code à CRIL"
+        },
+        {
+          "type": "row",
+          "label": "« Code d’invitation expiré. Demandez-en un nouveau. »",
+          "value": "Ce que cela signifie: Les 30 jours sont écoulés · Que faire: Demandez un nouveau code à CRIL"
+        },
+        {
+          "type": "row",
+          "label": "Cas de démonstration modifié (rouge)",
+          "value": "Ce que cela signifie: Une valeur de démonstration a été modifiée · Que faire: Remettez-la, ou passez à Plateforme live"
+        },
+        {
+          "type": "row",
+          "label": "La fixture synthétique vérifiée est indisponible.",
+          "value": "Ce que cela signifie: Aucune démonstration enregistrée n’est disponible · Que faire: Utilisez Plateforme live ; ou, sur un téléphone appairé, Parcourir les cinq écrans pour voir les écrans sans résultat"
+        },
+        {
+          "type": "row",
+          "label": "« Trop de requêtes… »",
+          "value": "Ce que cela signifie: Trop de tentatives en peu de temps · Que faire: Attendez quelques minutes"
+        },
+        {
+          "type": "row",
+          "label": "« Le résultat de l’évaluation est incertain. »",
+          "value": "Ce que cela signifie: La réponse n’est pas arrivée clairement · Que faire: Ne renvoyez pas plusieurs fois ; notez l’heure et informez CRIL"
+        }
+      ]
+    },
+    {
+      "title": "14. Vos données et confidentialité",
+      "blocks": [
+        {
+          "type": "bullet",
+          "text": "Le code d’invitation n’est jamais stocké. Votre session et un identifiant d’installation aléatoire sont conservés uniquement dans le magasin sécurisé du téléphone et sont supprimés lorsque vous vous déconnectez."
+        },
+        {
+          "type": "bullet",
+          "text": "Les saisies de cas et les résultats sont conservés en mémoire uniquement, et effacés à la fin de l’évaluation."
+        },
+        {
+          "type": "bullet",
+          "text": "L’application n’a ni analyse ni publicité, et ne peut pas être mise à jour à distance : chaque changement est une nouvelle version revue."
+        },
+        {
+          "type": "bullet",
+          "text": "Le service enregistre des événements techniques (par exemple, heure et résultat d’une requête) pour assurer sa sécurité ; il n’enregistre pas les valeurs cliniques."
+        }
+      ]
+    },
+    {
+      "title": "15. Mention légale : RGPD et cookies",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Concerne uniquement cette application. Le site de la plateforme ACR a sa propre mention."
+        },
+        {
+          "type": "heading",
+          "text": "Cookies"
+        },
+        {
+          "type": "paragraph",
+          "text": "Cette application n’utilise aucun cookie, pixel espion ou technologie de suivi."
+        },
+        {
+          "type": "heading",
+          "text": "Protection des données"
+        },
+        {
+          "type": "paragraph",
+          "text": "Responsable : Cornerstone Research International Ltd (CRIL), c/o NovaUCD, Belfield Innovation Park, University College Dublin, Dublin 4, D04 V2P1, Irlande. E-mail : info@acragent.com · www.acragent.com"
+        },
+        {
+          "type": "bullet",
+          "text": "Données collectées : libellé d’invitation et étiquette d’organisation ; identifiant d’appareil aléatoire créé par l’application (conservé uniquement sous forme hachée) ; dates d’appairage et d’expiration ; version de l’application ; événements de sécurité et enregistrements de requêtes (heure, route, résultat — jamais le contenu)."
+        },
+        {
+          "type": "bullet",
+          "text": "Données réseau : votre adresse IP est traitée par notre fournisseur réseau, Cloudflare, pour fournir et protéger le service."
+        },
+        {
+          "type": "bullet",
+          "text": "Non collectées : votre nom ou vos coordonnées, ni aucune donnée patient. Les saisies de cas synthétiques sont traitées uniquement pour renvoyer un résultat et ne sont pas stockées."
+        },
+        {
+          "type": "bullet",
+          "text": "Finalité : exécuter et sécuriser cette évaluation sur invitation."
+        },
+        {
+          "type": "bullet",
+          "text": "Base légale : à confirmer par revue juridique."
+        },
+        {
+          "type": "bullet",
+          "text": "Destinataires : Cloudflare, Inc., qui peut traiter des données en dehors de votre pays."
+        },
+        {
+          "type": "bullet",
+          "text": "Conservation : l’accès se termine 30 jours après l’appairage, ou lors de la révocation ; les enregistrements sont supprimés 30 jours après la fin de l’évaluation. CRIL peut modifier cette période."
+        },
+        {
+          "type": "bullet",
+          "text": "Vos droits : accès, rectification, effacement, limitation et opposition — contactez CRIL (section 16). UE/EEE/UK : vous pouvez déposer une plainte auprès de votre autorité de protection des données."
+        },
+        {
+          "type": "paragraph",
+          "text": "Politique de confidentialité complète disponible auprès de CRIL sur demande."
+        }
+      ]
+    },
+    {
+      "title": "16. Signaler un problème ou un commentaire",
+      "blocks": [
+        {
+          "type": "paragraph",
+          "text": "Veuillez envoyer vos conclusions à CRIL avec :"
+        },
+        {
+          "type": "bullet",
+          "text": "le modèle de téléphone et la version du système d’exploitation ;"
+        },
+        {
+          "type": "bullet",
+          "text": "la version de l’application (À propos) ;"
+        },
+        {
+          "type": "bullet",
+          "text": "la langue utilisée ;"
+        },
+        {
+          "type": "bullet",
+          "text": "la date et l’heure ;"
+        },
+        {
+          "type": "bullet",
+          "text": "ce que vous avez saisi (valeurs synthétiques uniquement), ce que vous attendiez et ce que vous avez vu ;"
+        },
+        {
+          "type": "bullet",
+          "text": "une capture d’écran, si utile."
+        },
+        {
+          "type": "paragraph",
+          "text": "Les commentaires cliniques sur les règles elles-mêmes appartiennent à la liste de revue et de test."
+        }
+      ]
+    },
+    {
+      "title": "17. Termes utilisés",
+      "blocks": [
+        {
+          "type": "row",
+          "label": "Plateforme ACR",
+          "value": "Signification: Le serveur qui contient le modèle de connaissances médicales et les règles, et qui produit les résultats"
+        },
+        {
+          "type": "row",
+          "label": "Passerelle",
+          "value": "Signification: Le service sécurisé entre l’application et la plateforme ACR"
+        },
+        {
+          "type": "row",
+          "label": "Référence / attestation",
+          "value": "Signification: La vérification que la plateforme est exactement la version approuvée"
+        },
+        {
+          "type": "row",
+          "label": "Niveau",
+          "value": "Signification: Le degré de complétude du cas : 1 ou 2 signifie que le risque est retenu ; 3 est une évaluation complète"
+        },
+        {
+          "type": "row",
+          "label": "Synthétique",
+          "value": "Signification: Données de test inventées, issues d’aucun patient"
+        },
+        {
+          "type": "row",
+          "label": "Amélioration bayésienne",
+          "value": "Signification: Une estimation de probabilité facultative ajoutée au résultat basé sur des règles"
+        }
+      ]
+    }
+  ]
+}

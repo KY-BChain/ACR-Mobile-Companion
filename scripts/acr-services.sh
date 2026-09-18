@@ -1,8 +1,14 @@
 #!/bin/zsh
+#
+#   scripts/acr-services.sh          start T1, T2, then T3 + T4, each after the last is healthy
+#   scripts/acr-services.sh stop     stop them in reverse: T4, T3, then T2 and T1 on your word
+#
+# Claude never starts or stops T1 or T2. The stop action asks you to confirm
+# before it signals them, so closing the platform is always your decision.
 
 REPO_DIR="${0:A:h:h}"
 PLATFORM_DIR="/Users/Kraken/DAPP/ACR-platform/ACR-Ontology-Interface"
-REVIEW_SCRIPT="$REPO_DIR/scripts/build47-review-service.sh"
+REVIEW_SCRIPT="$REPO_DIR/scripts/build48-review-service.sh"
 T1_WAIT=300
 T2_WAIT=120
 T3_WAIT=150
@@ -30,13 +36,67 @@ end run
 APPLESCRIPT
 }
 
+t2_pid() { pgrep -f 'cloudflared tunnel run --url http://localhost:8080 acr-api' | head -1; }
+t1_pid() { listening 8080; }
+
+stop_all() {
+  print -P "%BACR services — stop in reverse: T4 → T3 → T2 → T1%b  ($(date '+%d %b %Y %H:%M'))"
+
+  section "T4 + T3 — mobile app review service"
+  if [[ -n "$(listening 3001)" ]]; then
+    "$REVIEW_SCRIPT" stop || fail "The review service script did not stop cleanly"
+  else
+    ok "T3 and T4 are already stopped"
+  fi
+
+  section "T2 — acr-api tunnel, and T1 — ACR Platform"
+  local tp="$(t2_pid)" ip="$(t1_pid)"
+  if [[ -z "$tp" && -z "$ip" ]]; then
+    ok "T1 and T2 are already stopped"
+    section "All services are stopped"
+    return 0
+  fi
+  [[ -n "$tp" ]] && say "T2 tunnel running (PID $tp)" || say "T2 is already stopped"
+  [[ -n "$ip" ]] && say "T1 platform running on port 8080 (PID $ip)" || say "T1 is already stopped"
+  print -P "%F{yellow}The ACR Platform website loses its back end the moment T2 and T1 stop.%f"
+  if read -q "REPLY?Stop T2 and then T1 now? [y/N] "; then
+    print ""
+  else
+    print ""
+    say "T1 and T2 left running. Stop them with Ctrl+C in their own windows when you are ready."
+    return 0
+  fi
+
+  if [[ -n "$tp" ]]; then
+    kill -INT "$tp" 2>/dev/null
+    for i in $(seq 1 15); do [[ -z "$(t2_pid)" ]] && break; sleep 1; done
+    [[ -z "$(t2_pid)" ]] && ok "T2 stopped" || fail "T2 did not stop — use Ctrl+C in its window"
+  fi
+  if [[ -n "$ip" ]]; then
+    kill -INT "$ip" 2>/dev/null
+    for i in $(seq 1 30); do [[ -z "$(t1_pid)" ]] && break; sleep 2; done
+    [[ -z "$(t1_pid)" ]] && ok "T1 stopped, port 8080 free" || fail "T1 did not stop — use Ctrl+C in its window"
+  fi
+
+  section "All services are stopped"
+  ok "port 3001 free · port 8080 free"
+  say "The Terminal windows stay open; close them when you wish."
+  return 0
+}
+
+case "${1:-start}" in
+  stop) stop_all; exit $? ;;
+  start) ;;
+  *) print "Usage: ${0:t} [start|stop]"; exit 2 ;;
+esac
+
 print -P "%BACR services — T1 → T2 → T3 + T4%b  ($(date '+%d %b %Y %H:%M'))"
 
 section "Checks"
 command -v mvn >/dev/null && ok "Maven found" || fail "Maven (mvn) not found"
 command -v cloudflared >/dev/null && ok "cloudflared found" || fail "cloudflared not found"
 [[ -f "$PLATFORM_DIR/pom.xml" ]] && ok "ACR Platform folder found" || fail "ACR Platform folder not found: $PLATFORM_DIR"
-[[ -x "$REVIEW_SCRIPT" ]] && ok "Build 47 review service script found" || fail "Review service script not found: $REVIEW_SCRIPT"
+[[ -x "$REVIEW_SCRIPT" ]] && ok "Build 48 review service script found" || fail "Review service script not found: $REVIEW_SCRIPT"
 
 section "T1 — ACR Platform (Spring Boot, port 8080)"
 if t1_ready; then
@@ -79,8 +139,8 @@ section "T3 + T4 — mobile app gateway and review tunnel"
 if [[ -n "$(listening 3001)" && "$(code_of https://mobile-gateway-review.acragent.com/m/v1/live)" == 200 ]]; then
   ok "T3 and T4 are already running and healthy — not started again"
 else
-  [[ -n "$(listening 3001)" ]] && fail "Port 3001 is in use but the mobile gateway is not healthy — run: scripts/build47-review-service.sh status"
-  open_window "T3 + T4 · Build 47 review service" "cd '$REPO_DIR' && scripts/build47-review-service.sh start" || fail "Could not open the T3 + T4 Terminal window"
+  [[ -n "$(listening 3001)" ]] && fail "Port 3001 is in use but the mobile gateway is not healthy — run: scripts/build48-review-service.sh status"
+  open_window "T3 + T4 · Build 48 review service" "cd '$REPO_DIR' && scripts/build48-review-service.sh start" || fail "Could not open the T3 + T4 Terminal window"
   ok "T3 + T4 window opened — running the seven service checks"
   waited=0
   until [[ -n "$(listening 3001)" && "$(code_of https://mobile-gateway-review.acragent.com/m/v1/live)" == 200 ]]; do
@@ -91,13 +151,13 @@ else
   ok "T3 + T4 healthy after ${waited}s — https://mobile-gateway-review.acragent.com 200"
 fi
 [[ "$(code_of http://mobile-gateway-review.acragent.com/m/v1/live)" == 403 ]] && ok "Mobile gateway refuses unencrypted HTTP (403)" \
-  || fail "Mobile gateway answers unencrypted HTTP — stop it with: scripts/build47-review-service.sh stop"
+  || fail "Mobile gateway answers unencrypted HTTP — stop it with: scripts/build48-review-service.sh stop"
 
 section "All services are up"
 ok "ACR Platform website back end: https://api.acragent.com"
 ok "ACR Companion mobile app service: https://mobile-gateway-review.acragent.com"
 ok "The MacBook stays awake while the mobile gateway (T3) runs"
 print -P "\n%BTo stop, in this order:%b"
-print "  1. T3 + T4:  cd $REPO_DIR && scripts/build47-review-service.sh stop"
+print "  1. T3 + T4:  cd $REPO_DIR && scripts/build48-review-service.sh stop"
 print "  2. T2:       Ctrl+C in the 'T2 · acr-api tunnel' window"
 print "  3. T1:       Ctrl+C in the 'T1 · ACR Platform' window"

@@ -355,7 +355,7 @@
 				CODE_SIGN_ENTITLEMENTS = ACRCompanion/ACRCompanion.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 47;
+				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_TEAM = X9QB4QT8NH;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -368,7 +368,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.6.6;
+				MARKETING_VERSION = 0.6.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -395,7 +395,7 @@
 				CODE_SIGN_ENTITLEMENTS = ACRCompanion/ACRCompanion.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 47;
+				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_TEAM = X9QB4QT8NH;
 				INFOPLIST_FILE = ACRCompanion/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
@@ -403,7 +403,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.6.6;
+				MARKETING_VERSION = 0.6.7;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

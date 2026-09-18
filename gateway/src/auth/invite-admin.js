@@ -149,6 +149,61 @@ function sessions({ db }, { now = Date.now() } = {}) {
   }));
 }
 
+/**
+ * Delete records that stopped being current more than the retention period ago
+ * (Build 48; the privacy notice promises 30 days). A record is eligible only
+ * once its session or invitation has expired or been revoked for that long, so
+ * a live pairing is never touched. Dry run unless `apply` is true.
+ */
+function purge({ db }, { now = Date.now(), retentionMs = L.RETENTION_MS, apply = false } = {}) {
+  const cutoff = now - retentionMs;
+  const deadSessions = db.prepare(`
+    SELECT id FROM sessions
+     WHERE (revoked_at IS NOT NULL AND revoked_at <= ?) OR expires_at <= ?`).all(cutoff, cutoff).map((r) => r.id);
+  const deadInvitations = db.prepare(`
+    SELECT i.id FROM invitations i
+     WHERE ((i.revoked_at IS NOT NULL AND i.revoked_at <= ?) OR i.expires_at <= ?)
+       AND NOT EXISTS (SELECT 1 FROM sessions s WHERE s.invitation_id = i.id
+                         AND (s.revoked_at IS NULL AND s.expires_at > ?))`).all(cutoff, cutoff, cutoff).map((r) => r.id);
+  const auditRows = db.prepare('SELECT COUNT(*) AS n FROM audit WHERE at <= ?').get(cutoff).n;
+  const rateRows = db.prepare(`
+    SELECT COUNT(*) AS n FROM rate_limits
+     WHERE window_start <= ? AND (blocked_until IS NULL OR blocked_until <= ?)`).get(cutoff, now).n;
+  const counts = {
+    cutoff: new Date(cutoff).toISOString(),
+    sessions: deadSessions.length,
+    invitations: deadInvitations.length,
+    auditRows,
+    rateLimitRows: rateRows,
+    applied: false,
+  };
+  if (!apply) return counts;
+
+  db.exec('BEGIN IMMEDIATE');
+  try {
+    for (const id of deadSessions) {
+      db.prepare('DELETE FROM access_tokens WHERE session_id = ?').run(id);
+      db.prepare('DELETE FROM refresh_tokens WHERE session_id = ?').run(id);
+      db.prepare('DELETE FROM sessions WHERE id = ?').run(id);
+    }
+    for (const id of deadInvitations) {
+      // An invitation is removed only when no session of its own survives.
+      const remaining = db.prepare('SELECT COUNT(*) AS n FROM sessions WHERE invitation_id = ?').get(id).n;
+      if (remaining === 0) db.prepare('DELETE FROM invitations WHERE id = ?').run(id);
+      else counts.invitations -= 1;
+    }
+    db.prepare('DELETE FROM audit WHERE at <= ?').run(cutoff);
+    db.prepare('DELETE FROM rate_limits WHERE window_start <= ? AND (blocked_until IS NULL OR blocked_until <= ?)')
+      .run(cutoff, now);
+    db.exec('COMMIT');
+  } catch (error) {
+    db.exec('ROLLBACK');
+    throw error;
+  }
+  counts.applied = true;
+  return counts;
+}
+
 function arg(name) {
   const index = process.argv.indexOf(name);
   return index === -1 ? null : process.argv[index + 1];
@@ -199,8 +254,21 @@ function main() {
       case 'sessions':
         console.table(sessions(ctx));
         break;
+      case 'purge': {
+        const days = Number(arg('--days') || L.RETENTION_MS / (24 * 60 * 60 * 1000));
+        if (!Number.isFinite(days) || days < 1) throw new Error('--days must be a whole number of days, 1 or more');
+        const apply = process.argv.includes('--confirm');
+        const result = purge(ctx, { retentionMs: days * 24 * 60 * 60 * 1000, apply });
+        console.log(`${apply ? 'Deleted' : 'Would delete'} records that ended before ${result.cutoff} (${days} days):`);
+        console.log(`  invitations:      ${result.invitations}`);
+        console.log(`  sessions:         ${result.sessions}`);
+        console.log(`  audit rows:       ${result.auditRows}`);
+        console.log(`  rate-limit rows:  ${result.rateLimitRows}`);
+        if (!apply) console.log('Nothing was deleted. Add --confirm to apply.');
+        break;
+      }
       default:
-        console.log(`Usage: acr-invite <init|issue|revoke|list|sessions> [--org ${ORGANISATIONS.join('|')}] [--label X] [--issued-by Y] [--reason LOST]`);
+        console.log(`Usage: acr-invite <init|issue|revoke|list|sessions|purge> [--org ${ORGANISATIONS.join('|')}] [--label X] [--issued-by Y] [--reason LOST] [--days 30] [--confirm]`);
         process.exitCode = 1;
     }
   } finally {
@@ -210,4 +278,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { init, issue, revoke, list, sessions, defaultPaths };
+module.exports = { init, issue, revoke, list, sessions, purge, defaultPaths };
