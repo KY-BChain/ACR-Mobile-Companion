@@ -355,7 +355,7 @@
 				CODE_SIGN_ENTITLEMENTS = ACRCompanion/ACRCompanion.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 48;
+				CURRENT_PROJECT_VERSION = 49;
 				DEVELOPMENT_TEAM = X9QB4QT8NH;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -375,7 +375,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.anonymous.acr-mobile-companion";
+				PRODUCT_BUNDLE_IDENTIFIER = com.acragent.companion;
 				PRODUCT_NAME = ACRCompanion;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "ACRCompanion/ACRCompanion-Bridging-Header.h";
@@ -395,7 +395,7 @@
 				CODE_SIGN_ENTITLEMENTS = ACRCompanion/ACRCompanion.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 48;
+				CURRENT_PROJECT_VERSION = 49;
 				DEVELOPMENT_TEAM = X9QB4QT8NH;
 				INFOPLIST_FILE = ACRCompanion/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
@@ -410,7 +410,7 @@
 					"-lc++",
 				);
 				OTHER_SWIFT_FLAGS = "$(inherited) -D EXPO_CONFIGURATION_RELEASE";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.anonymous.acr-mobile-companion";
+				PRODUCT_BUNDLE_IDENTIFIER = com.acragent.companion;
 				PRODUCT_NAME = ACRCompanion;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "ACRCompanion/ACRCompanion-Bridging-Header.h";

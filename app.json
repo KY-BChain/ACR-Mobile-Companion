@@ -15,8 +15,8 @@
       "**/*"
     ],
     "ios": {
-      "bundleIdentifier": "com.anonymous.acr-mobile-companion",
-      "buildNumber": "48",
+      "bundleIdentifier": "com.acragent.companion",
+      "buildNumber": "49",
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -24,7 +24,7 @@
     },
     "android": {
       "package": "com.acragent.companion",
-      "versionCode": 48
+      "versionCode": 49
     }
   }
 }

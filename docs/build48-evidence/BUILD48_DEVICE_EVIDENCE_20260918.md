@@ -1,6 +1,6 @@
 # Build 48 — device evidence
 
-**Version:** v0.6.7 (Build 48) · **Date:** 18 September 2026 · **Branch:** feature/mobile-v0.6.6-build47
+**Version:** v0.6.7 (Build 48) · **Date:** 18 September 2026 · **Branch:** feature/mobile-v0.6.7-build48
 **Scope:** what was built, what was installed, what was tested and what remains open. Synthetic data only; no real patient data at any point.
 
 ---

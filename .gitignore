@@ -68,3 +68,7 @@ docs/archive/build44/mock-api-investigation-v1.0/
 docs/operations/ACR_BACKEND_SECURITY_PLAN*.md
 docs/operations/REFACTORING_BACKLOG.md
 **/*SECURITY_PLAN*.md
+
+# PDFs are a distribution format, exported from the .docx when a document is sent.
+# The .md is the source and the .docx the editable copy; both are tracked.
+*.pdf

@@ -1,0 +1,17 @@
+--- /Users/Kraken/DAPP/ACR-platform/acr-test-website/scripts/language-switcher.js	2026-04-13 17:07:57
++++ language-switcher.js.proposed	2026-09-18 20:54:56
+@@ -4,11 +4,14 @@
+             // Detect which page we're on
+             const isContactPage = window.location.href.includes('ACR-contact.html');
+             const isOwlPage = window.location.href.includes('acr-owl.html');
++            const isPrivacyPage = window.location.href.includes('privacy.html');
+             
+             let translationFile;
+             
+             if (isContactPage) {
+                 translationFile = `lang/contact-${lang}.json`;
++            } else if (isPrivacyPage) {
++                translationFile = `lang/privacy-${lang}.json`;
+             } else if (isOwlPage) {
+                 translationFile = `lang/acr-${lang}.json`;
+             } else {

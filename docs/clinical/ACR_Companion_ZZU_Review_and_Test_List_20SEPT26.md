@@ -1,7 +1,7 @@
-# ACR Companion (version 0.6.6): how the app works — review and test list for ZZU reviewers
+# ACR Companion (version 0.6.7): how the app works — review and test list for ZZU reviewers
 
-**Date:** 17 September 2026
-**Status:** DRAFT, for Kraken (CRIL) to approve before it is sent to Zhengzhou University hospital (ZZU).
+**Date:** 20 September 2026
+**Status:** approved by CRIL for the ZZU review. Not for public distribution.
 **For:** ZZU clinical reviewers and review testers.
 **Test data:** synthetic cases only. Do not enter any real patient's details. The app asks for no name or hospital number, and gives each assessment a random reference instead.
 **Not for clinical use:** the app is an evaluation of decision support. Its results must not be used to treat a patient.
@@ -280,7 +280,7 @@ When Bayesian enhancement is On:
 
 **Answer:**
 - **It is C, with one correction.** The rule is in the platform back end, but in the platform's Java completeness check (C4), not in the SWRL rules or the Openllet reasoner. No SWRL rule reads tumour size.
-- **It is not A.** The app blocks nothing. A blank tumour size is sent as "no value", and Version 0.6.6 only explains the platform's decision and offers the way back to screen 4.
+- **It is not A.** The app blocks nothing. A blank tumour size is sent as "no value", and Version 0.6.7 only explains the platform's decision and offers the way back to screen 4.
 - **It blocks less than the word "BLOCKED" suggests.** The platform still returns the subtype, treatment lines, biomarkers and Bayesian result. It withholds only the **risk**, because tumour size over 20 is part of the risk score (C5).
 - **Where B applies:** treating tumour size as essential is a **clinical judgement** written into that check. Whether a patient who has not yet had imaging should be blocked, or given a preliminary result, is a clinical decision for ZZU (Part F, question F1). Changing it would be a platform change, not an app change.
 
@@ -335,4 +335,4 @@ These questions need your clinical judgement. Our suggested starting point is gi
 
 ---
 
-*Prepared by CRIL from the ACR Companion app version 0.6.6 (build 47) and the ACR Platform as tested on 16 September 2026 (reasoner v2.2, 71 logical / 76 loaded rules). Detailed technical records are held by CRIL.*
+*Prepared by CRIL from the ACR Companion app version 0.6.7 (build 49) and the ACR Platform as tested on 20 September 2026 (reasoner v2.2, 71 logical / 76 loaded rules). Detailed technical records are held by CRIL.*

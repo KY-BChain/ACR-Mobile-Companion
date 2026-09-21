@@ -8,7 +8,7 @@
 
 REPO_DIR="${0:A:h:h}"
 PLATFORM_DIR="/Users/Kraken/DAPP/ACR-platform/ACR-Ontology-Interface"
-REVIEW_SCRIPT="$REPO_DIR/scripts/build48-review-service.sh"
+REVIEW_SCRIPT="$REPO_DIR/scripts/build49-review-service.sh"
 T1_WAIT=300
 T2_WAIT=120
 T3_WAIT=150
@@ -96,7 +96,7 @@ section "Checks"
 command -v mvn >/dev/null && ok "Maven found" || fail "Maven (mvn) not found"
 command -v cloudflared >/dev/null && ok "cloudflared found" || fail "cloudflared not found"
 [[ -f "$PLATFORM_DIR/pom.xml" ]] && ok "ACR Platform folder found" || fail "ACR Platform folder not found: $PLATFORM_DIR"
-[[ -x "$REVIEW_SCRIPT" ]] && ok "Build 48 review service script found" || fail "Review service script not found: $REVIEW_SCRIPT"
+[[ -x "$REVIEW_SCRIPT" ]] && ok "Build 49 review service script found" || fail "Review service script not found: $REVIEW_SCRIPT"
 
 section "T1 — ACR Platform (Spring Boot, port 8080)"
 if t1_ready; then
@@ -139,8 +139,8 @@ section "T3 + T4 — mobile app gateway and review tunnel"
 if [[ -n "$(listening 3001)" && "$(code_of https://mobile-gateway-review.acragent.com/m/v1/live)" == 200 ]]; then
   ok "T3 and T4 are already running and healthy — not started again"
 else
-  [[ -n "$(listening 3001)" ]] && fail "Port 3001 is in use but the mobile gateway is not healthy — run: scripts/build48-review-service.sh status"
-  open_window "T3 + T4 · Build 48 review service" "cd '$REPO_DIR' && scripts/build48-review-service.sh start" || fail "Could not open the T3 + T4 Terminal window"
+  [[ -n "$(listening 3001)" ]] && fail "Port 3001 is in use but the mobile gateway is not healthy — run: scripts/build49-review-service.sh status"
+  open_window "T3 + T4 · Build 49 review service" "cd '$REPO_DIR' && scripts/build49-review-service.sh start" || fail "Could not open the T3 + T4 Terminal window"
   ok "T3 + T4 window opened — running the seven service checks"
   waited=0
   until [[ -n "$(listening 3001)" && "$(code_of https://mobile-gateway-review.acragent.com/m/v1/live)" == 200 ]]; do
@@ -151,13 +151,13 @@ else
   ok "T3 + T4 healthy after ${waited}s — https://mobile-gateway-review.acragent.com 200"
 fi
 [[ "$(code_of http://mobile-gateway-review.acragent.com/m/v1/live)" == 403 ]] && ok "Mobile gateway refuses unencrypted HTTP (403)" \
-  || fail "Mobile gateway answers unencrypted HTTP — stop it with: scripts/build48-review-service.sh stop"
+  || fail "Mobile gateway answers unencrypted HTTP — stop it with: scripts/build49-review-service.sh stop"
 
 section "All services are up"
 ok "ACR Platform website back end: https://api.acragent.com"
 ok "ACR Companion mobile app service: https://mobile-gateway-review.acragent.com"
 ok "The MacBook stays awake while the mobile gateway (T3) runs"
 print -P "\n%BTo stop, in this order:%b"
-print "  1. T3 + T4:  cd $REPO_DIR && scripts/build48-review-service.sh stop"
+print "  1. T3 + T4:  cd $REPO_DIR && scripts/build49-review-service.sh stop"
 print "  2. T2:       Ctrl+C in the 'T2 · acr-api tunnel' window"
 print "  3. T1:       Ctrl+C in the 'T1 · ACR Platform' window"

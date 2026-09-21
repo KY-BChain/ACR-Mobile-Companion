@@ -27,7 +27,7 @@
 > - Marker and DCIS red-flag rules appear only under Technical details.
 > - R17a/R17b are applied without the T2 condition.
 >
-> The reviewer-facing account and test list for ZZU is `ACR_Companion_ZZU_Review_and_Test_List_17SEPT26.md`.
+> The reviewer-facing account and test list for ZZU is `ACR_Companion_ZZU_Review_and_Test_List_20SEPT26.md`.
 
 ---
 

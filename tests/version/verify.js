@@ -6,7 +6,7 @@ const root = path.resolve(__dirname, '../..');
 const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 const appConfig = JSON.parse(read('app.json'));
 const expectedVersion = '0.6.7';
-const expectedBuild = '48';
+const expectedBuild = '49';
 
 assert.equal(appConfig.expo.name, 'ACR Companion');
 assert.equal(appConfig.expo.version, expectedVersion);
