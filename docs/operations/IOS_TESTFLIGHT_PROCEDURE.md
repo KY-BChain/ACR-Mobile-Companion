@@ -1,11 +1,16 @@
 # ACR Companion for iOS — TestFlight procedure (private distribution)
 
 **Applies to:** v0.6.7 · Apple Developer Program team **X9QB4QT8NH** ("Kraken YU") · Xcode 26.3
-**Written:** 18 September 2026 · **Updated:** 19 September 2026
-**Status:** D-1 and D-2 decided; **Phase B complete** — v0.6.7 (Build 49), `com.acragent.companion`,
-client identity `mob-v0.6.7+49`, all suites green. Phase A **A1 to A4 complete and verified**;
-provisioning profiles now run twelve months, not seven days. No build has been uploaded to Apple.
-The next step is **A5, the distribution certificate**.
+**Written:** 18 September 2026 · **Updated:** 28 September 2026
+**Status:** **Phases A, B and C complete.** v0.6.7 (Build 49), `com.acragent.companion`, client
+identity `mob-v0.6.7+49`, uploaded 20 September 2026 and processed by Apple. Internal testing is
+proved end to end: the build installed on Kraken's iPhone 13 through TestFlight in the `CRIL` group,
+paired with a fresh invite code and ran as designed. **The build stops opening around 19 December
+2026** (90 days from upload). The live work is now **Phase E — inviting reviewers**.
+
+**Identifiers in this document:** phase steps are `A1…`, `B1…`, `C1…`, `D1…`, `E1…`, `F1…`. The three
+decisions are `DEC-1`, `DEC-2`, `DEC-3`. They were `D-1`, `D-2`, `D-3`, which was too close to the
+Phase D steps; renamed 28 September 2026. There is no other numbering anywhere in this procedure.
 
 ---
 
@@ -43,7 +48,7 @@ signed artefact for everyone, recorded by Apple.
 
 ## 2. The decisions
 
-### D-1 — the bundle identifier — **decided, 18 September 2026: `com.acragent.companion`**
+### DEC-1 — the bundle identifier — **decided, 18 September 2026: `com.acragent.companion`**
 
 The app carried `com.anonymous.acr-mobile-companion`, the placeholder Expo writes when no identifier
 is chosen. **A bundle identifier is permanent**: once a build is uploaded, Apple ties it to the app
@@ -57,7 +62,7 @@ controls; the two stores are separate namespaces, so there is no conflict. It is
 has now and redeem a fresh invite code. iOS refuses to install over an app signed by a different
 profile, so the current development build has to go, and with it the stored session.
 
-### D-2 — internal or external testers — **decided: internal first, external after**
+### DEC-2 — internal or external testers — **decided: internal first, external after**
 
 | | Internal | External |
 |---|---|---|
@@ -71,7 +76,7 @@ within the hour without Apple review and without a privacy policy URL. External 
 **private group with the public link switched off**, for the ZZU, UCD and HKU reviewers — they should
 not hold accounts on the developer team.
 
-### D-3 — the name shown to testers
+### DEC-3 — the name shown to testers
 
 The name in App Store Connect must be **unique across the entire App Store**, even for an app that is
 never published. "ACR Companion" may already be taken. Fallback: **"ACR Companion (CRIL)"**. Only
@@ -107,7 +112,7 @@ Once it is right, provisioning profiles last **12 months**, and the 25 September
 
 **A4 — register the App ID.**
 developer.apple.com → Certificates, Identifiers & Profiles → **Identifiers** → **+** → App IDs → App →
-**Explicit**. Description `ACR Companion`. Bundle ID: the identifier chosen in D-1. **Enable no
+**Explicit**. Description `ACR Companion`. Bundle ID: the identifier chosen in DEC-1. **Enable no
 capabilities** — the app's entitlements file is empty and must stay that way; every capability added
 here is something Apple will ask about later.
 
@@ -144,8 +149,8 @@ chmod 600 ~/.acr-signing/appstore-connect.env
 in a report.**
 
 **A7 — create the app record.**
-App Store Connect → **Apps** → **+** → New App. Platform **iOS**; name from D-3; primary language
-**English (UK)**; bundle ID from D-1 (it appears in the list once A4 is done); SKU
+App Store Connect → **Apps** → **+** → New App. Platform **iOS**; name from DEC-3; primary language
+**English (UK)**; bundle ID from DEC-1 (it appears in the list once A4 is done); SKU
 `ACR-COMPANION-001` (internal only, never shown); user access **Full Access**.
 
 ---
@@ -156,7 +161,7 @@ Done on a branch, reviewed by Kraken, committed as one change. Kraken pushes.
 
 | | Change | Why |
 |---|---|---|
-| B1 | **Done, 18 Sept.** Bundle identifier `com.acragent.companion` in `app.json`, `project.pbxproj` and the `Info.plist` URL scheme | D-1; `scripts/ios-testflight.sh preflight` refuses to build while the placeholder is there |
+| B1 | **Done, 18 Sept.** Bundle identifier `com.acragent.companion` in `app.json`, `project.pbxproj` and the `Info.plist` URL scheme | DEC-1; `scripts/ios-testflight.sh preflight` refuses to build while the placeholder is there |
 | B2 | Build number **48 → 49**, version stays **0.6.7** | Apple refuses a repeated build number for ever, even for a build that was rejected. Build 49 is also the rebuild already planned for the profile expiry |
 | B3 | Gateway: `ACR_EXPECTED_CLIENT_BUILD_ID=mob-v0.6.7+49`, `ACR_PREVIOUS_CLIENT_BUILD_IDS=mob-v0.6.7+48` | the Samsung and the Xiaomi keep working on Build 48 while iOS moves to 49 |
 | B4 | `scripts/build48-review-service.sh` → `build49-review-service.sh`, and the call in `scripts/acr-services.sh` | the rename was missed at Build 48 and stopped T3/T4 starting |
@@ -206,23 +211,23 @@ arrives by e-mail to the Apple ID.
 
 ## 6. Phase D — App Store Connect, once the build has processed (Kraken)
 
-**D1 — export compliance.** Because the app declares `ITSAppUsesNonExemptEncryption = false`, the
-build should pass straight through. If asked: the app uses only standard HTTPS/TLS provided by iOS
-and holds no proprietary cryptography, so it is exempt.
+**D1 — export compliance. Done, 20 September 2026.** Because the app declares
+`ITSAppUsesNonExemptEncryption = false`, the build passed straight through. If ever asked: the app
+uses only standard HTTPS/TLS provided by iOS and holds no proprietary cryptography, so it is exempt.
 
-**D2 — internal testing first.** TestFlight → the build → **Internal Testing** → add Kraken's own
-Apple ID. Install on the iPhone 13 and confirm: the app launches, the gateway pairs with a fresh
-invite code, the poster and the notice rotate, the manual opens in all eight languages, and the
-service banner behaves when T3 is stopped. **Do not proceed to external testers until this passes.**
+**D2 — internal testing first. Done, 20–21 September 2026.** Build 49 was added to the `CRIL`
+internal group with Kraken's own Apple ID, installed on the iPhone 13 through TestFlight, paired with
+a fresh invite code and ran as designed.
 
 **D3 — test information** (external testing only, and required before it can start):
 
 - Feedback e-mail: `info@acragent.com`
 - Marketing URL: `https://www.acragent.com`
-- **Privacy policy URL — this does not exist yet.** Apple requires one for external testing. Section
-  15 of the reviewer manual is already the right text; it needs to be put on a page at
-  `www.acragent.com`. **This is a blocker for external testing and nothing else in this procedure
-  resolves it.**
+- **Privacy policy URL — written, not yet published.** `privacy.html` exists, with
+  `terms.html`, `ethics.html` and `accessibility.html`, in the `acr-test-website` working copy, and
+  the four links at the foot of the home page point at them. **They are not on the live site**, so
+  the URL `https://www.acragent.com/privacy.html` does not resolve yet. Until that FTP publication
+  happens, external testing cannot be started. Internal testing is unaffected.
 
 **D4 — "What to test", draft:**
 
@@ -245,36 +250,94 @@ service banner behaves when T3 is stopped. **Do not proceed to external testers 
 > The backend is a restricted research service. If the app reports that the service is unavailable,
 > please contact info@acragent.com and we will confirm the service window.
 
-**D6 — the tester group.** TestFlight → **Groups** → **+** → `CRIL invited reviewers`. **Leave the
-public link switched off.** A public link would make the build available to anyone holding the URL,
+**D6 — the tester group. Done, 20 September 2026.** The internal group is named `CRIL`. **The public
+link stays switched off.** A public link would make the build available to anyone holding the URL,
 which is exactly what must not happen.
 
 ---
 
 ## 7. Phase E — inviting one reviewer
 
-1. **Kraken** adds the reviewer's e-mail to the `CRIL invited reviewers` group. Only names on the
-   approved list; ZZU, UCD and HKU reviewers are added only after Kraken's own approval.
-2. **The reviewer** installs Apple's **TestFlight** app (iOS 14 or later), accepts the e-mail
-   invitation, and installs ACR Companion from it. **If they already have a cabled development build,
-   they delete it first** — iOS will not install over a differently signed copy.
-3. **Kraken** asks for an invite code. **Claude** runs, with the gateway up:
-   ```zsh
-   cd /Users/Kraken/DAPP/acr-mobile-companion/gateway
-   ACR_AUTH_STORE_PATH=$HOME/.acr-gateway/gate10/auth.db \
-   ACR_AUTH_PEPPER_PATH=$HOME/.acr-gateway/gate10/pepper.bin \
-     node src/auth/invite-admin.js issue --org ZZU --label "reviewer-3" --issued-by Kraken
-   ```
+**Route in force today: internal testing.** External testing is blocked until the privacy page is
+published (D3). An internal tester must hold a user account on the Apple team — that is Apple's rule,
+not a choice — so every reviewer invited this way sees the ACR Companion app record in App Store
+Connect. Limits: **100 internal testers per app, 30 devices each.** No Apple review, so a reviewer can
+be running the app within minutes.
 
-   > **Both environment variables are required.** Without them the tool falls back to the Build 45
-   > paths (`~/.acr-gateway/build45-*`), where an empty database still sits. It would issue a
-   > perfectly valid-looking code that the live gateway then rejects, with nothing to say why.
-   Organisations: `ZZU`, `UCD`, `HKU`, `CRIL`, `TEST`. The code is shown **once**, is stored nowhere,
-   and is never written to a file, a report or a commit.
-4. **Kraken** delivers the code through the agreed private channel — not by e-mail alongside the
-   TestFlight invitation.
-5. **The reviewer** enters it within **7 days**. The session then lasts **30 days** and is bound to
-   that one device. A second device needs a second code.
+Everything in E2 to E4 happens at **[appstoreconnect.apple.com](https://appstoreconnect.apple.com)**,
+signed in as Kraken. Apple moves these labels from time to time; the names below are what they read
+in September 2026.
+
+**E1 — collect two things from the reviewer, in writing.** Their **full name**, and the **e-mail
+address of their Apple Account**. It must be the address their Apple Account already uses, or one
+they are willing to create an Apple Account with — an invitation sent to any other address cannot be
+accepted. Nothing else about them is needed. Record the person in the private reviewer list outside
+this repository; **no reviewer name, e-mail or hospital ever goes into the repository.**
+
+**E2 — invite them onto the team.**
+**Users and Access** (top of the page) → the **Users** tab → the **+** button.
+
+- **First name**, **Last name**, **Email** — exactly as given in E1.
+- **Role: Customer Support.** This is the lightest role Apple allows for a TestFlight tester. Do not
+  choose Admin, App Manager or Developer for a reviewer.
+- **Apps: Selected Apps only → tick ACR Companion.** Never "All Apps".
+- Leave **Access to Certificates, Identifiers & Profiles** and any cloud signing option **unticked**.
+- **Invite.**
+
+The reviewer receives an e-mail from Apple and must accept it and sign in before they can be added as
+a tester. Until they do, they appear as **Pending** on the Users tab. If the invitation lapses, use
+the same page to send it again.
+
+**E3 — add them to the tester group.**
+**Apps** → **ACR Companion** → the **TestFlight** tab → under **Internal Testing** in the left
+sidebar, the **`CRIL`** group → **Testers** → **+** → tick the reviewer → **Add**.
+
+**E4 — make sure a build is attached to the group.** In the same group, **Builds** should list
+**0.6.7 (49)**. If it does not, **+** → select it. Apple e-mails the tester as soon as a build is
+attached.
+
+**E5 — the reviewer installs the app.** They install Apple's **TestFlight** app from the App Store
+(iOS 14 or later), open Apple's e-mail on the iPhone, tap **View in TestFlight**, then **Install**.
+**If they still have a cabled development build of ACR Companion, they delete it first** — iOS
+refuses to install over a copy signed with a different profile, and the old stored session goes with
+it.
+
+**E6 — issue the gateway invite code.** This has nothing to do with Apple. With T1 to T4 running,
+**Claude** runs, on Kraken's request:
+
+```zsh
+cd /Users/Kraken/DAPP/acr-mobile-companion/gateway
+ACR_AUTH_STORE_PATH=$HOME/.acr-gateway/gate10/auth.db \
+ACR_AUTH_PEPPER_PATH=$HOME/.acr-gateway/gate10/pepper.bin \
+  node src/auth/invite-admin.js issue --org ZZU --label reviewer-03 --issued-by Kraken
+```
+
+> **Both environment variables are required.** Without them the tool falls back to the Build 45
+> paths (`~/.acr-gateway/build45-*`), where an empty database still sits. It would issue a
+> perfectly valid-looking code that the live gateway then rejects, with nothing to say why.
+
+`--org` must be one of `ZZU`, `UCD`, `HKU`, `CRIL`, `TEST`. `--label` takes letters, digits, `-` and
+`_` only, up to 64 characters: use a number, never a person's name. The code is printed **once**, is
+stored nowhere, and is never written to a file, a report or a commit. Losing it costs nothing — issue
+another.
+
+**E7 — deliver the code and confirm.** Kraken sends the code through the agreed private channel, not
+in the same e-mail as the TestFlight invitation. The reviewer enters it within **7 days**; the
+session then lasts **30 days** and is bound to that one device. A second device, or the WeChat
+mini-program, needs its own code. In App Store Connect the tester's status moves to **Installed** once
+they open the build, which is the only confirmation Apple gives.
+
+### When the privacy page is live — the external route
+
+Once `https://www.acragent.com/privacy.html` resolves, ZZU, UCD and HKU reviewers should be moved to
+**external** testing, as DEC-2 decided: they are then invited **by e-mail address alone**, hold no
+account on the Apple team, and see nothing but the app. The differences from E1 to E7:
+
+- Fill in **D3** test information and **D5** review notes first, then submit the build for **Beta App
+  Review** — 24 to 48 hours, once per version, not per build.
+- Create the group under **External Testing**, not Internal, and **leave the public link off**.
+- E2 disappears: there is no Users and Access step, no role and no team membership.
+- E5, E6 and E7 are unchanged.
 
 ---
 
@@ -320,9 +383,10 @@ which is exactly what must not happen.
 
 | Risk | Likelihood | What it would look like | Mitigation |
 |---|---|---|---|
-| Beta App Review queries the clinical nature of the app (App Store guidelines 1.4.1, 5.1.1) | moderate | Rejection asking for regulatory documentation or a claim to be removed | The D5 wording is written for this. If it is still queried: keep the evaluation on **internal** testers, where no review takes place |
+| Beta App Review queries the clinical nature of the app (App Store guidelines 1.4.1, 5.1.1) — external route only | moderate | Rejection asking for regulatory documentation or a claim to be removed | The D5 wording is written for this. If it is still queried: keep the evaluation on **internal** testers, where no review takes place |
 | The backend is down when Apple's reviewer opens the app | **high, if not planned for** | Rejection for "unable to sign in" or a non-functional app | Keep T1–T4 up for the whole review window, and say so in the review notes |
-| No privacy policy URL | certain, today | External testing cannot be started at all | Publish manual section 15 at `www.acragent.com` (§6, D3) |
-| Bundle identifier regretted later | low | Cannot be changed; a new app record and every tester re-invited | Take D-1 deliberately, now |
+| Privacy policy URL not yet published | certain, today | External testing cannot be started at all | The pages are written in the `acr-test-website` working copy; publish them to `www.acragent.com` by FTP (§6, D3) |
+| Internal reviewer sees the app record in App Store Connect | certain, on the internal route | A ZZU reviewer holds a Customer Support account on the team | Least-privilege role and app-scoped access (E2); move reviewers to external testing once the privacy page is live |
+| Bundle identifier regretted later | low | Cannot be changed; a new app record and every tester re-invited | Take DEC-1 deliberately, now |
 | Distribution certificate or `.p8` lost | low | No upload possible until replaced; the `.p8` cannot be re-downloaded | Back both up to `~/.acr-signing` on the day they are created |
-| Build expiry passes unnoticed | moderate | Reviewers locked out silently at 90 days | Diary the date when the first build is accepted |
+| Build expiry passes unnoticed | moderate | Reviewers locked out silently at 90 days — Build 49 stops opening around **19 December 2026** | Diary that date now; upload a fresh build before it (§10) |
