@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../ACR-platform"
+		},
+		{
+			"path": "../BE-website"
+		}
+	],
+	"settings": {
+		"java.compile.nullAnalysis.mode": "disabled"
+	}
+}

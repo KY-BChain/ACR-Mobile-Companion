@@ -16,7 +16,7 @@ const { openAuthDatabase } = require('../src/auth/db');
 const { purge, revoke, sessions } = require('../src/auth/invite-admin');
 const L = require('../src/auth/lifetimes');
 
-const BUILD = 'mob-v0.6.7+49';
+const BUILD = 'mob-v0.6.7+50';
 const DAY = 24 * 60 * 60 * 1000;
 
 let fixture;

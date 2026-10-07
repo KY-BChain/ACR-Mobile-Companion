@@ -69,7 +69,7 @@ assert.equal(sample.matchesDemoCase(sample.SAMPLE_FORM, sample.DEMO_P1, sample.D
 assert.equal(sample.matchesDemoCase(sample.SAMPLE_FORM, sample.DEMO_P1, { ...sample.DEMO_P2, lvef: '61' }), false);
 assert.equal(sample.matchesDemoCase({ ...sample.SAMPLE_FORM, step1: { ...sample.SAMPLE_FORM.step1, ki67: '26' } }, sample.DEMO_P1, sample.DEMO_P2), false);
 const requestBuilder = compile('src/api/requestBuilder.ts', {
-  '../config/appIdentity': { MOBILE_BUILD_ID: 'mob-v0.6.7+49' },
+  '../config/appIdentity': { MOBILE_BUILD_ID: 'mob-v0.6.7+50' },
   '../utils/provisionalValidation': compile('src/utils/provisionalValidation.ts'),
 });
 const demoRequest = requestBuilder.buildAssessmentRequest({
@@ -193,9 +193,12 @@ assert.match(gradle, /throw new GradleException\("Release signing properties not
 assert.match(gradle, /include 'arm64-v8a', 'armeabi-v7a'/);
 assert.match(gradle, /universalApk true/);
 assert.doesNotMatch(gradle, /storePassword '(?!android')/, 'no release password in the repository');
-const script = read('scripts/build49-review-service.sh');
+const script = read('scripts/build50-review-service.sh');
 assert.match(script, new RegExp(`CLIENT_BUILD_ID="mob-v${app.version.replace(/\./g, '\\.')}\\+${app.ios.buildNumber}"`));
-assert.match(script, /PREVIOUS_CLIENT_BUILD_IDS="\$\{ACR_PREVIOUS_CLIENT_BUILD_IDS-mob-v0\.6\.7\+48\}"/);
+// Build 50 keeps BOTH earlier builds in the list: the Android APK published for
+// download is Build 49, and Build 48 is still on a phone. Existing sessions on
+// either stay valid; only the current build can redeem a new invitation.
+assert.match(script, /PREVIOUS_CLIENT_BUILD_IDS="\$\{ACR_PREVIOUS_CLIENT_BUILD_IDS-mob-v0\.6\.7\+49,mob-v0\.6\.7\+48\}"/);
 assert.match(script, /fixtures\/demo-\$CLIENT_BUILD_ID/);
-console.log('STATIC PASS Android app ID com.acragent.companion, fail-closed release signing, arm64/armv7 split with universal APK, Build 49 service identity');
+console.log('STATIC PASS Android app ID com.acragent.companion, fail-closed release signing, arm64/armv7 split with universal APK, Build 50 service identity');
 console.log('PASS Build 47 completeness, demonstration and release-identity verifier');

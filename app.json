@@ -16,7 +16,7 @@
     ],
     "ios": {
       "bundleIdentifier": "com.acragent.companion",
-      "buildNumber": "49",
+      "buildNumber": "50",
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -24,7 +24,7 @@
     },
     "android": {
       "package": "com.acragent.companion",
-      "versionCode": 49
+      "versionCode": 50
     }
   }
 }
