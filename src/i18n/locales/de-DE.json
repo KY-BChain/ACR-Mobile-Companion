@@ -30,7 +30,9 @@
     "emDash": "—",
     "negative": "negativ",
     "positive": "positiv",
-    "retryCheck": "Erneut versuchen"
+    "retryCheck": "Erneut versuchen",
+    "showCode": "Code anzeigen",
+    "hideCode": "Code verbergen"
   },
   "welcome": {
     "title": "Bevor Sie beginnen",

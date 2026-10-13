@@ -58,11 +58,14 @@ export const WelcomeScreen: React.FC = () => {
         return undefined;
       }
 
+      // Build 51 (Kraken, 11 Oct 2026): held for five seconds, not three.
+      // Three was not long enough to read the welcome screen, which is the
+      // first thing a reviewer sees after pairing.
       const posterTimer = setTimeout(() => {
         if (navigation.isFocused()) {
           navigation.replace('Poster');
         }
-      }, 3000);
+      }, 5000);
 
       return () => clearTimeout(posterTimer);
     }, [langModalVisible, navigation, pairingNotice]),

@@ -1,0 +1,136 @@
+# ACR Companion for iPhone — how to get it
+
+## What you will receive, and from whom
+
+**Two separate e-mails, both from Apple.** They arrive at different times and look similar, which
+catches people out.
+
+**The first** invites you to join Cornerstone Research International's developer team. The subject
+line mentions **App Store Connect**. You must accept this one before the second can arrive.
+
+**The second** invites you to test the app itself. It comes from **TestFlight**, Apple's app for
+trying software before public release.
+
+Both go to the e-mail address of your **Apple Account** — the address you use for the App Store. If
+you gave us a different address, tell us, or the invitations cannot be accepted.
+
+---
+
+## Step 1 — accept the first e-mail
+
+Open it on any device. Click **Activate** or **Accept**, and sign in with your Apple Account.
+
+If it asks you to create an App Store Connect profile, do so — it takes a minute and costs nothing.
+
+## Step 2 — install TestFlight on your iPhone
+
+Open the **App Store** and search for **TestFlight**. It is free, made by Apple. Install it.
+
+Do this before the second e-mail arrives and the rest is quicker.
+
+## Step 3 — accept the second e-mail, on the iPhone
+
+Open the TestFlight e-mail **on the iPhone itself**, not on a computer. Tap **View in TestFlight**.
+
+TestFlight opens and shows **ACR Companion**. Tap **Install**.
+
+## Step 4 — open the app
+
+It appears on your home screen like any other app. Open it.
+
+---
+
+## What you will see
+
+The app opens on a poster screen. **READ DETAILS** there opens a short manual, available in eight
+languages.
+
+Then:
+
+1. A notice headed **Before you begin**. Tap **I understand — Begin**.
+2. A screen called **Evaluation access**. Set the selector to **Synthetic demonstration**.
+3. Five screens of clinical questions — receptor status, tumour characteristics, biomarkers, and two
+   provisional assessments. Twenty questions in all. Tap **Next** on each.
+4. A **Review** screen listing everything you entered. Tap **Submit**.
+
+**You need no password, no code and no internet connection for any of this.** Go through it as many
+times as you like.
+
+The app will tell you, at the end, that no result can be returned. **That is expected** — see below.
+
+---
+
+## If you want to see an actual result
+
+The twenty questions are only the input. The answer is produced by **our research service**, which
+applies several hundred clinical rules to what you entered and returns an assessment with an
+explanation of how it reached it. The app on your phone deliberately holds none of that.
+
+To see it working, you need two things from us: a short **access code**, and the service switched on
+at an agreed time. **Just ask** and we will arrange a slot — it takes a few minutes.
+
+Without the code, the app is a complete guided walk-through of the assessment. With it, you see the
+reasoning as a clinician would.
+
+---
+
+## Please note
+
+This is a **research prototype under evaluation**. It is **not a medical device**, it makes no
+diagnostic claim, and it must not be used in the care of any patient. Every screen says so.
+
+**Never enter real patient information.** The questions are there to be answered with the example
+data in the manual.
+
+Anything you tell us about the app is welcome — in TestFlight you can shake the phone to send
+feedback with a screenshot.
+
+---
+
+## If something does not work
+
+| | |
+|---|---|
+| No e-mail arrived | check spam, and confirm with us which address your Apple Account uses |
+| Second e-mail won't open | open it **on the iPhone**, not a computer |
+| TestFlight says the invitation expired | tell us and we will send it again |
+| App will not install | make sure iOS is version 14 or later |
+
+Contact: **info@acragent.com**
+
+---
+
+# Appendix — what ACR is, and the other versions
+
+The **ACR platform** assesses a cancer diagnosis from twenty clinical answers. A formal ontology of
+several hundred clinical rules does the reasoning, AI agents explain how it reached its conclusion,
+and an optional Bayesian layer adds probabilities and uncertainty bounds. **ACR Companion** is the
+mobile companion to that platform — the same five screens and twenty fields, on a phone. Breast
+cancer is implemented today; a prostate cancer ontology is being added as of October 2026. The
+project's website is **www.acragent.com**.
+
+## Getting the app
+
+One address covers all of it: **www.acragent.com**. Sign in there and the download options appear —
+you will not see them until you do. Then choose the version you need.
+
+| | |
+|---|---|
+| **iPhone** | You are already being invited. The four steps on the previous pages are all you need |
+| **Android** | Choose Android after signing in. We send you a download code to use on that page |
+| **WeChat mini-program** | Also available, for use inside China. Just ask |
+
+## Seeing a real result
+
+Walking through the app needs nothing from us — no code, no account, no network.
+
+To see the engine actually working, **just ask**. We send you an **invite code** and switch the
+service on at an agreed time.
+
+## Why there are so many steps
+
+Our apologies. The platform handles clinical data, and EU healthcare data protection — **GDPR**
+above all — governs who may be given access and how that is recorded. Apple's review rules add a
+further layer for the iPhone. None of it is caution for its own sake.
+
+Contact: **info@acragent.com**

@@ -39,6 +39,33 @@ APPLESCRIPT
 t2_pid() { pgrep -f 'cloudflared tunnel run --url http://localhost:8080 acr-api' | head -1; }
 t1_pid() { listening 8080; }
 
+# Hold the Mac awake for as long as a given process lives.
+#
+#   -i  no idle system sleep        -m  no disk idle sleep
+#   -s  no system sleep on AC power
+#
+# Deliberately NO -d: that would also keep the SCREEN on, and this machine runs
+# for days at a time. The display is left free to sleep, which is what
+# PreventUserIdleDisplaySleep 0 in `pmset -g assertions` confirms.
+#
+# -w ties the assertion to that PID, so it releases itself when the service
+# stops and never outlives what it was protecting.
+#
+# WHY HERE AS WELL AS IN THE REVIEW SCRIPT. build50-review-service.sh already
+# does this for the gateway (T3). That left a gap: stopping T3 while T1 and T2
+# kept running released the only assertion, the Mac could then sleep, and the
+# website's back end would go down with it. This one is tied to T1.
+keep_awake() {
+  local pid="$1" label="$2"
+  [[ -z "$pid" ]] && return 0
+  if pgrep -f "caffeinate -ims -w $pid" >/dev/null 2>&1; then
+    ok "Mac already held awake for $label"
+    return 0
+  fi
+  caffeinate -ims -w "$pid" >/dev/null 2>&1 &
+  ok "Mac held awake while $label runs — the screen may still sleep"
+}
+
 stop_all() {
   print -P "%BACR services — stop in reverse: T4 → T3 → T2 → T1%b  ($(date '+%d %b %Y %H:%M'))"
 
@@ -113,6 +140,7 @@ else
   done
   ok "T1 healthy after ${waited}s — health, status and manifest all 200"
 fi
+keep_awake "$(t1_pid)" "T1"
 
 section "T2 — acr-api tunnel (api.acragent.com)"
 if [[ -n "$(pgrep -f 'cloudflared tunnel run --url http://localhost:8080 acr-api')" && "$(code_of https://api.acragent.com/api/infer/health)" == 200 ]]; then
@@ -156,7 +184,10 @@ fi
 section "All services are up"
 ok "ACR Platform website back end: https://api.acragent.com"
 ok "ACR Companion mobile app service: https://mobile-gateway-review.acragent.com"
-ok "The MacBook stays awake while the mobile gateway (T3) runs"
+ok "The MacBook stays awake while T1 and the mobile gateway (T3) run"
+say "The screen is still free to sleep — only the machine is held awake."
+say "Keep it on mains power: the -s assertion does not apply on battery, and a"
+say "closed lid sleeps the Mac whatever caffeinate says."
 print -P "\n%BTo stop, in this order:%b"
 print "  1. T3 + T4:  cd $REPO_DIR && scripts/build50-review-service.sh stop"
 print "  2. T2:       Ctrl+C in the 'T2 · acr-api tunnel' window"

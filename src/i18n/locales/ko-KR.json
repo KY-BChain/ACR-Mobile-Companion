@@ -30,7 +30,9 @@
     "emDash": "—",
     "negative": "음성",
     "positive": "양성",
-    "retryCheck": "다시 시도"
+    "retryCheck": "다시 시도",
+    "showCode": "코드 표시",
+    "hideCode": "코드 숨기기"
   },
   "welcome": {
     "title": "시작하기 전에",

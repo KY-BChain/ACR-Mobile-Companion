@@ -30,7 +30,9 @@
     "emDash": "—",
     "negative": "阴性",
     "positive": "阳性",
-    "retryCheck": "重试检查"
+    "retryCheck": "重试检查",
+    "showCode": "显示邀请码",
+    "hideCode": "隐藏邀请码"
   },
   "welcome": {
     "title": "开始前",

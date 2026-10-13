@@ -30,7 +30,9 @@
     "emDash": "—",
     "negative": "陰性",
     "positive": "陽性",
-    "retryCheck": "再試行"
+    "retryCheck": "再試行",
+    "showCode": "コードを表示",
+    "hideCode": "コードを非表示"
   },
   "welcome": {
     "title": "開始する前に",

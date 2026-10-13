@@ -10,7 +10,9 @@
  * organisation to the operator and in the admin listings. The gateway stores
  * the tag and a label only — never a name or an email address.
  */
-const ORGANISATIONS = Object.freeze(['ZZU', 'UCD', 'HKU', 'CRIL','TEST']);
+// HKG added 12 Oct 2026 for the Hong Kong reviewers. Kept in step with
+// acr-test-website/api/mobile-codes.php and tools/make-download-code.php.
+const ORGANISATIONS = Object.freeze(['ZZU', 'UCD', 'HKU', 'CRIL', 'HKG', 'TEST']);
 
 const ORG_PATTERN = /^[A-Z]{2,6}$/;
 

@@ -1,4 +1,4 @@
-import React, { useId } from 'react';
+import React, { useId, useState } from 'react';
 import { InputAccessoryView, Keyboard, Platform, Pressable, TextInput, Text, View, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ACRColors, ACRTypography } from '../theme/colors';
@@ -13,6 +13,12 @@ interface Props {
   hint?: string;
   readOnly?: boolean;
   secureTextEntry?: boolean;
+  /**
+   * Build 51 (Kraken, 11 Oct 2026): offer an eye to reveal a masked value.
+   * Asked for on the invite code, which reviewers type from an e-mail and
+   * previously had no way of checking before tapping Connect.
+   */
+  revealable?: boolean;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   /** Accessible name for the field. Falls back to the placeholder or hint. */
   accessibilityLabel?: string;
@@ -27,9 +33,14 @@ export const ACRInput: React.FC<Props> = ({
   hint,
   readOnly = false,
   secureTextEntry = false,
+  revealable = false,
   autoCapitalize = 'sentences',
   accessibilityLabel,
 }) => {
+  const [revealed, setRevealed] = useState(false);
+  // Only a masked field has anything to reveal.
+  const canReveal = revealable && secureTextEntry;
+  const masked = secureTextEntry && !revealed;
   const { t, i18n } = useTranslation();
   const language = i18n.resolvedLanguage ?? i18n.language;
   const direction = getLocaleDirection(language);
@@ -41,17 +52,18 @@ export const ACRInput: React.FC<Props> = ({
   const needsDoneBar = Platform.OS === 'ios' && keyboardType !== 'default' && editable && !readOnly;
   return (
     <View style={{ direction }}>
+      <View style={canReveal ? styles.row : undefined}>
       <TextInput
         accessibilityLabel={accessibilityLabel ?? placeholder ?? hint}
         accessibilityHint={hint}
         accessibilityState={{ disabled: !(editable && !readOnly) }}
-        style={[styles.input, { direction, textAlign }, readOnly && styles.readOnly]}
+        style={[styles.input, { direction, textAlign }, readOnly && styles.readOnly, canReveal && styles.inputInRow]}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         keyboardType={keyboardType}
         editable={editable && !readOnly}
-        secureTextEntry={secureTextEntry}
+        secureTextEntry={masked}
         autoCapitalize={autoCapitalize}
         autoCorrect={false}
         placeholderTextColor={ACRColors.muted}
@@ -60,6 +72,16 @@ export const ACRInput: React.FC<Props> = ({
         onSubmitEditing={() => Keyboard.dismiss()}
         inputAccessoryViewID={needsDoneBar ? accessoryId : undefined}
       />
+      {canReveal ? <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t(revealed ? 'common:hideCode' : 'common:showCode')}
+        accessibilityState={{ selected: revealed }}
+        onPress={() => setRevealed((shown) => !shown)}
+        hitSlop={12}
+        style={styles.reveal}>
+        <Text style={[styles.revealGlyph, revealed && styles.revealGlyphOn]}>{'\u{1F441}'}</Text>
+      </Pressable> : null}
+      </View>
       {needsDoneBar ? <InputAccessoryView nativeID={accessoryId}>
         <View style={styles.doneBar}>
           <Pressable accessibilityRole="button" accessibilityLabel={t('common:done')} onPress={() => Keyboard.dismiss()} hitSlop={10}>
@@ -83,6 +105,25 @@ const styles = StyleSheet.create({
     fontSize: 13,
     backgroundColor: '#fff',
     color: ACRColors.ink,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  inputInRow: {
+    flex: 1,
+    width: undefined,
+  },
+  reveal: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  revealGlyph: {
+    fontSize: 18,
+    opacity: 0.45,
+  },
+  revealGlyphOn: {
+    opacity: 1,
   },
   readOnly: {
     backgroundColor: '#f4f6f8',

@@ -16,6 +16,8 @@
     "about": "About",
     "retry": "Retry check",
     "retryCheck": "Retry check",
+    "showCode": "Show code",
+    "hideCode": "Hide code",
     "newAssessment": "New assessment",
     "required": "required",
     "optional": "optional",

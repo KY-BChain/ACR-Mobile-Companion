@@ -174,7 +174,7 @@ export const GatewayAccessScreen: React.FC = () => {
           single-use invitation is spent; showing an empty invite field then
           reads as "access lost" (Gate 12 device finding). */}
       {!accessReady && !waitingForServer && savedAccess !== 'UNKNOWN' ? <ACRCard title={t('gatewayAccess:inviteTitle')}>
-        <ACRInput value={inviteCode} onChangeText={setInviteCode} secureTextEntry autoCapitalize="none" placeholder={t('gatewayAccess:invitePlaceholder')} hint={t('gatewayAccess:inviteHint')} />
+        <ACRInput value={inviteCode} onChangeText={setInviteCode} secureTextEntry revealable autoCapitalize="none" placeholder={t('gatewayAccess:invitePlaceholder')} hint={t('gatewayAccess:inviteHint')} />
       </ACRCard> : null}
       {waitingForServer ? <ACRCard title={t('build47:signedInTitle')}>
         <Text accessibilityRole="alert" style={[styles.hint, textStyle]}>{gatewayLive === 'DOWN' ? t('build47:waitingForServer') : t('build47:reconnecting')}</Text>

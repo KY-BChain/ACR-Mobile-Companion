@@ -30,7 +30,9 @@
     "emDash": "—",
     "negative": "سلبي",
     "positive": "إيجابي",
-    "retryCheck": "إعادة المحاولة"
+    "retryCheck": "إعادة المحاولة",
+    "showCode": "إظهار الرمز",
+    "hideCode": "إخفاء الرمز"
   },
   "welcome": {
     "title": "قبل أن تبدأ",

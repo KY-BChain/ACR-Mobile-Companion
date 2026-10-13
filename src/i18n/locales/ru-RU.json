@@ -30,7 +30,9 @@
     "emDash": "—",
     "negative": "негативный",
     "positive": "позитивный",
-    "retryCheck": "Повторить проверку"
+    "retryCheck": "Повторить проверку",
+    "showCode": "Показать код",
+    "hideCode": "Скрыть код"
   },
   "welcome": {
     "title": "Перед началом",

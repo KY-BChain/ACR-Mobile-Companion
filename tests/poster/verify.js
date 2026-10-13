@@ -66,7 +66,8 @@ assert.match(welcome, /if \(!supportsPoster \|\| langModalVisible \|\| pairingNo
 assert.match(welcome, /setTimeout\(\(\) => \{/);
 assert.match(welcome, /navigation\.isFocused\(\)/);
 assert.match(welcome, /navigation\.replace\('Poster'\)/);
-assert.match(welcome, /\}, 3000\)/);
+// Build 51: the welcome screen is held for five seconds, not three.
+assert.match(welcome, /\}, 5000\)/);
 assert.match(welcome, /clearTimeout\(posterTimer\)/);
 console.log('STATIC PASS focused timer cleanup, modal safeguard, and non-Welcome redirect guard');
 

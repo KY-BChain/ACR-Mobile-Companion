@@ -1,83 +1,71 @@
 # ACR Companion for iPhone — how to get it
 
-**Written for the reviewer, not for the project.** Send this as it stands, or paste it into an
-e-mail. Nothing here needs technical knowledge.
-
-**Before sending, see "Notes for whoever sends this" at the foot of the page.**
-
----
-
 ## What you will receive, and from whom
 
-**Two separate e-mails, both from Apple.** They arrive at different times and look similar, which
-catches people out.
+**One e-mail from Apple's TestFlight**, inviting you to test ACR Companion. It goes to the address
+you gave us when you asked for the iPhone version. If you gave us the wrong address, tell us — we
+cannot redirect an invitation Apple has already sent.
 
-**The first** invites you to join Cornerstone Research International's developer team. The subject
-line mentions **App Store Connect**. You must accept this one before the second can arrive.
+**Separately, from us: an invite code.** That is not from Apple and has nothing to do with it. The
+app needs it to connect to our research service, and **without it the app cannot be used at all**.
+Keep both messages.
 
-**The second** invites you to test the app itself. It comes from **TestFlight**, Apple's app for
-trying software before public release.
-
-Both go to the e-mail address of your **Apple Account** — the address you use for the App Store. If
-you gave us a different address, tell us, or the invitations cannot be accepted.
+> **If you are a CRIL colleague**, you will receive **two** e-mails from Apple instead, and the
+> first must be accepted before the second arrives. See *"If you were invited internally"* at the
+> end.
 
 ---
 
-## Step 1 — accept the first e-mail
+## Step 1 — install TestFlight on your iPhone
 
-Open it on any device. Click **Activate** or **Accept**, and sign in with your Apple Account.
+Open the **App Store** and search for **TestFlight**. It is free and made by Apple. Install it.
 
-If it asks you to create an App Store Connect profile, do so — it takes a minute and costs nothing.
+Doing this before the invitation arrives makes the rest quicker. You need to be signed in to the
+App Store with an Apple Account to install it — that account does **not** have to be the address
+your invitation was sent to.
 
-## Step 2 — install TestFlight on your iPhone
+## Step 2 — open the invitation on the iPhone
 
-Open the **App Store** and search for **TestFlight**. It is free, made by Apple. Install it.
-
-Do this before the second e-mail arrives and the rest is quicker.
-
-## Step 3 — accept the second e-mail, on the iPhone
-
-Open the TestFlight e-mail **on the iPhone itself**, not on a computer. Tap **View in TestFlight**.
+Open Apple's TestFlight e-mail **on the iPhone itself**, not on a computer. Tap
+**View in TestFlight**.
 
 TestFlight opens and shows **ACR Companion**. Tap **Install**.
 
-## Step 4 — open the app
+## Step 3 — open the app and enter your invite code
 
-It appears on your home screen like any other app. Open it.
+The app appears on your home screen. Open it.
+
+It starts on a screen headed **Evaluation access**. Enter the **invite code** we sent you
+separately and tap **Connect securely**. From Build 51 onwards you can tap the eye beside the box
+to check what you have typed.
+
+The code must be used **within 7 days**, works on **one iPhone only**, and your access then lasts
+**30 days**.
 
 ---
 
 ## What you will see
 
-The app opens on a poster screen. **READ DETAILS** there opens a short manual, available in eight
-languages.
-
-Then:
+Once connected:
 
 1. A notice headed **Before you begin**. Tap **I understand — Begin**.
-2. A screen called **Evaluation access**. Set the selector to **Synthetic demonstration**.
-3. Five screens of clinical questions — receptor status, tumour characteristics, biomarkers, and two
-   provisional assessments. Twenty questions in all. Tap **Next** on each.
-4. A **Review** screen listing everything you entered. Tap **Submit**.
+2. Five screens of clinical questions — receptor status, tumour characteristics, biomarkers, and
+   two provisional assessments. **Twenty questions in all.** Tap **Next** on each.
+3. A **Review** screen listing everything you entered. Tap **Submit**.
 
-**You need no password, no code and no internet connection for any of this.** Go through it as many
-times as you like.
+**READ DETAILS** on the opening poster gives you a short manual in eight languages.
 
-The app will tell you, at the end, that no result can be returned. **That is expected** — see below.
+### Two ways to run it
 
----
+**Synthetic demonstration** walks you through all twenty fields without sending anything to our
+service. Nothing is submitted, no assessment is produced, and what you typed is cleared at the end.
 
-## If you want to see an actual result
+**Live platform** sends your twenty answers to our research service, which applies several hundred
+clinical rules and returns an assessment together with an explanation of how it reached it. The app
+on your phone holds none of that reasoning itself, by design.
 
-The twenty questions are only the input. The answer is produced by **our research service**, which
-applies several hundred clinical rules to what you entered and returns an assessment with an
-explanation of how it reached it. The app on your phone deliberately holds none of that.
-
-To see it working, you need two things from us: a short **access code**, and the service switched on
-at an agreed time. **Just ask** and we will arrange a slot — it takes a few minutes.
-
-Without the code, the app is a complete guided walk-through of the assessment. With it, you see the
-reasoning as a clinician would.
+If the service is not running you will be told so plainly, and no result will appear. If that is
+not what you expected, tell us and we will switch it on at an agreed time.
 
 ---
 
@@ -98,39 +86,59 @@ feedback with a screenshot.
 
 | | |
 |---|---|
-| No e-mail arrived | check spam, and confirm with us which address your Apple Account uses |
-| Second e-mail won't open | open it **on the iPhone**, not a computer |
-| TestFlight says the invitation expired | tell us and we will send it again |
-| App will not install | make sure iOS is version 14 or later |
+| No e-mail arrived | check spam, and confirm with us which address we were given |
+| The invitation will not open | open it **on the iPhone**, not a computer |
+| TestFlight says the invitation expired | tell us and we will send another |
+| The app will not install | iOS must be **13.4 or later** |
+| **Evaluation access** will not accept the code | check it has not been more than 7 days, and that you are not using a second phone — each code works on one device |
+| The five screens will not open | the invite code has not been accepted yet. It is what unlocks them |
 
 Contact: **info@acragent.com**
 
 ---
+
+## If you were invited internally
+
+A few reviewers working directly with us are added to our Apple developer team instead. Only CRIL
+colleagues are, and you will have been told. The difference:
+
+- You receive **two** e-mails from Apple. The first, mentioning **App Store Connect**, invites you
+  to join Cornerstone Research International's developer team. Accept it — click **Activate** or
+  **Accept** and sign in — before the TestFlight e-mail can arrive.
+- Both must go to the address of a **real Apple Account**, and the iPhone you review on must be
+  signed in to that same account.
+
+Everything from Step 1 onwards is then identical.
+
 ---
 
-## Notes for whoever sends this — remove before sending
+# Appendix — what ACR is, and the other versions
 
-**This is the internal TestFlight route**, which is why there are two e-mails. The recipient is being
-added as a user on CRIL's Apple team, so they will be able to open the ACR Companion record in App
-Store Connect and see builds, dates and feedback. They cannot see anyone's personal Apple Account,
-payment details, banking, agreements, or any other app. The steps for adding them are **E1 to E5** in
-`IOS_TESTFLIGHT_PROCEDURE.md`.
+The **ACR platform** assesses a cancer diagnosis from twenty clinical answers. A formal ontology of
+several hundred clinical rules does the reasoning, AI agents explain how it reached its conclusion,
+and an optional Bayesian layer adds probabilities and uncertainty bounds. **ACR Companion** is the
+mobile companion to that platform — the same five screens and twenty fields, on a phone. Breast
+cancer is implemented today; a prostate cancer ontology is being added as of October 2026. The
+project's website is **www.acragent.com**.
 
-**External TestFlight would need only one e-mail and no team account**, but it was refused twice
-under Guideline 2.2 on 2 and 3 October 2026 and is treated as closed. See the status block of that
-document.
+## Getting the app
 
-**Two decisions before sending:**
+One address covers all of it: **www.acragent.com**. Create an account there, sign in, and a
+**Mobile app** button appears at the bottom right of the screen. You will not see it until you have
+signed in. Then choose the version you need.
 
-1. **Whether to name CRIL in the first paragraph.** It is accurate, but it tells the recipient the
-   legal entity before they have accepted anything.
-2. **Whether to offer the live demonstration at all.** It commits you to having T1 to T4 running at
-   an agreed time, and to issuing an invite code that is redeemed within 7 days and binds to that one
-   device. For someone who only wants to see the app, the walk-through alone is enough and nothing
-   needs to be switched on.
+| | |
+|---|---|
+| **iPhone** | Request it on that page. We arrange the TestFlight invitation by hand |
+| **Android** | Request it on that page. Once approved, we e-mail you a download code |
+| **WeChat mini-program** | Also available, for use inside China. Just ask |
 
-**Remove the access when they are finished.** App Store Connect → Users and Access → Users → select
-the person → Remove. An investor who passes should not keep a login to the developer account.
+Each account may hold up to **three** download codes and **three** invite codes.
 
-**Build 50 is marked Rejected in App Store Connect.** That applies to external testing only. Internal
-testing needs no Apple review, so the build installs normally by this route.
+## Why there are so many steps
+
+Our apologies. The platform handles clinical data, and EU healthcare data protection — **GDPR**
+above all — governs who may be given access and how that is recorded. Apple's review rules add a
+further layer for the iPhone. None of it is caution for its own sake.
+
+Contact: **info@acragent.com**

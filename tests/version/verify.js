@@ -67,4 +67,4 @@ assert.equal(
 const gatewayConfig = read('src/config/gateway.ts');
 assert.match(gatewayConfig, /ACTIVE_GATEWAY_ORIGIN: GovernedOrigin = BUILD45_REVIEW_ORIGIN/, 'the compiled origin is the Build 45 review hostname');
 assert.doesNotMatch(gatewayConfig, /http:\/\//, 'no cleartext origin is compiled into the app');
-console.log('PASS version/native consistency: Expo, Android, iOS and derived gateway build ID are 0.6.7 / 48; one compiled https origin and no cleartext exception on either platform');
+console.log(`PASS version/native consistency: Expo, Android, iOS and derived gateway build ID are ${expectedVersion} / ${expectedBuild}; one compiled https origin and no cleartext exception on either platform`);

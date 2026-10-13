@@ -1,6 +1,6 @@
 # Issuing codes to a reviewer
 
-**Updated:** 29 September 2026 · **Applies to:** v0.6.7 (Build 49)
+**Updated:** 10 October 2026 · **Applies to:** v0.6.7 (Build 50)
 
 A reviewer needs **two** codes, and they are not interchangeable. Issue them in this order, and send
 them in **two separate messages**.
@@ -65,16 +65,19 @@ alongside a link that would let a stranger use both.
 
 1. Signs in at `www.blockenergy.net` with their website account.
 2. Clicks the **Android app** button, bottom right of the page they land on.
-3. Types the download code and downloads `ACRCompanion-v0.6.7-build49.apk` (about 70 MB).
-4. Uninstalls any older ACR Companion first — Android refuses to install over an app signed with a
-   different key.
+3. Types the download code and downloads `ACRCompanion-v0.6.7-build50.apk` (about 70 MB).
+4. **Build 48, 49 and 50 all carry the same release key, so Build 50 installs straight over them
+   and the stored session survives.** Only uninstall first if Android actually refuses — which it
+   will if the phone holds a *debug* build, signed with a different key. Uninstalling loses the
+   session and costs a fresh invite code.
 5. Opens the file, allows the browser to install unknown apps when prompted, and accepts the warning
    that the app did not come from a store.
 6. Opens ACR Companion and enters the **invite code** from Part I.
 
 The page shows the file's size and SHA-256 checksum, read from the file itself, so a careful reviewer
-can confirm the download arrived intact. For Build 49 that checksum is
-`7767e54b941ed4517059b534f6fe297c88bb3fa67e070762d771e20ae4a2e9a6`.
+can confirm the download arrived intact. For Build 50 that checksum is
+`c0f141747ad95b1286202698b5da3bf3a0a9c0630ce0e4c604dcb35a4a6da967` (73,212,617 bytes), published
+10 October 2026.
 
 ### D6 — Check, and cancel if you need to
 
@@ -149,7 +152,7 @@ The session then lasts **30 days** and is bound to that one device.
 
 ### Two notes for the WeChat mini-program
 
-- The mini-program identifies itself to the gateway as the iOS/Android app (`mob-v0.6.7+49`, channel
+- The mini-program identifies itself to the gateway as the iOS/Android app (`mob-v0.6.7+50`, channel
   MOBILE, set in `config/appIdentity.js`). That is why a standard code works. Whether it should have
   its own identity is still an open decision.
 - **In WeChat DevTools:** switch off domain checking in the project settings. **On a phone:**
