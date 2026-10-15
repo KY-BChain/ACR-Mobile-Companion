@@ -15,7 +15,14 @@
 
 set -u
 
-ENDPOINT="https://www.blockenergy.net/api/log-ingest.php"
+# Both sites. mobile-review.php — and its T3 traffic tab — runs on each of
+# them, and each has its OWN sites/private/, so a push to one leaves the other
+# tab showing nothing. The same key must therefore be installed on both.
+# Comment a line out to stop pushing to that site.
+ENDPOINTS=(
+  "https://www.acragent.com/api/log-ingest.php"
+  "https://www.blockenergy.net/api/log-ingest.php"
+)
 KEY_FILE="$HOME/.acr-gateway/log-push.key"
 LOG_DIR="$HOME/.acr-gateway/logs"
 INTERVAL=60
@@ -77,30 +84,49 @@ print(json.dumps(d))" 2>/dev/null) || return 1
     say "log        : $(basename "$log")"
     say "lines ready: ${n:-0}"
     say "services   : $(service_codes)"
-    say "endpoint   : $ENDPOINT  (nothing sent in status mode)"
+    for e in "${ENDPOINTS[@]}"; do say "endpoint   : $e  (nothing sent in status mode)"; done
     return 0
   fi
 
-  local reply
-  reply=$(curl -s --max-time 25 -X POST "$ENDPOINT" \
+  # Each site is pushed to and reported on separately: one site being
+  # unreachable must not hide a success on the other, nor stop the loop.
+  local reply site code out added held failures=0
+  for endpoint in "${ENDPOINTS[@]}"; do
+    site="${${endpoint#https://}%%/*}"
+    # One request only. The status code is appended on its own line and split
+    # off, so the payload is never posted twice — which would both waste a push
+    # and make the second reply report "0 new".
+    out=$(curl -s --max-time 25 -X POST "$endpoint" \
             -H "X-ACR-Key: $KEY" -H 'Content-Type: application/json' \
-            --data-binary "$payload" 2>/dev/null)
+            --data-binary "$payload" -w '\n%{http_code}' 2>/dev/null)
+    code="${out##*$'\n'}"
+    reply="${out%$'\n'*}"
 
-  if print -r -- "$reply" | grep -q '"success":true'; then
-    local added held
-    added=$(print -r -- "$reply" | sed -n 's/.*"added":\([0-9]*\).*/\1/p')
-    held=$(print -r -- "$reply"  | sed -n 's/.*"held":\([0-9]*\).*/\1/p')
-    ok "pushed — ${added:-0} new, ${held:-?} held on the server (offered ${n:-0})"
-  else
-    bad "push failed: ${reply:-no reply}"
-    return 1
-  fi
+    if print -r -- "$reply" | grep -q '"success":true'; then
+      added=$(print -r -- "$reply" | sed -n 's/.*"added":\([0-9]*\).*/\1/p')
+      held=$(print -r -- "$reply"  | sed -n 's/.*"held":\([0-9]*\).*/\1/p')
+      ok "$site — ${added:-0} new, ${held:-?} held (offered ${n:-0})"
+    else
+      # The common failures say nothing useful on their own, so name the cause.
+      case "$code" in
+        404) bad "$site — api/log-ingest.php is not on this server. Upload it." ;;
+        401) bad "$site — key refused. sites/private/log-ingest.key must match ~/.acr-gateway/log-push.key on THIS site." ;;
+        500) bad "$site — the endpoint errored. Check sites/private/ exists and is writable." ;;
+        000) bad "$site — no reply. Network, or the host is down." ;;
+        *)   bad "$site — HTTP ${code:-?}: ${reply:-no reply}" ;;
+      esac
+      failures=$(( failures + 1 ))
+    fi
+  done
+  (( failures == ${#ENDPOINTS[@]} )) && return 1
+  return 0
 }
 
 case "$mode" in
   once|status) push_once ;;
   loop)
-    say "pushing to $ENDPOINT every ${INTERVAL}s — Ctrl+C to stop"
+    say "pushing to ${#ENDPOINTS[@]} site(s) every ${INTERVAL}s — Ctrl+C to stop"
+    for e in "${ENDPOINTS[@]}"; do say "  $e"; done
     say "this reads the log only; it never touches T1 to T4"
     while true; do
       push_once

@@ -5,6 +5,9 @@
     },
     {
       "path": "../wechat-acr-companion"
+    },
+    {
+      "path": "../ACR-platform"
     }
   ],
   "settings": {

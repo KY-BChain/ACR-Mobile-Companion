@@ -192,3 +192,6 @@ print -P "\n%BTo stop, in this order:%b"
 print "  1. T3 + T4:  cd $REPO_DIR && scripts/build50-review-service.sh stop"
 print "  2. T2:       Ctrl+C in the 'T2 · acr-api tunnel' window"
 print "  3. T1:       Ctrl+C in the 'T1 · ACR Platform' window"
+
+"$REPO_DIR/scripts/quiet-check.sh"
+

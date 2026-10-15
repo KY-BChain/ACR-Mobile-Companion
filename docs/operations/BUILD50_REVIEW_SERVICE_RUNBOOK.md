@@ -389,6 +389,124 @@ node src/capture-tool.js --authorize-synthetic-capture \
 
 **Review, then approve.** The capture is written as a candidate that the gateway will not replay. Kraken reviews the captured result: subtype, tier 3, risk and treatments. Only after that approval is the manifest changed to `"verificationStatus": "VERIFIED_PLATFORM_CAPTURE"` and `"eligibleForDeliveredReplay": true`, and the folder renamed to `demo-mob-v0.6.7+50`. The next `start` then reports `synthetic demo fixture: …`.
 
+## 10. The T3 traffic tab in `mobile-review.php`
+
+Added 14 October 2026. A tab on the admin module that shows what T3 has recorded, without
+the page ever speaking to T3.
+
+### 10.1 Why it works the way it does
+
+`mobile-review.php` runs on the ISP's web server. T3 runs on this MacBook and writes its
+log here. The ISP cannot read that, so nothing on the website can show T3 activity
+directly. The tab therefore sits at the end of a chain that already existed:
+
+```
+T3  (MacBook, 127.0.0.1:3001)
+ │   writes one JSON line per request
+ ▼
+~/.acr-gateway/logs/gateway-<UTC>.log           ← the record (see §3)
+ │
+ │   scripts/acr-log-push.sh, every 60 s
+ │   POST with the shared key in ~/.acr-gateway/log-push.key
+ ▼
+https://www.<site>/api/log-ingest.php
+ │   keeps allow-listed fields only; rolling 4,000 lines
+ ▼
+~/sites/private/gateway-activity.jsonl          ← a window, not an archive
+~/sites/private/gateway-status.json             ← last push time, T1–T4 codes
+ │
+ ▼
+mobile-review.php?view=t3                       ← this tab
+ │
+ ▼
+the browser's own localStorage                  ← a convenience, nobody's record
+```
+
+Two consequences the tab states on screen, because they are easy to misread:
+
+- It is **as fresh as the last push and no fresher**. If `acr-log-push.sh` is not running,
+  the tab shows nothing new — which looks identical to nothing happening. The tab
+  distinguishes the two: "Nothing has ever been pushed", "Stale — the last push was N
+  minutes ago", or "Current".
+- The push **omits health probes** (`/m/v1/live`). The monitor's own traffic would
+  otherwise bury the device activity.
+
+### 10.2 The three switches
+
+All three default to the quiet choice, and each is a different colour so you can see which
+is live without reading.
+
+| Switch | Off — the default | On | Colour when on |
+|---|---|---|---|
+| Traffic feed | nothing is read, nothing polled | reads the pushed activity | green |
+| Plain English | the native log line | the same entry explained | amber |
+| Live for 2 minutes | a snapshot, with its timestamp | refreshes every 5 s, stops by itself | purple |
+
+**Traffic feed off is enforced in the PHP, not hidden in the markup.** With it off, the
+activity file is not opened and no refresh is armed. A page left open in a spare tab does
+not sit there polling.
+
+**The live window closes itself.** The deadline travels in the URL as `until=<epoch>`, so
+each refresh carries the same deadline forward rather than extending it. Two minutes means
+two minutes. Turning the feed off while live stops it immediately — the feed switch wins.
+
+**Plain English covers eleven cases**, including the ones that need an action:
+`INVITE_INVALID` ("a code that was wrong, already used, or past its date"),
+`CLIENT_BUILD_MISMATCH` ("the reviewer must update the app before their code will work"),
+and `MISDIRECTED_REQUEST` ("correct behaviour — almost always a scanner, not a reviewer").
+The service codes get the same treatment: `530 — the tunnel is up but nothing is behind it`.
+
+### 10.3 Why the display is held in the browser
+
+Each entry the page renders is written to that browser's `localStorage`. With the feed off,
+the page shows the held copy under **Held in this browser** instead of asking the server
+for anything. So the feed stays genuinely off, yet reopening the tab still shows what you
+were last looking at.
+
+Each stored entry carries **both** renderings — the native line and the English for it —
+so the Plain English switch still works on the held copy. The translation is computed in
+PHP and sent with the data, so there is one translator rather than two that drift apart.
+
+The held copy is per-browser and per-site: `localStorage` on acragent.com is invisible to
+blockenergy.net, and nothing reaches the server, another machine, or another browser. It
+survives closing the tab and the browser. It goes when **Clear what this browser is
+holding** is pressed, or site data is cleared by hand.
+
+**It is not an audit trail**, and the tab says so. It is a convenience. The record is T3's
+log on the MacBook — archived by `scripts/archive-gateway-logs.sh`, documented in
+[GATEWAY_LOG_ARCHIVE.md](GATEWAY_LOG_ARCHIVE.md).
+
+### 10.4 Operation
+
+| | Step |
+|---|---|
+| B1 | On the MacBook, **before** turning the tab's feed on, send the log up: `scripts/acr-log-push.sh once`. One push, then it exits. Without it the tab shows only what was last pushed, and says so. |
+| B1a | Only if you intend to watch for a while: `scripts/acr-log-push.sh` instead, which pushes every 60 s until Ctrl+C. Not left running otherwise — its own health probe adds a `/m/v1/live` line to the log each minute, which is noise the tab then has to discard. |
+| B2 | Sign in to `mobile-review.php` on the site you want, and open **T3 traffic**. |
+| B3 | Turn on **Traffic feed**. The service codes for T1–T4 and the pushed activity appear. |
+| B4 | Turn on **Plain English** if you want each line explained rather than raw. |
+| B5 | Turn on **Live for 2 minutes** while watching a reviewer work. It stops on its own. |
+| B6 | Leave the tab. Next time it opens with the feed off, showing what the browser kept. |
+| B7 | **Clear what this browser is holding** when you want that gone. |
+
+### 10.5 Troubleshooting
+
+| Symptom | Cause |
+|---|---|
+| "Nothing has ever been pushed to this server" | `acr-log-push.sh` has never run against this site, or the key in `~/.acr-gateway/log-push.key` does not match `~/sites/private/log-ingest.key` on the server. The two must be identical, **per site** — `sites/private/` is not shared between acragent.com and blockenergy.net. |
+| "Stale. The last push was N minutes ago" | The push has stopped, or the MacBook is off the network. The services may be perfectly healthy; this says only that nothing is reporting. |
+| Feed on, but no entries | Nothing reviewer-facing has happened since the window began. Health probes are deliberately not pushed. |
+| T3 shows a code other than 200 | See §4. The tab reports what the push measured; it cannot reach T3 to check. |
+| Held copy does not reappear | A private window, or site data cleared. The page renders correctly either way. |
+
+### 10.6 Deployment
+
+One file, to both sites: `mobile-review.php` → `/sites/<site>/mobile-review.php`.
+
+**Do not upload** `private/gateway-activity.jsonl` or `private/gateway-status.json` from
+the test tree. Those are local demo data generated from the real log; on the live servers
+`api/log-ingest.php` writes them.
+
 ## Additional info re invite code (KY 13SEPT26)
 
 ### 1. The script that generates invite codes

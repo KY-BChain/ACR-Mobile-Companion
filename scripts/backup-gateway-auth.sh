@@ -27,8 +27,12 @@
 
 set -euo pipefail
 
-STORE="$HOME/.acr-gateway/gate10/auth.db"
-PEPPER="$HOME/.acr-gateway/gate10/pepper.bin"
+# Honour the same override the service script uses, so a store that has been
+# moved to another volume is still the one that gets backed up. Without this the
+# backup would quietly keep copying the old location and report success.
+AUTH_DIR="${ACR_AUTH_DIR:-${ACR45_AUTH_DIR:-$HOME/.acr-gateway/gate10}}"
+STORE="$AUTH_DIR/auth.db"
+PEPPER="$AUTH_DIR/pepper.bin"
 DEST_ROOT="/Volumes/AndroidDev"
 KEEP=3
 

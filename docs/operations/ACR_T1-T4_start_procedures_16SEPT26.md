@@ -139,3 +139,8 @@ If you ever want certainty rather than inference, this asks the running process 
 lsof -p $(lsof -nP -iTCP:3001 -sTCP:LISTEN -t) | grep '\.log'
 ```
 One thing to remember: if you restart the services, a new log is created and your tail -f will keep watching the old, now-dead file silently. Restart the tail whenever you restart T3.
+
+## To see T3 traffic in Terminal:
+```sh
+tail -f "$(ls -t ~/.acr-gateway/logs/gateway-*.log | head -1)"
+```
