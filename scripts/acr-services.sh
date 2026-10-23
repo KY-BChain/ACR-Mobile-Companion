@@ -193,5 +193,17 @@ print "  1. T3 + T4:  cd $REPO_DIR && scripts/build50-review-service.sh stop"
 print "  2. T2:       Ctrl+C in the 'T2 · acr-api tunnel' window"
 print "  3. T1:       Ctrl+C in the 'T1 · ACR Platform' window"
 
+section "Quick status — scripts/quiet-check.sh"
+say "Reads the four services and T3's own log, and shows the last reviewer activity"
+say "and the live sessions. Read-only: it changes nothing and contacts no reviewer."
 "$REPO_DIR/scripts/quiet-check.sh"
+
+section "T3 traffic tab — scripts/acr-log-push.sh once"
+say "Sends the latest T3 gateway activity to www.acragent.com and www.blockenergy.net,"
+say "so the T3 traffic tab in mobile-review.php shows current data. One push, then it"
+say "exits. Reads the log only; it never touches T1 to T4. Run it again before viewing"
+say "the tab later: cd $REPO_DIR && scripts/acr-log-push.sh once"
+"$REPO_DIR/scripts/acr-log-push.sh" once
+
+
 
