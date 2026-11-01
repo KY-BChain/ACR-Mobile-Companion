@@ -74,6 +74,10 @@ describe('canonical platform mapper', () => {
     expect(mapAssessmentToPlatform(mobileRequest({ her2Low: input })).patientData.her2Low).toBe(output);
   });
 
+  test.each([['PAGET', "Paget's disease"], ['IDC', 'IDC'], ['ILC', 'ILC'], ['DCIS', 'DCIS'], [null, null]])('sends histology %p as the website code %p', (input, output) => {
+    expect(mapAssessmentToPlatform(mobileRequest({ histologicalSubtype: input })).patientData.histologicalSubtype).toBe(output);
+  });
+
   test('maps omitted optionals to explicit null without inventing platform facts', () => {
     const minimal = mobileRequest();
     for (const field of ['stage', 'grade', 'histologicalSubtype', 'nodalStatus', 'age', 'ca153', 'cea', 'surgeryDate', 'tumorSize', 'gender', 'ecogScore', 'pdl1Status', 'her2Low', 'lvef', 'treatmentIntent']) delete minimal.assessment[field];

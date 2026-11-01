@@ -8,6 +8,9 @@
     },
     {
       "path": "../ACR-platform"
+    },
+    {
+      "path": "../REVIEW-WORKTREES"
     }
   ],
   "settings": {

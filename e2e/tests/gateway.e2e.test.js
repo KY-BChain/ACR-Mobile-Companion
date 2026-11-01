@@ -35,17 +35,19 @@ function platformResponse() {
   };
 }
 
-test('full five-screen request reaches configured platform adapter unchanged at the clinical fact boundary', async () => {
+test('full five-screen request maps phone codes at the configured platform adapter boundary', async () => {
   let sent;
   const adapter = new PlatformAdapter({
     upstreamInferUrl: 'https://verified-route.example/api/infer', timeoutMs: 1000,
     fetchImpl: async (url, options) => { sent = JSON.parse(options.body); return { ok: true, json: async () => platformResponse() }; },
   });
-  const result = await adapter.infer(request);
+  const pagetRequest = { ...request, assessment: { ...request.assessment, histologicalSubtype: 'PAGET' } };
+  const result = await adapter.infer(pagetRequest);
   assert.equal(Object.keys(sent.patientData).length, 20);
   assert.equal(sent.patientData.nodalStatus, 'N0');
   assert.equal(sent.patientData.tumorSize, 2.5);
   assert.equal(sent.patientData.her2Low, false);
+  assert.equal(sent.patientData.histologicalSubtype, "Paget's disease");
   assert.equal(sent.bayesianEnhanced, false);
   assert.equal(result.resultMode, 'LIVE_REASONER');
   assert.deepEqual(result.data, platformResponse().data);

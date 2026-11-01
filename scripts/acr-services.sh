@@ -7,7 +7,10 @@
 # before it signals them, so closing the platform is always your decision.
 
 REPO_DIR="${0:A:h:h}"
-PLATFORM_DIR="/Users/Kraken/DAPP/ACR-platform/ACR-Ontology-Interface"
+# Two T1 versions until T1 v2.1 is approved (Kraken, 29 Oct 2026); the start asks which one serves the platform.
+T1_LIVE_DIR="/Users/Kraken/DAPP/ACR-T1-live-pre-v2.1/ACR-Ontology-Interface"
+T1_V21_DIR="/Users/Kraken/DAPP/ACR-platform/ACR-Ontology-Interface"
+PLATFORM_DIR=""
 REVIEW_SCRIPT="$REPO_DIR/scripts/build50-review-service.sh"
 T1_WAIT=300
 T2_WAIT=120
@@ -38,6 +41,30 @@ APPLESCRIPT
 
 t2_pid() { pgrep -f 'cloudflared tunnel run --url http://localhost:8080 acr-api' | head -1; }
 t1_pid() { listening 8080; }
+t1_dir_of() { lsof -a -p "$1" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p'; }
+t1_name() {
+  case "$1" in
+    "$T1_LIVE_DIR") print "T1 live (before v2.1)" ;;
+    "$T1_V21_DIR")  print "T1 v2.1 (under review)" ;;
+    *)              print "T1 from $1" ;;
+  esac
+}
+# Waits for Kraken's choice; ACR_T1=live or ACR_T1=v2.1 answers it in advance.
+choose_t1() {
+  local ans="${ACR_T1:-}"
+  if [[ -z "$ans" ]]; then
+    print -P "\n%BWhich T1 serves the ACR Platform (websites and both phone apps)?%b"
+    print "  1  T1 live (before v2.1)   $T1_LIVE_DIR"
+    print "  2  T1 v2.1 (under review)  $T1_V21_DIR"
+    read -r "ans?Choose 1 or 2: "
+  fi
+  case "$ans" in
+    1|live) PLATFORM_DIR="$T1_LIVE_DIR" ;;
+    2|v2.1) PLATFORM_DIR="$T1_V21_DIR" ;;
+    *) print -P "%F{red}No T1 chosen — nothing was started.%f"; exit 2 ;;
+  esac
+  ok "Chosen: $(t1_name "$PLATFORM_DIR")"
+}
 
 # Hold the Mac awake for as long as a given process lives.
 #
@@ -118,6 +145,7 @@ case "${1:-start}" in
 esac
 
 print -P "%BACR services — T1 → T2 → T3 + T4%b  ($(date '+%d %b %Y %H:%M'))"
+choose_t1
 
 section "Checks"
 command -v mvn >/dev/null && ok "Maven found" || fail "Maven (mvn) not found"
@@ -127,10 +155,12 @@ command -v cloudflared >/dev/null && ok "cloudflared found" || fail "cloudflared
 
 section "T1 — ACR Platform (Spring Boot, port 8080)"
 if t1_ready; then
-  ok "T1 is already running and healthy — not started again"
+  running="$(t1_dir_of "$(t1_pid)")"
+  ok "T1 is already running and healthy — not started again: $(t1_name "$running")"
+  [[ "$running" == "$PLATFORM_DIR" ]] || fail "The running T1 is not the one chosen — stop it first (scripts/acr-services.sh stop), then start again"
 else
   [[ -n "$(listening 8080)" ]] && fail "Port 8080 is in use but T1 is not healthy — check the program on port 8080 first"
-  open_window "T1 · ACR Platform" "cd '$PLATFORM_DIR' && mvn spring-boot:run -Dspring-boot.run.profiles=hybrid" || fail "Could not open the T1 Terminal window"
+  open_window "T1 · $(t1_name "$PLATFORM_DIR")" "cd '$PLATFORM_DIR' && mvn spring-boot:run -Dspring-boot.run.profiles=hybrid" || fail "Could not open the T1 Terminal window"
   ok "T1 window opened — starting Spring Boot and loading the ontology"
   waited=0
   until t1_ready; do
