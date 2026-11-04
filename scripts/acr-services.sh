@@ -1,7 +1,7 @@
 #!/bin/zsh
 #
-#   scripts/acr-services.sh          start T1, T2, then T3 + T4, each after the last is healthy
-#   scripts/acr-services.sh stop     stop them in reverse: T4, T3, then T2 and T1 on your word
+#   scripts/acr-services.sh          start T1, T2, T3 + T4, then the T5L sync, each after the last is healthy
+#   scripts/acr-services.sh stop     stop them in reverse: T5L sync, T4, T3, then T2 and T1 on your word
 #
 # Claude never starts or stops T1 or T2. The stop action asks you to confirm
 # before it signals them, so closing the platform is always your decision.
@@ -12,6 +12,11 @@ T1_LIVE_DIR="/Users/Kraken/DAPP/ACR-T1-live-pre-v2.1/ACR-Ontology-Interface"
 T1_V21_DIR="/Users/Kraken/DAPP/ACR-platform/ACR-Ontology-Interface"
 PLATFORM_DIR=""
 REVIEW_SCRIPT="$REPO_DIR/scripts/build50-review-service.sh"
+# T5L sync: imports T1 v2.1's two outboxes into the local T5L record every T5L_WATCH seconds.
+# Paths come from t5l/config.json. The live T1 before v2.1 writes no outbox, so T5L runs only with v2.1.
+T5L_DIR="/Users/Kraken/DAPP/ACR-platform"
+T5L_PY="/usr/bin/python3"
+T5L_WATCH=60
 T1_WAIT=300
 T2_WAIT=120
 T3_WAIT=150
@@ -40,6 +45,7 @@ APPLESCRIPT
 }
 
 t2_pid() { pgrep -f 'cloudflared tunnel run --url http://localhost:8080 acr-api' | head -1; }
+t5l_pid() { pgrep -f 't5l.sync --watch' | head -1; }
 t1_pid() { listening 8080; }
 t1_dir_of() { lsof -a -p "$1" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p'; }
 t1_name() {
@@ -94,7 +100,20 @@ keep_awake() {
 }
 
 stop_all() {
-  print -P "%BACR services — stop in reverse: T4 → T3 → T2 → T1%b  ($(date '+%d %b %Y %H:%M'))"
+  print -P "%BACR services — stop in reverse: T5L sync → T4 → T3 → T2 → T1%b  ($(date '+%d %b %Y %H:%M'))"
+
+  section "T5L — local CDS results record (sync)"
+  local sp="$(t5l_pid)"
+  if [[ -n "$sp" ]]; then
+    # Ctrl+C equivalent. Each import pass is its own SQLite transaction, so an
+    # interrupted pass leaves nothing half-written; the next start carries on
+    # from the saved outbox offsets.
+    kill -INT "$sp" 2>/dev/null
+    for i in $(seq 1 10); do [[ -z "$(t5l_pid)" ]] && break; sleep 1; done
+    [[ -z "$(t5l_pid)" ]] && ok "T5L sync stopped" || fail "T5L sync did not stop — use Ctrl+C in its window"
+  else
+    ok "T5L sync is already stopped"
+  fi
 
   section "T4 + T3 — mobile app review service"
   if [[ -n "$(listening 3001)" ]]; then
@@ -211,6 +230,22 @@ fi
 [[ "$(code_of http://mobile-gateway-review.acragent.com/m/v1/live)" == 403 ]] && ok "Mobile gateway refuses unencrypted HTTP (403)" \
   || fail "Mobile gateway answers unencrypted HTTP — stop it with: scripts/build50-review-service.sh stop"
 
+section "T5L — local CDS results record (sync every ${T5L_WATCH}s)"
+if [[ "$PLATFORM_DIR" != "$T1_V21_DIR" ]]; then
+  say "Skipped: the live T1 before v2.1 writes no outbox, so there is nothing for T5L to import."
+elif [[ -n "$(t5l_pid)" ]]; then
+  ok "T5L sync is already running (PID $(t5l_pid)) — not started again"
+else
+  [[ -f "$T5L_DIR/t5l/config.json" ]] || fail "T5L config not found: $T5L_DIR/t5l/config.json"
+  # One pass first, here, so a fault shows now rather than in a window nobody reads.
+  first="$(cd "$T5L_DIR" && "$T5L_PY" -m t5l.sync 2>&1)" || fail "T5L sync pass failed: $(print -r -- "$first" | tail -1)"
+  ok "T5L first pass: ${first#SYNC }"
+  open_window "T5L · sync every ${T5L_WATCH}s" "cd '$T5L_DIR' && '$T5L_PY' -m t5l.sync --watch $T5L_WATCH" || fail "Could not open the T5L Terminal window"
+  for i in $(seq 1 10); do [[ -n "$(t5l_pid)" ]] && break; sleep 1; done
+  [[ -n "$(t5l_pid)" ]] && ok "T5L sync running (PID $(t5l_pid)) — record: $(sed -n 's/.*"db": *"\([^"]*\)".*/\1/p' "$T5L_DIR/t5l/config.json")" \
+    || fail "T5L sync window opened but the sync is not running — see the T5L window"
+fi
+
 section "All services are up"
 ok "ACR Platform website back end: https://api.acragent.com"
 ok "ACR Companion mobile app service: https://mobile-gateway-review.acragent.com"
@@ -218,10 +253,12 @@ ok "The MacBook stays awake while T1 and the mobile gateway (T3) run"
 say "The screen is still free to sleep — only the machine is held awake."
 say "Keep it on mains power: the -s assertion does not apply on battery, and a"
 say "closed lid sleeps the Mac whatever caffeinate says."
-print -P "\n%BTo stop, in this order:%b"
-print "  1. T3 + T4:  cd $REPO_DIR && scripts/build50-review-service.sh stop"
-print "  2. T2:       Ctrl+C in the 'T2 · acr-api tunnel' window"
-print "  3. T1:       Ctrl+C in the 'T1 · ACR Platform' window"
+print -P "\n%BTo stop everything in order:%b  $REPO_DIR/scripts/acr-services.sh stop"
+print "  or by hand:"
+print "  1. T5L:      Ctrl+C in the 'T5L · sync' window"
+print "  2. T3 + T4:  cd $REPO_DIR && scripts/build50-review-service.sh stop"
+print "  3. T2:       Ctrl+C in the 'T2 · acr-api tunnel' window"
+print "  4. T1:       Ctrl+C in the 'T1 · ACR Platform' window"
 
 section "Quick status — scripts/quiet-check.sh"
 say "Reads the four services and T3's own log, and shows the last reviewer activity"
